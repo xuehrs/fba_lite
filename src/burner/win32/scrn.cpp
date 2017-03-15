@@ -37,8 +37,6 @@ static int bBackFromHibernation = 0;
 HWND hwndChat = NULL;
 WNDPROC pOldWndProc = NULL;
 
-bool bRescanRoms = false;
-
 //static bool bDrag = false;
 static int nDragX, nDragY;
 //static int nOldWindowX, nOldWindowY;
@@ -823,7 +821,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
             if (kNetGame)
             {
                 kNetGame = 0;
-                //					kailleraEndGame();
                 Kaillera_End_Game();
                 DeActivateChat();
                 PostQuitMessage(0);

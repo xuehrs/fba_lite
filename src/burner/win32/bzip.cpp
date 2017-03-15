@@ -1,6 +1,5 @@
 // Burner Zip module
 #include "burner.h"
-#include "shlwapi.h"
 
 int nBzipError = 0;												// non-zero if there is a problem with the opened romset
 
@@ -413,6 +412,9 @@ int BzipStatus()
     return BZIP_STATUS_BADDATA;
 }
 
+//打开当前选择的ROM;
+//失败返回1
+//成功返回0
 int BzipOpen(bool bootApp)
 {
     int nMemLen;														// Zip name number
@@ -464,6 +466,7 @@ int BzipOpen(bool bootApp)
         char *szName = NULL;
         bool bFound = false;
 
+		//获取游戏的zip名,有些游戏不止1个zip
         if (BurnDrvGetZipName(&szName, y))
         {
             break;
@@ -477,31 +480,14 @@ int BzipOpen(bool bootApp)
             if(PathFileExists(szFullName))
             {
                 bFound = true;
-
                 szBzipName[z] = (TCHAR *)malloc(MAX_PATH * sizeof(TCHAR));
                 _tcscpy(szBzipName[z], szFullName);
-
+				z++;
                 if (!bootApp)
                 {
                     FBAPopupAddText(PUF_TEXT_DEFAULT, MAKEINTRESOURCE(IDS_ERR_LOAD_FOUND), szName, szBzipName[z]);
                 }
-
-                z++;
-                if (z >= BZIP_MAX) break;
-
-                // Look further in the last ten paths specified, so you can put files with ROMs
-                // used only by FB Alpha there without causing problems with dat files
-                if (d < DIRS_MAX - 11)
-                {
-                    d = DIRS_MAX - 11;
-                }
-                else
-                {
-                    if (d >= DIRS_MAX - 1)
-                    {
-                        break;
-                    }
-                }
+				break;
             }
         }
 
@@ -519,7 +505,6 @@ int BzipOpen(bool bootApp)
     // Locate the ROM data in the zip files
     for (int z = 0; z < BZIP_MAX; z++)
     {
-
         if (szBzipName[z] == NULL)
         {
             continue;

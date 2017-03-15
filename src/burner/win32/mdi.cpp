@@ -48,12 +48,7 @@ bool				GetThemeStatus		();
 static bool bDrag = false;
 static int nOldWindowX, nOldWindowY;
 static float nDownX, nDownY, nMoveX, nMoveY;
-HBITMAP hbitmap = NULL;
-void StretchBmForClient(HDC, HWND, HBITMAP);
 
-//static int OnCreate			(HWND, LPCREATESTRUCT);
-//static void OnSize			(HWND, UINT state, int, int);
-static void OnMDIActivate	(HWND, BOOL, HWND, HWND);
 static void OnPaint         (HWND);
 static int OnMouseMove		(HWND, int, int, UINT);
 static int OnLButtonDown	(HWND, BOOL, int, int, UINT);
@@ -82,27 +77,23 @@ LRESULT CALLBACK VideoWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
     switch (Msg)
     {
-        //HANDLE_MSG(hWnd, WM_CREATE,				OnCreate);
-        //HANDLE_MSG(hWnd, WM_SIZE,			OnSize);
-        HANDLE_MSG(hWnd, WM_MDIACTIVATE,	OnMDIActivate);
         HANDLE_MSGB(hWnd, WM_PAINT,			OnPaint);
         HANDLE_MSG(hWnd, WM_MOUSEMOVE,		OnMouseMove);
         HANDLE_MSG(hWnd, WM_LBUTTONUP,		OnLButtonUp);
         HANDLE_MSG(hWnd, WM_LBUTTONDOWN,	OnLButtonDown);
         HANDLE_MSG(hWnd, WM_LBUTTONDBLCLK,	OnLButtonDblClk);
+	    // We can't use the macro from windowsx.h macro for this one
+	    case WM_SYSCOMMAND:
+	    {
+	        if (OnSysCommand(hWnd, (UINT)wParam, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam)))
+	        {
+	            return 0;
+	        }
+	        break;
+	    }
 
-    // We can't use the macro from windowsx.h macro for this one
-    case WM_SYSCOMMAND:
-    {
-        if (OnSysCommand(hWnd, (UINT)wParam, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam)))
-        {
-            return 0;
-        }
-        break;
-    }
-
-    default:
-        return DefMDIChildProc(hWnd, Msg, wParam, lParam);
+	    default:
+	        return DefMDIChildProc(hWnd, Msg, wParam, lParam);
     }
     return 0;
 }
@@ -176,7 +167,6 @@ void DestroyBurnerMDI(int nAction)
         break;
     }
     }
-    DeleteObject(hbitmap);
 }
 
 // Check if Windows has a Theme active (Windows XP+)
@@ -202,68 +192,18 @@ bool GetThemeStatus()
     return bThemeActive;
 }
 
-//static int OnCreate(HWND, LPCREATESTRUCT)
-//{
-//	// ...
-//	return 1;
-//}
-
-//static void OnSize(HWND hwnd, UINT /*state*/, int /*cx*/, int /*cy*/)
-//{
-//	// ...
-//}
-
-static void OnMDIActivate(HWND /*hwnd*/, BOOL /*fActive*/, HWND /*hwndActivate*/, HWND /*hwndDeactivate*/)
-{
-    // ...
-    return;
-}
-
-// Needed for the non-preview mode
-void StretchBmForClient(HDC hDC, HWND hWnd, HBITMAP hBitmap)
-{
-    HDC memDC;
-    BITMAP bm;
-    RECT re;
-
-    memDC = CreateCompatibleDC(hDC);
-    HGDIOBJ hOldObj = SelectObject(memDC, hBitmap);
-
-    GetObject(hBitmap, sizeof(BITMAP), (LPSTR)&bm);
-    GetClientRect(hWnd, &re);
-
-    StretchBlt(hDC, 0, 0, re.right, re.bottom, memDC, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY);
-
-    SelectObject(memDC, hOldObj);
-    DeleteDC(memDC);
-}
-
 static void OnPaint(HWND hwnd)
 {
     if(!nVidFullscreen)
     {
-        // This was formerly an alternative for the fail in using the "Preview blitter"
-        // option in Win9x plattaforms, now, this is used just to complement the option
-        // if you don't like the preview enabled.
-        if (!bDrvOkay)
-        {
-            PAINTSTRUCT ps;
-
-            //hbitmap = (HBITMAP)LoadImage(hAppInst, _T("BMP_SPLASH"), IMAGE_BITMAP, 304, 224, 0);
-            hbitmap = (HBITMAP)LoadImage(hAppInst, MAKEINTRESOURCE(BMP_SPLASH), IMAGE_BITMAP, 304, 224, 0);
-
-            HDC hDC = BeginPaint(hwnd, &ps);
-            StretchBmForClient(hDC, hwnd, hbitmap);
-
-            return;
-        }
-
         PAINTSTRUCT ps;
         HDC hdc = NULL;
         hdc = BeginPaint (hwnd, &ps);
         EndPaint (hwnd, &ps);
-
-        VidPaint(1);
+		if (bDrvOkay)
+        {
+        	VidPaint(1);
+		}
     }
 }
 

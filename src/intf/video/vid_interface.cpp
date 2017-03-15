@@ -4,7 +4,7 @@
 #define DEFAULT_IMAGE_WIDTH (304)
 #define DEFAULT_IMAGE_HEIGHT (224)
 
-#define ENABLE_PREVIEW
+//#define ENABLE_PREVIEW
 
 #if defined (BUILD_WIN32)
 extern struct VidOut VidOutDDraw;
@@ -146,36 +146,11 @@ INT32 VidSelect(UINT32 nPlugin)
 // Forward to VidOut functions
 INT32 VidInit()
 {
-#if defined (BUILD_WIN32) && defined (ENABLE_PREVIEW)
-    HBITMAP hbitmap = NULL;
-    BITMAP bitmap;
-#endif
-
     INT32 nRet = 1;
 
     VidExit();
-
-#if defined (BUILD_WIN32) && defined (ENABLE_PREVIEW)
-    if (!bDrvOkay)
+    if (nVidSelect < VID_LEN)
     {
-        //hbitmap = (HBITMAP)LoadImage(hAppInst, _T("BMP_SPLASH"), IMAGE_BITMAP, 304, 224, 0);
-        hbitmap = (HBITMAP)LoadImage(hAppInst, MAKEINTRESOURCE(BMP_SPLASH), IMAGE_BITMAP, 304, 224, 0);
-
-        GetObject(hbitmap, sizeof(BITMAP), &bitmap);
-
-        nVidImageWidth = bitmap.bmWidth;
-        nVidImageHeight = bitmap.bmHeight;
-        nVidImageLeft = nVidImageTop = 0;
-    }
-#endif
-
-#if defined (BUILD_WIN32) && defined (ENABLE_PREVIEW)
-    if ((nVidSelect < VID_LEN) && (bDrvOkay || hbitmap))
-    {
-#else
-    if ((nVidSelect < VID_LEN) && bDrvOkay)
-    {
-#endif
         nVidActive = nVidSelect;
         if ((nRet = pVidOut[nVidActive]->Init()) == 0)
         {
@@ -200,72 +175,6 @@ INT32 VidInit()
             }
         }
     }
-
-#if defined (BUILD_WIN32) && defined (ENABLE_PREVIEW)
-    if (bVidOkay && hbitmap)
-    {
-        BITMAPINFO bitmapinfo;
-        UINT8 *pLineBuffer = (UINT8 *)malloc(bitmap.bmWidth * 4);
-        HDC hDC = GetDC(hVidWnd);
-
-        if (hDC && pLineBuffer)
-        {
-
-            memset(&bitmapinfo, 0, sizeof(BITMAPINFO));
-            bitmapinfo.bmiHeader.biSize = sizeof(BITMAPINFO);
-            bitmapinfo.bmiHeader.biWidth = bitmap.bmWidth;
-            bitmapinfo.bmiHeader.biHeight = bitmap.bmHeight;
-            bitmapinfo.bmiHeader.biPlanes = 1;
-            bitmapinfo.bmiHeader.biBitCount = 24;
-            bitmapinfo.bmiHeader.biCompression = BI_RGB;
-
-            for (INT32 y = 0; y < nVidImageHeight; y++)
-            {
-                UINT8 *pd = pVidImage + y * nVidImagePitch;
-                UINT8 *ps = pLineBuffer;
-
-                GetDIBits(hDC, hbitmap, nVidImageHeight - 1 - y, 1, ps, &bitmapinfo, DIB_RGB_COLORS);
-
-                for (INT32 x = 0; x < nVidImageWidth; x++, ps += 3)
-                {
-                    UINT32 nColour = VidHighCol(ps[2], ps[1], ps[0], 0);
-                    switch (nVidImageBPP)
-                    {
-                    case 2:
-                        *((UINT16 *)pd) = (UINT16)nColour;
-                        pd += 2;
-                        break;
-                    case 3:
-                        pd[0] = (nColour >> 16) & 0xFF;
-                        ps[1] = (nColour >>  8) & 0xFF;
-                        pd[2] = (nColour >>  0) & 0xFF;
-                        pd += 3;
-                        break;
-                    case 4:
-                        *((UINT32 *)pd) = nColour;
-                        pd += 4;
-                        break;
-                    }
-                }
-            }
-        }
-        if (hDC)
-        {
-            ReleaseDC(hVidWnd, hDC);
-        }
-        if (pLineBuffer)
-        {
-            free(pLineBuffer);
-            pLineBuffer = NULL;
-        }
-    }
-
-    if (hbitmap)
-    {
-        DeleteObject(hbitmap);
-    }
-#endif
-
     return nRet;
 }
 

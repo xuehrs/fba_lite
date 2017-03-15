@@ -1,3 +1,7 @@
+/*
+* ROM路径设置
+* ROM扫描
+*/
 #include "burner.h"
 #include <shlobj.h>
 #include <process.h>
@@ -7,6 +11,7 @@ static HWND hParent = NULL;
 
 char *gameAv = NULL;
 bool avOk = false;
+bool bRescanRoms = false;
 
 static unsigned ScanThreadId = 0;
 static HANDLE hScanThread = NULL;
@@ -30,98 +35,94 @@ static INT_PTR CALLBACK DefInpProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
 
     switch (Msg)
     {
-    case WM_INITDIALOG:
-    {
-        chOk = false;
+	    case WM_INITDIALOG:
+	    {
+	        chOk = false;
 
-        // Setup edit controls values (ROMs Paths)
-        for(int x = 0; x < DIRS_MAX; x++)
-        {
-            SetDlgItemText(hDlg, IDC_ROMSDIR_EDIT1 + x, szAppRomPaths[x]);
-        }
+	        // Setup edit controls values (ROMs Paths)
+	        for(int x = 0; x < DIRS_MAX; x++)
+	        {
+	            SetDlgItemText(hDlg, IDC_ROMSDIR_EDIT1 + x, szAppRomPaths[x]);
+	        }
+	        WndInMid(hDlg, hParent);
+	        return TRUE;
+	    }
+	    case WM_COMMAND:
+	    {
+	        LPMALLOC pMalloc = NULL;
+	        BROWSEINFO bInfo;
+	        ITEMIDLIST *pItemIDList = NULL;
+	        TCHAR buffer[MAX_PATH];
 
-        UpdateWindow(hDlg);
+	        if (LOWORD(wParam) == IDOK)
+	        {
 
-        WndInMid(hDlg, hParent);
-        SetFocus(hDlg);											// Enable Esc=close
-        break;
-    }
-    case WM_COMMAND:
-    {
-        LPMALLOC pMalloc = NULL;
-        BROWSEINFO bInfo;
-        ITEMIDLIST *pItemIDList = NULL;
-        TCHAR buffer[MAX_PATH];
+	            for (int i = 0; i < DIRS_MAX; i++)
+	            {
+	                GetDlgItemText(hDlg, IDC_ROMSDIR_EDIT1 + i, buffer, sizeof(buffer));
+	                if (lstrcmp(szAppRomPaths[i], buffer)) chOk = true;
+	                lstrcpy(szAppRomPaths[i], buffer);
+	            }
+	            SendMessage(hDlg, WM_CLOSE, 0, 0);
+	            break;
+	        }
+	        else
+	        {
+	            if (LOWORD(wParam) >= IDC_ROMSDIR_BR1 && LOWORD(wParam) <= IDC_ROMSDIR_BR20)
+	            {
+	                var = IDC_ROMSDIR_EDIT1 + LOWORD(wParam) - IDC_ROMSDIR_BR1;
+	            }
+	            else
+	            {
+	                if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDCANCEL)
+	                {
+	                    SendMessage(hDlg, WM_CLOSE, 0, 0);
+	                }
+	                break;
+	            }
+	        }
 
-        if (LOWORD(wParam) == IDOK)
-        {
+	        SHGetMalloc(&pMalloc);
 
-            for (int i = 0; i < DIRS_MAX; i++)
-            {
-                GetDlgItemText(hDlg, IDC_ROMSDIR_EDIT1 + i, buffer, sizeof(buffer));
-                if (lstrcmp(szAppRomPaths[i], buffer)) chOk = true;
-                lstrcpy(szAppRomPaths[i], buffer);
-            }
-            SendMessage(hDlg, WM_CLOSE, 0, 0);
-            break;
-        }
-        else
-        {
-            if (LOWORD(wParam) >= IDC_ROMSDIR_BR1 && LOWORD(wParam) <= IDC_ROMSDIR_BR20)
-            {
-                var = IDC_ROMSDIR_EDIT1 + LOWORD(wParam) - IDC_ROMSDIR_BR1;
-            }
-            else
-            {
-                if (HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDCANCEL)
-                {
-                    SendMessage(hDlg, WM_CLOSE, 0, 0);
-                }
-                break;
-            }
-        }
+	        memset(&bInfo, 0, sizeof(bInfo));
+	        bInfo.hwndOwner = hDlg;
+	        bInfo.pszDisplayName = buffer;
+	        bInfo.lpszTitle = FBALoadStringEx(hAppInst, IDS_ROMS_SELECT_DIR, true);
+	        bInfo.ulFlags = BIF_USENEWUI;
 
-        SHGetMalloc(&pMalloc);
+	        pItemIDList = SHBrowseForFolder(&bInfo);
 
-        memset(&bInfo, 0, sizeof(bInfo));
-        bInfo.hwndOwner = hDlg;
-        bInfo.pszDisplayName = buffer;
-        bInfo.lpszTitle = FBALoadStringEx(hAppInst, IDS_ROMS_SELECT_DIR, true);
-        bInfo.ulFlags = BIF_USENEWUI;
+	        if (pItemIDList)
+	        {
+	            if (SHGetPathFromIDList(pItemIDList, buffer))
+	            {
+	                int strLen = _tcslen(buffer);
+	                if (strLen)
+	                {
+	                    if (buffer[strLen - 1] != _T('\\'))
+	                    {
+	                        buffer[strLen] = _T('\\');
+	                        buffer[strLen + 1] = _T('\0');
+	                    }
+	                    SetDlgItemText(hDlg, var, buffer);
+	                }
+	            }
+	            pMalloc->Free(pItemIDList);
+	        }
+	        pMalloc->Release();
 
-        pItemIDList = SHBrowseForFolder(&bInfo);
-
-        if (pItemIDList)
-        {
-            if (SHGetPathFromIDList(pItemIDList, buffer))
-            {
-                int strLen = _tcslen(buffer);
-                if (strLen)
-                {
-                    if (buffer[strLen - 1] != _T('\\'))
-                    {
-                        buffer[strLen] = _T('\\');
-                        buffer[strLen + 1] = _T('\0');
-                    }
-                    SetDlgItemText(hDlg, var, buffer);
-                }
-            }
-            pMalloc->Free(pItemIDList);
-        }
-        pMalloc->Release();
-
-        break;
-    }
-    case WM_CLOSE:
-    {
-        hParent = NULL;
-        EndDialog(hDlg, 0);
-        if (chOk)
-        {
-            bRescanRoms = true;
-            CreateROMInfo(hDlg);
-        }
-    }
+	        break;
+	    }
+	    case WM_CLOSE:
+	    {
+	        hParent = NULL;
+	        EndDialog(hDlg, 0);
+	        if (chOk)
+	        {
+	            bRescanRoms = true;
+	            CreateROMInfo(hDlg);
+	        }
+	    }
     }
 
     return 0;
@@ -180,6 +181,7 @@ int WriteGameAvb()
     return 0;
 }
 
+//失败返回1
 static int DoCheck(TCHAR *buffPos)
 {
     TCHAR label[256];
@@ -324,6 +326,7 @@ static int QuitRomsScan()
     return 1;
 }
 
+//ROM搜索线程
 static unsigned __stdcall AnalyzingRoms(void *)
 {
     for (unsigned int z = 0; z < nBurnDrvCount; z++)
@@ -366,7 +369,6 @@ static INT_PTR CALLBACK WaitProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM)		//
     case WM_INITDIALOG:
         hRomsDlg = hDlg;
         nOldSelect = nBurnDrvActive;
-        //memset(gameAv, 0, sizeof(gameAv)); // sizeof(gameAv) is 4!! -dink
         memset(gameAv, 0, nBurnDrvCount);
         SendDlgItemMessage(hDlg, IDC_WAIT_PROG, PBM_SETRANGE, 0, MAKELPARAM(0, nBurnDrvCount));
         SendDlgItemMessage(hDlg, IDC_WAIT_PROG, PBM_SETSTEP, (WPARAM)1, 0);
@@ -421,6 +423,7 @@ static INT_PTR CALLBACK WaitProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM)		//
     return 0;
 }
 
+//生成ROM列表
 int CreateROMInfo(HWND hParentWND)
 {
     hParent = hParentWND;

@@ -17,15 +17,7 @@ static HWND hSelList			= NULL;
 static HWND hParent				= NULL;
 static HWND hInfoLabel[6]		= { NULL, NULL, NULL, NULL, NULL };			// 4 things in our Info-box
 static HWND hInfoText[6]		= { NULL, NULL, NULL, NULL, NULL };			// 4 things in our Info-box
-
-static HBRUSH hWhiteBGBrush;
-static HICON hExpand, hCollapse;
-static HICON hNotWorking, hNotFoundEss, hNotFoundNonEss;
-
-
 static char TreeBuilding		= 0;										// if 1, ignore TVN_SELCHANGED messages
-
-bool bGameInfoOpen				= false;
 
 // Dialog Sizing
 int nSelDlgWidth = 750;
@@ -874,18 +866,12 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
     if (Msg == WM_INITDIALOG)
     {
         hSelDlg = hDlg;
-
-        hWhiteBGBrush	= CreateSolidBrush(RGB(0xFF, 0xFF, 0xFF));
-        hExpand			= (HICON)LoadImage(hAppInst, MAKEINTRESOURCE(IDI_TV_PLUS),			IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
-        hCollapse		= (HICON)LoadImage(hAppInst, MAKEINTRESOURCE(IDI_TV_MINUS),			IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
-
         TCHAR szOldTitle[1024] = _T(""), szNewTitle[1024] = _T("");
         GetWindowText(hSelDlg, szOldTitle, 1024);
         _sntprintf(szNewTitle, 1024, _T(APP_TITLE) _T(SEPERATOR_1) _T("%s"), szOldTitle);
         SetWindowText(hSelDlg, szNewTitle);
 
         hSelList		= GetDlgItem(hSelDlg, IDC_TREE1);
-
         hInfoLabel[0]	= GetDlgItem(hSelDlg, IDC_LABELROMNAME);
         hInfoLabel[1]	= GetDlgItem(hSelDlg, IDC_LABELROMINFO);
         hInfoLabel[2]	= GetDlgItem(hSelDlg, IDC_LABELSYSTEM);
@@ -1291,7 +1277,6 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
     {
         nDialogSelect = nOldDlgSelected;
 		EndDialog(hSelDlg, 0);
-        DeleteObject(hWhiteBGBrush);
         return 0;
     }
 
@@ -1300,7 +1285,6 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
         bDialogCancel = true;
         nDialogSelect = nOldDlgSelected;
         EndDialog(hSelDlg, 0);
-        DeleteObject(hWhiteBGBrush);
         return 0;
     }
     NMHDR *pNmHdr = (NMHDR *)lParam;

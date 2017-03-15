@@ -525,7 +525,7 @@ ifeq ($(MAKELEVEL),2)
 endif
 endif
 
-$(app_gnuc.rc): app.rc $(license.rc) $(license.rtf) $(srcdir)dep/scripts/fixrc.pl $(srcdir)burner/resource/fba.ico $(srcdir)burner/resource/about.bmp $(srcdir)burner/resource/splash.bmp $(srcdir)burner/resource/misc.bmp
+$(app_gnuc.rc): app.rc $(license.rc) $(license.rtf) $(srcdir)dep/scripts/fixrc.pl $(srcdir)burner/resource/fba.ico $(srcdir)burner/resource/about.bmp $(srcdir)burner/resource/misc.bmp
 
 ifdef	PERL
 	@$(srcdir)dep/scripts/fixrc.pl $< -o $@

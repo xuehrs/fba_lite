@@ -16,7 +16,7 @@
 #define MAKE_STRING_2(s) #s
 #define MAKE_STRING(s) MAKE_STRING_2(s)
 
-#define BZIP_MAX (40)								// Maximum zip files to search through
+#define BZIP_MAX (8)								// Maximum zip files to search through
 #define DIRS_MAX (4)								// Maximum number of directories to search
 
 #include "title.h"
