@@ -7,10 +7,6 @@
 // #define DONT_DISPLAY_SPLASH		// Prevent Splash screen from being displayed
 #define APP_DEBUG_LOG			// log debug messages to zzBurnDebug.html
 
-#ifdef USE_SDL
-#include "SDL.h"
-#endif
-
 #include "burner.h"
 
 #ifdef _MSC_VER
@@ -28,8 +24,6 @@ long int nMainThreadID;
 int nAppThreadPriority = THREAD_PRIORITY_NORMAL;
 int nAppShowCmd;
 
-static TCHAR szCmdLine[1024] = _T("");
-
 HACCEL hAccel = NULL;
 
 int nAppVirtualFps = 6000;			// App fps * 100
@@ -39,7 +33,7 @@ TCHAR szAppExeName[EXE_NAME_SIZE + 1];
 
 bool bCmdOptUsed = 0;
 bool bAlwaysProcessKeyboardInput = false;
-bool bAlwaysCreateSupportFolders = true;
+bool bAlwaysCreateSupportFolders = false;
 
 bool bNoChangeNumLock = 1;
 static bool bNumlockStatus;
@@ -472,78 +466,42 @@ int OpenDebugLog()
     return 0;
 }
 
+//ÆÁÄ»±ÈÀý¼ì²â
 void MonitorAutoCheck()
 {
-    RECT rect;
-    int x, y;
-
-    SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+    int x, y, s;
 
     x = GetSystemMetrics(SM_CXSCREEN);
     y = GetSystemMetrics(SM_CYSCREEN);
-
-    TCHAR szResXY[256] = _T("");
-    _stprintf(szResXY, _T("%dx%d"), x, y);
-
-    // Normal CRT (4:3) ( Verified at Wikipedia.Org )
-    if( !_tcscmp(szResXY, _T("320x240"))	||
-            !_tcscmp(szResXY, _T("512x384"))	||
-            !_tcscmp(szResXY, _T("640x480"))	||
-            !_tcscmp(szResXY, _T("800x600"))	||
-            !_tcscmp(szResXY, _T("832x624"))	||
-            !_tcscmp(szResXY, _T("1024x768"))	||
-            !_tcscmp(szResXY, _T("1120x832"))	||
-            !_tcscmp(szResXY, _T("1152x864"))	||
-            !_tcscmp(szResXY, _T("1280x960"))	||
-            !_tcscmp(szResXY, _T("1280x1024"))	||
-            !_tcscmp(szResXY, _T("1400x1050"))	||
-            !_tcscmp(szResXY, _T("1600x1200"))	||
-            !_tcscmp(szResXY, _T("2048x1536"))	||
-            !_tcscmp(szResXY, _T("2800x2100"))	||
-            !_tcscmp(szResXY, _T("3200x2400"))	||
-            !_tcscmp(szResXY, _T("4096x3072"))	||
-            !_tcscmp(szResXY, _T("6400x4800")) )
-    {
-        nVidScrnAspectX = 4;
-        nVidScrnAspectY = 3;
-    }
-
-    // Normal LCD (5:4) ( Verified at Wikipedia.Org )
-    if( !_tcscmp(szResXY, _T("320x256"))	||
-            !_tcscmp(szResXY, _T("640x512"))	||
-            !_tcscmp(szResXY, _T("1280x1024"))	||
-            !_tcscmp(szResXY, _T("2560x2048"))	||
-            !_tcscmp(szResXY, _T("5120x4096")) )
-    {
-        nVidScrnAspectX = 5;
+	s = x * 100 / y;
+	if(s < 120)
+	{
+		return;
+	}
+	if(s < 130)
+	{
+		nVidScrnAspectX = 5;
         nVidScrnAspectY = 4;
-    }
-
-    // CRT Widescreen (16:9) ( Verified at Wikipedia.Org )
-    if( !_tcscmp(szResXY, _T("480x270"))  ||
-            !_tcscmp(szResXY, _T("1280x720")) ||
-            !_tcscmp(szResXY, _T("1360x768")) ||
-            !_tcscmp(szResXY, _T("1366x768")) ||
-            !_tcscmp(szResXY, _T("1920x1080")))
-    {
-        nVidScrnAspectX = 16;
-        nVidScrnAspectY = 9;
-    }
-
-    // LCD Widescreen (16:10) ( Verified at Wikipedia.Org )
-    if(	!_tcscmp(szResXY, _T("320x200"))	||
-            !_tcscmp(szResXY, _T("1280x800"))	||
-            !_tcscmp(szResXY, _T("1440x900"))	||
-            !_tcscmp(szResXY, _T("1680x1050"))	||
-            !_tcscmp(szResXY, _T("1920x1200"))	||
-            !_tcscmp(szResXY, _T("2560x1600"))	||
-            !_tcscmp(szResXY, _T("3840x2400"))	||
-            !_tcscmp(szResXY, _T("5120x3200"))	||
-            !_tcscmp(szResXY, _T("7680x4800")) )
-    {
-        nVidScrnAspectX = 16;
+		return;
+	}
+	if(s < 140)
+	{
+		nVidScrnAspectX = 4;
+        nVidScrnAspectY = 3;
+		return;
+	}
+	if(s < 170)
+	{
+		nVidScrnAspectX = 16;
         nVidScrnAspectY = 10;
-    }
+		return;
+	}
+	if(s < 180)
+	{
+		nVidScrnAspectX = 16;
+        nVidScrnAspectY = 9;
+		return;
+	}
 }
 
 bool SetNumLock(bool bState)
@@ -608,10 +566,6 @@ static int AppInit()
 
     bCheatsAllowed = true;
 
-#ifdef USE_SDL
-    SDL_Init(0);
-#endif
-
     ComputeGammaLUT();
 
     if (VidSelect(nVidSelect))
@@ -658,10 +612,6 @@ static int AppExit()
     MediaExit();
     BurnLibExit();					// Exit the Burn library
 
-#ifdef USE_SDL
-    SDL_Quit();
-#endif
-
     FBALocaliseExit();
     BurnerExitGameListLocalisation();
 
@@ -670,8 +620,6 @@ static int AppExit()
         DestroyAcceleratorTable(hAccel);
         hAccel = NULL;
     }
-
-    SplashDestroy(1);
 
     CloseHandle(hMainThread);
 
@@ -711,254 +659,6 @@ bool AppProcessKeyboardInput()
     return true;
 }
 
-int ProcessCmdLine()
-{
-    unsigned int i;
-    int nOptX = 0, nOptY = 0, nOptD = 0;
-    int nOpt1Size;
-    TCHAR szOpt2[3] = _T("");
-    TCHAR szName[MAX_PATH];
-
-    if (szCmdLine[0] == _T('\"'))
-    {
-        int nLen = _tcslen(szCmdLine);
-        nOpt1Size = 1;
-        while (szCmdLine[nOpt1Size] != _T('\"') && nOpt1Size < nLen)
-        {
-            nOpt1Size++;
-        }
-        if (nOpt1Size == nLen)
-        {
-            szName[0] = 0;
-        }
-        else
-        {
-            nOpt1Size++;
-            _tcsncpy(szName, szCmdLine + 1, nOpt1Size - 2);
-            szName[nOpt1Size - 2] = 0;
-        }
-    }
-    else
-    {
-        int nLen = _tcslen(szCmdLine);
-        nOpt1Size = 0;
-        while (szCmdLine[nOpt1Size] != _T(' ') && nOpt1Size < nLen)
-        {
-            nOpt1Size++;
-        }
-        _tcsncpy(szName, szCmdLine, nOpt1Size);
-        szName[nOpt1Size] = 0;
-    }
-
-    if (_tcslen(szName))
-    {
-        if (_tcscmp(szName, _T("-listinfo")) == 0)
-        {
-            write_datfile(DAT_ARCADE_ONLY, stdout);
-            return 1;
-        }
-
-        if (_tcscmp(szName, _T("-listinfomdonly")) == 0)
-        {
-            write_datfile(DAT_MEGADRIVE_ONLY, stdout);
-            return 1;
-        }
-
-        if (_tcscmp(szName, _T("-listinfopceonly")) == 0)
-        {
-            write_datfile(DAT_PCENGINE_ONLY, stdout);
-            return 1;
-        }
-
-        if (_tcscmp(szName, _T("-listinfotg16only")) == 0)
-        {
-            write_datfile(DAT_TG16_ONLY, stdout);
-            return 1;
-        }
-
-        if (_tcscmp(szName, _T("-listinfosgxonly")) == 0)
-        {
-            write_datfile(DAT_SGX_ONLY, stdout);
-            return 1;
-        }
-
-        if (_tcscmp(szName, _T("-listinfosg1000only")) == 0)
-        {
-            write_datfile(DAT_SG1000_ONLY, stdout);
-            return 1;
-        }
-
-        if (_tcscmp(szName, _T("-listinfocolecoonly")) == 0)
-        {
-            write_datfile(DAT_COLECO_ONLY, stdout);
-            return 1;
-        }
-
-        if (_tcscmp(szName, _T("-listinfosmsonly")) == 0)
-        {
-            write_datfile(DAT_MASTERSYSTEM_ONLY, stdout);
-            return 1;
-        }
-
-        if (_tcscmp(szName, _T("-listinfoggonly")) == 0)
-        {
-            write_datfile(DAT_GAMEGEAR_ONLY, stdout);
-            return 1;
-        }
-
-        if (_tcscmp(szName, _T("-listextrainfo")) == 0)
-        {
-            int nWidth;
-            int nHeight;
-            int nAspectX;
-            int nAspectY;
-            for (i = 0; i < nBurnDrvCount; i++)
-            {
-                nBurnDrvActive = i;
-                BurnDrvGetVisibleSize(&nWidth, &nHeight);
-                BurnDrvGetAspect(&nAspectX, &nAspectY);
-                printf("%s\t%ix%i\t%i:%i\t0x%08X\t\"%s\"\t%i\t%i\t%x\t%x\t\"%s\"\n", BurnDrvGetTextA(DRV_NAME), nWidth, nHeight, nAspectX, nAspectY, BurnDrvGetHardwareCode(), BurnDrvGetTextA(DRV_SYSTEM), BurnDrvIsWorking(), BurnDrvGetMaxPlayers(), BurnDrvGetGenreFlags(), BurnDrvGetFamilyFlags(), BurnDrvGetTextA(DRV_COMMENT));
-            }
-            return 1;
-        }
-    }
-
-    _stscanf(&szCmdLine[nOpt1Size], _T("%2s %i x %i x %i"), szOpt2, &nOptX, &nOptY, &nOptD);
-
-    if (_tcslen(szName))
-    {
-        bool bFullscreen = 1;
-        bCmdOptUsed = 1;
-
-        if (_tcscmp(szOpt2, _T("-r")) == 0)
-        {
-            if (nOptX && nOptY)
-            {
-                nVidWidth = nOptX;
-                nVidHeight = nOptY;
-            }
-            if (nOptD)
-            {
-                nVidDepth = nOptD;
-            }
-        }
-        else
-        {
-            if (_tcscmp(szOpt2, _T("-a")) == 0)
-            {
-                bVidArcaderes = 1;
-            }
-            else
-            {
-                if (_tcscmp(szOpt2, _T("-w")) == 0)
-                {
-                    bCmdOptUsed = 0;
-                    bFullscreen = 0;
-                }
-            }
-        }
-
-        if (bFullscreen)
-        {
-            nVidFullscreen = 1;
-        }
-
-        if (_tcscmp(&szName[_tcslen(szName) - 3], _T(".fs")) == 0)
-        {
-            if (BurnStateLoad(szName, 1, &DrvInitCallback))
-            {
-                return 1;
-            }
-            else
-            {
-                //				bRunPause = 1;
-            }
-        }
-        else
-        {
-            if (_tcscmp(&szName[_tcslen(szName) - 3], _T(".fr")) == 0)
-            {
-                if (StartReplay(szName))
-                {
-                    return 1;
-                }
-            }
-            else
-            {
-                for (i = 0; i < nBurnDrvCount; i++)
-                {
-                    nBurnDrvActive = i;
-                    if ((_tcscmp(BurnDrvGetText(DRV_NAME), szName) == 0) && (!(BurnDrvGetFlags() & BDF_BOARDROM)))
-                    {
-                        MediaInit();
-                        DrvInit(i, true);
-                        break;
-                    }
-                }
-                if (i == nBurnDrvCount)
-                {
-                    FBAPopupAddText(PUF_TEXT_DEFAULT, MAKEINTRESOURCE(IDS_ERR_UI_NOSUPPORT), szName, _T(APP_TITLE));
-                    FBAPopupDisplay(PUF_TYPE_ERROR);
-                    return 1;
-                }
-            }
-        }
-    }
-
-    POST_INITIALISE_MESSAGE;
-
-    if (!nVidFullscreen)
-    {
-        MenuEnableItems();
-    }
-
-    return 0;
-}
-
-static void CreateSupportFolders()
-{
-    TCHAR szSupportDirs[31][MAX_PATH] =
-    {
-        {_T("support/")},
-        {_T("support/previews/")},
-        {_T("support/titles/")},
-        {_T("support/icons/")},
-        {_T("support/cheats/")},
-        {_T("support/hiscores/")},
-        {_T("support/samples/")},
-        {_T("support/ips/")},
-        {_T("support/neocdz/")},
-        {_T("support/blend/")},
-        {_T("support/select/")},
-        {_T("support/versus/")},
-        {_T("support/howto/")},
-        {_T("support/scores/")},
-        {_T("support/bosses/")},
-        {_T("support/gameover/")},
-        {_T("support/flyers/")},
-        {_T("support/marquees/")},
-        {_T("support/cpanel/")},
-        {_T("support/cabinets/")},
-        {_T("support/pcbs/")},
-        {_T("support/history/")},
-        {_T("neocdiso/")},
-        // the below are named after the MESS software lists
-        {_T("megadriv/")},
-        {_T("pce/")},
-        {_T("sgx/")},
-        {_T("tg16/")},
-        {_T("sg1000/")},
-        {_T("coleco/")},
-        {_T("sms/")},
-        {_T("gamegear/")},
-    };
-
-    for(int x = 0; x < 31; x++)
-    {
-        CreateDirectory(szSupportDirs[x], NULL);
-    }
-}
-
 // Main program entry point
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nShowCmd)
 {
@@ -966,12 +666,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nShowCmd
     DICore_Init();
     DDCore_Init();
     Dx9Core_Init();
-
-    // Try to initiate DWMAPI.DLL on Windows 7
-    if(IsWindows7())
-    {
-        InitDWMAPI();
-    }
 
     // Provide a custom exception handler
     SetUnhandledExceptionFilter(ExceptionFilter);
@@ -990,67 +684,31 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nShowCmd
         _stprintf(szAppBurnVer, _T("%x.%x.%x"), nBurnVer >> 20, (nBurnVer >> 16) & 0x0F, (nBurnVer >> 8) & 0xFF);
     }
 
-#if !defined (DONT_DISPLAY_SPLASH)
-    //	if (lpCmdLine[0] == 0) SplashCreate();
-#endif
-
     nAppShowCmd = nShowCmd;
 
     AppDirectory();								// Set current directory to be the applications directory
 
-#ifdef INCLUDE_AVI_RECORDING
-#define DIRCNT 10
-#else
-#define DIRCNT 9
-#endif
     // Make sure there are roms and cfg subdirectories
-    TCHAR szDirs[DIRCNT][MAX_PATH] =
-    {
-        {_T("config")},
-        {_T("config/games")},
-        {_T("config/ips")},
-        {_T("config/localisation")},
-        {_T("config/presets")},
-        {_T("recordings")},
-        {_T("roms")},
-        {_T("savestates")},
-        {_T("screenshots")},
-#ifdef INCLUDE_AVI_RECORDING
-        {_T("avi")},
-#endif
-    };
-
-    for(int x = 0; x < DIRCNT; x++)
-    {
-        CreateDirectory(szDirs[x], NULL);
-    }
-#undef DIRCNT
+	CreateDirectory(_T("cheats"), NULL);
+	CreateDirectory(_T("config"), NULL);
+	CreateDirectory(_T("config/games"), NULL);
+	CreateDirectory(_T("config/localisation"), NULL);
+	CreateDirectory(_T("config/presets"), NULL);
+	CreateDirectory(_T("roms"), NULL);
+	CreateDirectory(_T("savestates"), NULL);
 
     //
-
+    INITCOMMONCONTROLSEX initCC =
     {
-        INITCOMMONCONTROLSEX initCC =
-        {
-            sizeof(INITCOMMONCONTROLSEX),
-            ICC_BAR_CLASSES | ICC_COOL_CLASSES | ICC_LISTVIEW_CLASSES | ICC_PROGRESS_CLASS | ICC_TREEVIEW_CLASSES,
-        };
-        InitCommonControlsEx(&initCC);
-    }
-
-    if (lpCmdLine)
-    {
-        _tcscpy(szCmdLine, ANSIToTCHAR(lpCmdLine, NULL, 0));
-    }
+        sizeof(INITCOMMONCONTROLSEX),
+        ICC_BAR_CLASSES | ICC_COOL_CLASSES | ICC_LISTVIEW_CLASSES | ICC_PROGRESS_CLASS | ICC_TREEVIEW_CLASSES,
+    };
+    InitCommonControlsEx(&initCC);
 
     if (!(AppInit()))  							// Init the application
     {
-        if (bAlwaysCreateSupportFolders) CreateSupportFolders();
-        if (!(ProcessCmdLine()))
-        {
             MediaInit();
-
             RunMessageLoop();					// Run the application message loop
-        }
     }
 
     ConfigAppSave();							// Save config for the application
