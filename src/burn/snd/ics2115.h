@@ -5,4 +5,4 @@ void ics2115write(UINT8 offset, UINT8 data);
 void ics2115_adjust_timer(INT32 ticks);
 void ics2115_update(INT16 *outputs, int samples);
 void ics2115_exit();
-void ics2115_scan(INT32 nAction,INT32 * /*pnMin*/);
+void ics2115_scan(INT32 nAction, INT32 * /*pnMin*/);

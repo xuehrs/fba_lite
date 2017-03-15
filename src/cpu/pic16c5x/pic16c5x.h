@@ -1,13 +1,13 @@
- /**************************************************************************\
- *                      Microchip PIC16C5x Emulator                         *
- *                                                                          *
- *                    Copyright Tony La Porta                               *
- *                 Originally written for the MAME project.                 *
- *                                                                          *
- *                                                                          *
- *      Addressing architecture is based on the Harvard addressing scheme.  *
- *                                                                          *
- \**************************************************************************/
+/**************************************************************************\
+*                      Microchip PIC16C5x Emulator                         *
+*                                                                          *
+*                    Copyright Tony La Porta                               *
+*                 Originally written for the MAME project.                 *
+*                                                                          *
+*                                                                          *
+*      Addressing architecture is based on the Harvard addressing scheme.  *
+*                                                                          *
+\**************************************************************************/
 
 
 #ifndef __PIC16C5X_H__
@@ -26,11 +26,11 @@
 
 enum
 {
-	PIC16C5x_PC=1, PIC16C5x_STK0, PIC16C5x_STK1, PIC16C5x_FSR,
-	PIC16C5x_W,    PIC16C5x_ALU,  PIC16C5x_STR,  PIC16C5x_OPT,
-	PIC16C5x_TMR0, PIC16C5x_PRTA, PIC16C5x_PRTB, PIC16C5x_PRTC,
-	PIC16C5x_WDT,  PIC16C5x_TRSA, PIC16C5x_TRSB, PIC16C5x_TRSC,
-	PIC16C5x_PSCL
+    PIC16C5x_PC = 1, PIC16C5x_STK0, PIC16C5x_STK1, PIC16C5x_FSR,
+    PIC16C5x_W,    PIC16C5x_ALU,  PIC16C5x_STR,  PIC16C5x_OPT,
+    PIC16C5x_TMR0, PIC16C5x_PRTA, PIC16C5x_PRTB, PIC16C5x_PRTC,
+    PIC16C5x_WDT,  PIC16C5x_TRSA, PIC16C5x_TRSB, PIC16C5x_TRSC,
+    PIC16C5x_PSCL
 };
 
 

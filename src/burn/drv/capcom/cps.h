@@ -21,24 +21,30 @@ extern INT32 Cps2DisableQSnd;
 extern INT32 nCPS68KClockspeed;
 extern INT32 nCpsCycles;												// Cycles per frame
 extern INT32 nCpsZ80Cycles;
-extern UINT8 *CpsGfx;  extern UINT32 nCpsGfxLen;		// All the graphics
-extern UINT8 *CpsRom;  extern UINT32 nCpsRomLen;		// Program Rom (as in rom)
-extern UINT8 *CpsCode; extern UINT32 nCpsCodeLen;		// Program Rom (decrypted)
-extern UINT8 *CpsZRom; extern UINT32 nCpsZRomLen;		// Z80 Roms
-extern          INT8 *CpsQSam; extern UINT32 nCpsQSamLen;		// QSound Sample Roms
-extern UINT8 *CpsAd;   extern UINT32 nCpsAdLen;		// ADPCM Data
+extern UINT8 *CpsGfx;
+extern UINT32 nCpsGfxLen;		// All the graphics
+extern UINT8 *CpsRom;
+extern UINT32 nCpsRomLen;		// Program Rom (as in rom)
+extern UINT8 *CpsCode;
+extern UINT32 nCpsCodeLen;		// Program Rom (decrypted)
+extern UINT8 *CpsZRom;
+extern UINT32 nCpsZRomLen;		// Z80 Roms
+extern          INT8 *CpsQSam;
+extern UINT32 nCpsQSamLen;		// QSound Sample Roms
+extern UINT8 *CpsAd;
+extern UINT32 nCpsAdLen;		// ADPCM Data
 extern UINT32 nCpsGfxScroll[4];								// Offset to Scroll tiles
 extern UINT32 nCpsGfxMask;									// Address mask
-extern UINT8* CpsStar;
+extern UINT8 *CpsStar;
 INT32 CpsInit();
 INT32 Cps2Init();
 INT32 CpsExit();
-INT32 CpsLoadTiles(UINT8 *Tile,INT32 nStart);
-INT32 CpsLoadTilesByte(UINT8 *Tile,INT32 nStart);
+INT32 CpsLoadTiles(UINT8 *Tile, INT32 nStart);
+INT32 CpsLoadTilesByte(UINT8 *Tile, INT32 nStart);
 INT32 CpsLoadTilesForgottn(INT32 nStart);
 INT32 CpsLoadTilesForgottna(INT32 nStart);
 INT32 CpsLoadTilesForgottnu(INT32 nStart);
-INT32 CpsLoadTilesPang(UINT8 *Tile,INT32 nStart);
+INT32 CpsLoadTilesPang(UINT8 *Tile, INT32 nStart);
 INT32 CpsLoadTilesSf2ebbl(UINT8 *Tile, INT32 nStart);
 INT32 CpsLoadTilesSf2b(UINT8 *Tile, INT32 nStart);
 INT32 CpsLoadTilesSf2koryuExtra(UINT8 *Tile, INT32 nStart);
@@ -65,8 +71,8 @@ INT32 CpsLoadTilesPunisherb(INT32 nStart);
 INT32 CpsLoadStars(UINT8 *pStar, INT32 nStart);
 INT32 CpsLoadStarsByte(UINT8 *pStar, INT32 nStart);
 INT32 CpsLoadStarsForgottnAlt(UINT8 *pStar, INT32 nStart);
-INT32 Cps2LoadTiles(UINT8 *Tile,INT32 nStart);
-INT32 Cps2LoadTilesSIM(UINT8 *Tile,INT32 nStart);
+INT32 Cps2LoadTiles(UINT8 *Tile, INT32 nStart);
+INT32 Cps2LoadTilesSIM(UINT8 *Tile, INT32 nStart);
 INT32 Cps2LoadTilesGigaman2(UINT8 *Tile, UINT8 *pSrc);
 
 // cps_config.h
@@ -156,7 +162,7 @@ extern INT32 GfxRomBankMapper(INT32 Type, INT32 Code);
 extern void SetCpsBId(INT32 CpsBId, INT32 bStars);
 
 // cps_pal.cpp
-extern UINT32* CpsPal;										// Hicolor version of palette
+extern UINT32 *CpsPal;										// Hicolor version of palette
 extern INT32 nCpsPalCtrlReg;
 extern INT32 bCpsUpdatePalEveryFrame;
 INT32 CpsPalInit();
@@ -165,18 +171,18 @@ INT32 CpsPalUpdate(UINT8 *pNewPal);
 
 // cps_mem.cpp
 extern UINT8 *CpsRam90;
-extern UINT8 *CpsZRamC0,*CpsZRamF0;
+extern UINT8 *CpsZRamC0, *CpsZRamF0;
 extern UINT8 *CpsSavePal;
-extern UINT8 *CpsRam708,*CpsReg,*CpsFrg;
+extern UINT8 *CpsRam708, *CpsReg, *CpsFrg;
 extern UINT8 *CpsSaveReg[MAX_RASTER + 1];
 extern UINT8 *CpsSaveFrg[MAX_RASTER + 1];
 extern UINT8 *CpsRamFF;
 void CpsMapObjectBanks(INT32 nBank);
 INT32 CpsMemInit();
 INT32 CpsMemExit();
-INT32 CpsAreaScan(INT32 nAction,INT32 *pnMin);
+INT32 CpsAreaScan(INT32 nAction, INT32 *pnMin);
 
-typedef INT32 (*CpsMemScanCallback)(INT32, INT32*);
+typedef INT32 (*CpsMemScanCallback)(INT32, INT32 *);
 extern CpsMemScanCallback CpsMemScanCallbackFunction;
 
 // cps_run.cpp
@@ -204,22 +210,23 @@ extern CpsRunFrameMiddleCallback CpsRunFrameMiddleCallbackFunction;
 typedef void (*CpsRunFrameEndCallback)();
 extern CpsRunFrameEndCallback CpsRunFrameEndCallbackFunction;
 
-inline static UINT8* CpsFindGfxRam(INT32 nAddr,INT32 nLen)
+inline static UINT8 *CpsFindGfxRam(INT32 nAddr, INT32 nLen)
 {
-  nAddr&=0xffffff; // 24-bit bus
-  if (nAddr>=0x900000 && nAddr+nLen<=0x930000) return CpsRam90+nAddr-0x900000;
-  return NULL;
+    nAddr &= 0xffffff; // 24-bit bus
+    if (nAddr >= 0x900000 && nAddr + nLen <= 0x930000) return CpsRam90 + nAddr - 0x900000;
+    return NULL;
 }
 
 inline static void GetPalette(INT32 nStart, INT32 nCount)
 {
-	// Update Palette (Ghouls points to the wrong place on boot up I think)
-	INT32 nPal = (BURN_ENDIAN_SWAP_INT16(*((UINT16*)(CpsReg + 0x0A))) << 8) & 0xFFFC00;
-	
-	UINT8* Find = CpsFindGfxRam(nPal, 0xc00 << 1);
-	if (Find) {
-		memcpy(CpsSavePal + (nStart << 10), Find + (nStart << 10), nCount << 10);
-	}
+    // Update Palette (Ghouls points to the wrong place on boot up I think)
+    INT32 nPal = (BURN_ENDIAN_SWAP_INT16(*((UINT16 *)(CpsReg + 0x0A))) << 8) & 0xFFFC00;
+
+    UINT8 *Find = CpsFindGfxRam(nPal, 0xc00 << 1);
+    if (Find)
+    {
+        memcpy(CpsSavePal + (nStart << 10), Find + (nStart << 10), nCount << 10);
+    }
 }
 
 // cps_rw.cpp
@@ -259,7 +266,7 @@ extern INT32 Dinohunt;
 extern INT32 Port6SoundWrite;
 extern INT32 CpsBootlegEEPROM;
 
-extern UINT8* CpsEncZRom;
+extern UINT8 *CpsEncZRom;
 
 INT32 CpsRwInit();
 INT32 CpsRwExit();
@@ -323,18 +330,20 @@ void QscWrite(INT32 a, INT32 d);
 INT32 QscUpdate(INT32 nEnd);
 
 // cps_tile.cpp
-extern UINT32* CpstPal;
-extern UINT32 nCpstType; extern INT32 nCpstX,nCpstY;
-extern UINT32 nCpstTile; extern INT32 nCpstFlip;
+extern UINT32 *CpstPal;
+extern UINT32 nCpstType;
+extern INT32 nCpstX, nCpstY;
+extern UINT32 nCpstTile;
+extern INT32 nCpstFlip;
 extern UINT32 nCpsBlend;
-extern short* CpstRowShift;
+extern short *CpstRowShift;
 extern UINT32 CpstPmsk; // Pixel mask
 
 inline static void CpstSetPal(INT32 nPal)
 {
-	nPal <<= 4;
-	nPal &= 0x7F0;
-	CpstPal= CpsPal + nPal;
+    nPal <<= 4;
+    nPal &= 0x7F0;
+    CpstPal = CpsPal + nPal;
 }
 
 // ctv.cpp
@@ -342,7 +351,7 @@ extern INT32 nBgHi;
 extern UINT16  ZValue;
 extern UINT16 *ZBuf;
 extern UINT16 *pZVal;
-extern UINT32    nCtvRollX,nCtvRollY;
+extern UINT32    nCtvRollX, nCtvRollY;
 extern UINT8  *pCtvTile;					// Pointer to tile data
 extern INT32             nCtvTileAdd;					// Amount to add after each tile line
 extern UINT8  *pCtvLine;					// Pointer to output bitmap
@@ -385,9 +394,9 @@ INT32 DaimakaibObjGet();
 INT32 WofhObjGet();
 INT32 Sf2mdtObjGet();
 void CpsObjDrawInit();
-INT32  Cps1ObjDraw(INT32 nLevelFrom,INT32 nLevelTo);
-INT32  Cps2ObjDraw(INT32 nLevelFrom,INT32 nLevelTo);
-INT32  FcrashObjDraw(INT32 nLevelFrom,INT32 nLevelTo);
+INT32  Cps1ObjDraw(INT32 nLevelFrom, INT32 nLevelTo);
+INT32  Cps2ObjDraw(INT32 nLevelFrom, INT32 nLevelTo);
+INT32  FcrashObjDraw(INT32 nLevelFrom, INT32 nLevelTo);
 
 // cps_scr.cpp
 #define SCROLL_2 0
@@ -399,26 +408,27 @@ extern INT32 Xmcota;
 extern INT32 Scroll1TileMask;
 extern INT32 Scroll2TileMask;
 extern INT32 Scroll3TileMask;
-INT32 Cps1Scr1Draw(UINT8 *Base,INT32 sx,INT32 sy);
-INT32 Cps1Scr3Draw(UINT8 *Base,INT32 sx,INT32 sy);
-INT32 Cps2Scr1Draw(UINT8 *Base,INT32 sx,INT32 sy);
-INT32 Cps2Scr3Draw(UINT8 *Base,INT32 sx,INT32 sy);
+INT32 Cps1Scr1Draw(UINT8 *Base, INT32 sx, INT32 sy);
+INT32 Cps1Scr3Draw(UINT8 *Base, INT32 sx, INT32 sy);
+INT32 Cps2Scr1Draw(UINT8 *Base, INT32 sx, INT32 sy);
+INT32 Cps2Scr3Draw(UINT8 *Base, INT32 sx, INT32 sy);
 
 // cpsr.cpp
 extern UINT8 *CpsrBase;						// Tile data base
-extern INT32 nCpsrScrX,nCpsrScrY;						// Basic scroll info
+extern INT32 nCpsrScrX, nCpsrScrY;						// Basic scroll info
 extern UINT16 *CpsrRows;					// Row scroll table, 0x400 words long
 extern INT32 nCpsrRowStart;							// Start of row scroll (can wrap?)
 
 // Information needed to draw a line
-struct CpsrLineInfo {
-	INT32 nStart;										// 0-0x3ff - where to start drawing tiles from
-	INT32 nWidth;										// 0-0x400 - width of scroll shifts
-													// e.g. for no rowscroll at all, nWidth=0
-	INT32 nTileStart;									// Range of tiles which are visible onscreen
-	INT32 nTileEnd;									// (e.g. 0x20 -> 0x50 , wraps around to 0x10)
-	INT16 Rows[16];									// 16 row scroll values for this line
-	INT32 nMaxLeft, nMaxRight;						// Maximum row shifts left and right
+struct CpsrLineInfo
+{
+    INT32 nStart;										// 0-0x3ff - where to start drawing tiles from
+    INT32 nWidth;										// 0-0x400 - width of scroll shifts
+    // e.g. for no rowscroll at all, nWidth=0
+    INT32 nTileStart;									// Range of tiles which are visible onscreen
+    INT32 nTileEnd;									// (e.g. 0x20 -> 0x50 , wraps around to 0x10)
+    INT16 Rows[16];									// 16 row scroll values for this line
+    INT32 nMaxLeft, nMaxRight;						// Maximum row shifts left and right
 };
 extern struct CpsrLineInfo CpsrLineInfo[15];
 INT32 Cps1rPrepare();

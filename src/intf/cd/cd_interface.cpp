@@ -9,21 +9,21 @@ CDEmuStatusValue CDEmuStatus;
 static InterfaceInfo CDEmuInfo = { NULL, NULL, NULL };
 
 #if defined BUILD_WIN32
-	extern struct CDEmuDo isowavDo;
+extern struct CDEmuDo isowavDo;
 #elif defined BUILD_SDL
-	// CD emulation module
+// CD emulation module
 #elif defined (_XBOX)
-	extern struct CDEmuDo isowavDo;
+extern struct CDEmuDo isowavDo;
 #endif
 
-static struct CDEmuDo* pCDEmuDo[] =
+static struct CDEmuDo *pCDEmuDo[] =
 {
 #if defined BUILD_WIN32
-	&isowavDo,
+    &isowavDo,
 #elif defined BUILD_SDL
-	// CD emulation module
+    // CD emulation module
 #elif defined (_XBOX)
-	&isowavDo,
+    &isowavDo,
 #endif
 };
 
@@ -36,106 +36,120 @@ TCHAR CDEmuImage[MAX_PATH] = _T("");
 
 INT32 CDEmuExit()
 {
-	IntInfoFree(&CDEmuInfo);
+    IntInfoFree(&CDEmuInfo);
 
-	if (!bCDEmuOkay || nCDEmuSelect >= CDEMU_LEN) {
-		return 1;
-	}
-	bCDEmuOkay = false;
+    if (!bCDEmuOkay || nCDEmuSelect >= CDEMU_LEN)
+    {
+        return 1;
+    }
+    bCDEmuOkay = false;
 
-	return pCDEmuDo[nCDEmuSelect]->CDEmuExit();
+    return pCDEmuDo[nCDEmuSelect]->CDEmuExit();
 }
 
 INT32 CDEmuInit()
 {
-	INT32 nRet;
+    INT32 nRet;
 
-	if (nCDEmuSelect >= CDEMU_LEN) {
-		return 1;
-	}
+    if (nCDEmuSelect >= CDEMU_LEN)
+    {
+        return 1;
+    }
 
-	CDEmuStatus = idle;
+    CDEmuStatus = idle;
 
-	if ((nRet = pCDEmuDo[nCDEmuSelect]->CDEmuInit()) == 0) {
-		bCDEmuOkay = true;
-	}
+    if ((nRet = pCDEmuDo[nCDEmuSelect]->CDEmuInit()) == 0)
+    {
+        bCDEmuOkay = true;
+    }
 
-	return nRet;
+    return nRet;
 }
 
 INT32 CDEmuStop()
 {
-	if (!bCDEmuOkay || nCDEmuSelect >= CDEMU_LEN) {
-		return 1;
-	}
+    if (!bCDEmuOkay || nCDEmuSelect >= CDEMU_LEN)
+    {
+        return 1;
+    }
 
-	return pCDEmuDo[nCDEmuSelect]->CDEmuStop();
+    return pCDEmuDo[nCDEmuSelect]->CDEmuStop();
 }
 
 INT32 CDEmuPlay(UINT8 M, UINT8 S, UINT8 F)
 {
-	if (!bCDEmuOkay || nCDEmuSelect >= CDEMU_LEN) {
-		return 1;
-	}
+    if (!bCDEmuOkay || nCDEmuSelect >= CDEMU_LEN)
+    {
+        return 1;
+    }
 
-	return pCDEmuDo[nCDEmuSelect]->CDEmuPlay(M, S, F);
+    return pCDEmuDo[nCDEmuSelect]->CDEmuPlay(M, S, F);
 }
 
-INT32 CDEmuLoadSector(INT32 LBA, char* pBuffer)
+INT32 CDEmuLoadSector(INT32 LBA, char *pBuffer)
 {
-	if (!bCDEmuOkay || nCDEmuSelect >= CDEMU_LEN) {
-		return 0;
-	}
+    if (!bCDEmuOkay || nCDEmuSelect >= CDEMU_LEN)
+    {
+        return 0;
+    }
 
-	return pCDEmuDo[nCDEmuSelect]->CDEmuLoadSector(LBA, pBuffer);
+    return pCDEmuDo[nCDEmuSelect]->CDEmuLoadSector(LBA, pBuffer);
 }
 
-UINT8* CDEmuReadTOC(INT32 track)
+UINT8 *CDEmuReadTOC(INT32 track)
 {
-	if (!bCDEmuOkay || nCDEmuSelect >= CDEMU_LEN) {
-		return NULL;
-	}
+    if (!bCDEmuOkay || nCDEmuSelect >= CDEMU_LEN)
+    {
+        return NULL;
+    }
 
-	return pCDEmuDo[nCDEmuSelect]->CDEmuReadTOC(track);
+    return pCDEmuDo[nCDEmuSelect]->CDEmuReadTOC(track);
 }
 
-UINT8* CDEmuReadQChannel()
+UINT8 *CDEmuReadQChannel()
 {
-	if (!bCDEmuOkay || nCDEmuSelect >= CDEMU_LEN) {
-		return NULL;
-	}
+    if (!bCDEmuOkay || nCDEmuSelect >= CDEMU_LEN)
+    {
+        return NULL;
+    }
 
-	return pCDEmuDo[nCDEmuSelect]->CDEmuReadQChannel();
+    return pCDEmuDo[nCDEmuSelect]->CDEmuReadQChannel();
 }
 
-INT32 CDEmuGetSoundBuffer(INT16* buffer, INT32 samples)
+INT32 CDEmuGetSoundBuffer(INT16 *buffer, INT32 samples)
 {
-	if (!bCDEmuOkay || nCDEmuSelect >= CDEMU_LEN) {
-		return 1;
-	}
+    if (!bCDEmuOkay || nCDEmuSelect >= CDEMU_LEN)
+    {
+        return 1;
+    }
 
-	return pCDEmuDo[nCDEmuSelect]->CDEmuGetSoundBuffer(buffer, samples);
+    return pCDEmuDo[nCDEmuSelect]->CDEmuGetSoundBuffer(buffer, samples);
 }
 
-InterfaceInfo* CDEmuGetInfo()
+InterfaceInfo *CDEmuGetInfo()
 {
-	if (IntInfoInit(&CDEmuInfo)) {
-		IntInfoFree(&CDEmuInfo);
-		return NULL;
-	}
+    if (IntInfoInit(&CDEmuInfo))
+    {
+        IntInfoFree(&CDEmuInfo);
+        return NULL;
+    }
 
-	if (bCDEmuOkay) {
+    if (bCDEmuOkay)
+    {
 
-		CDEmuInfo.pszModuleName = pCDEmuDo[nCDEmuSelect]->szModuleName;
+        CDEmuInfo.pszModuleName = pCDEmuDo[nCDEmuSelect]->szModuleName;
 
-	 	if (pCDEmuDo[nCDEmuSelect]->GetPluginSettings) {
-			pCDEmuDo[nCDEmuSelect]->GetPluginSettings(&CDEmuInfo);
-		}
-	} else {
-		IntInfoAddStringInterface(&CDEmuInfo, _T("CD/CD-ROM emulation module not initialised"));
-	}
+        if (pCDEmuDo[nCDEmuSelect]->GetPluginSettings)
+        {
+            pCDEmuDo[nCDEmuSelect]->GetPluginSettings(&CDEmuInfo);
+        }
+    }
+    else
+    {
+        IntInfoAddStringInterface(&CDEmuInfo, _T("CD/CD-ROM emulation module not initialised"));
+    }
 
-	return &CDEmuInfo;
+    return &CDEmuInfo;
 
-	return NULL;
+    return NULL;
 }

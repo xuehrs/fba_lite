@@ -22,7 +22,7 @@ void YM2413WriteReg(int which, int r, int v);
 unsigned char YM2413Read(int which, int a);
 void YM2413UpdateOne(int which, INT16 **buffers, int length);
 
-typedef void (*OPLL_UPDATEHANDLER)(int param,int min_interval_us);
+typedef void (*OPLL_UPDATEHANDLER)(int param, int min_interval_us);
 
 void YM2413SetUpdateHandler(int which, OPLL_UPDATEHANDLER UpdateHandler, int param);
 

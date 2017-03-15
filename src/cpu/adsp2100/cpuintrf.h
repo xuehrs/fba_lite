@@ -20,7 +20,8 @@ enum
 };
 
 
-enum {
+enum
+{
     CLEAR_LINE = 0,				/* clear (a fired, held or pulsed) line */
     ASSERT_LINE,				/* assert an interrupt immediately */
     HOLD_LINE,					/* hold interrupt line until acknowledged */

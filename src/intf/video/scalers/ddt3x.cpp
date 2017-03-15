@@ -1,6 +1,6 @@
 /*
    Hyllian's Data Dependent Triangulation 3x
-   
+
    Copyright (C) 2011, 2012 Hyllian/Jararaca - sergiogdb@gmail.com
 
    This program is free software; you can redistribute it and/or
@@ -24,9 +24,9 @@
 extern "C"
 {
     static unsigned char initialized = 0;
-//	unsigned int	RGBtoYUV[65536];
-//    static unsigned int tbl_5_to_8[32]={0, 8, 16, 25, 33, 41, 49,  58, 66, 74, 82, 90, 99, 107, 115, 123, 132, 140, 148, 156, 165, 173, 181, 189,  197, 206, 214, 222, 230, 239, 247, 255};
-//    static unsigned int tbl_6_to_8[64]={0, 4, 8, 12, 16, 20, 24,  28, 32, 36, 40, 45, 49, 53, 57, 61, 65, 69, 73, 77, 81, 85, 89, 93, 97, 101,  105, 109, 113, 117, 121, 125, 130, 134, 138, 142, 146, 150, 154, 158, 162, 166,  170, 174, 178, 182, 186, 190, 194, 198, 202, 206, 210, 215, 219, 223, 227, 231,  235, 239, 243, 247, 251, 255};
+    //	unsigned int	RGBtoYUV[65536];
+    //    static unsigned int tbl_5_to_8[32]={0, 8, 16, 25, 33, 41, 49,  58, 66, 74, 82, 90, 99, 107, 115, 123, 132, 140, 148, 156, 165, 173, 181, 189,  197, 206, 214, 222, 230, 239, 247, 255};
+    //    static unsigned int tbl_6_to_8[64]={0, 4, 8, 12, 16, 20, 24,  28, 32, 36, 40, 45, 49, 53, 57, 61, 65, 69, 73, 77, 81, 85, 89, 93, 97, 101,  105, 109, 113, 117, 121, 125, 130, 134, 138, 142, 146, 150, 154, 158, 162, 166,  170, 174, 178, 182, 186, 190, 194, 198, 202, 206, 210, 215, 219, 223, 227, 231,  235, 239, 243, 247, 251, 255};
 }
 
 unsigned short int ddt_red_blue_mask;
@@ -87,104 +87,104 @@ unsigned short int ddt_green_mask;
  }\
 }\
 
-        
-void ddt3x(unsigned char * src,  unsigned int srcPitch,
-			unsigned char * dest, unsigned int dstPitch,
-			int Xres, int Yres)
-{	
-	unsigned short int x, y;
-	unsigned short int PA, PB, PC, PD, PE, PF, PG, PH, PI;
-	register unsigned short int *sa1, *sa2, *sa3; // sa = start_address
-	unsigned short int nl, nl_src; // nl = new_line
-    unsigned short int nl1;	
-	unsigned short int *E;  // E = dst_pixel
-	unsigned short int src_width = (unsigned short int)Xres; 
-	unsigned short int src_height = (unsigned short int)Yres;
-	unsigned short int dst_width = src_width * 3;
-//	unsigned short int dst_height = src_height * 3;
-	unsigned short int complete_line_src, complete_line_dst;
-	unsigned short int src_pitch = (unsigned short int)srcPitch;
-	unsigned char pprev;
+
+void ddt3x(unsigned char *src,  unsigned int srcPitch,
+           unsigned char *dest, unsigned int dstPitch,
+           int Xres, int Yres)
+{
+    unsigned short int x, y;
+    unsigned short int PA, PB, PC, PD, PE, PF, PG, PH, PI;
+    register unsigned short int *sa1, *sa2, *sa3; // sa = start_address
+    unsigned short int nl, nl_src; // nl = new_line
+    unsigned short int nl1;
+    unsigned short int *E;  // E = dst_pixel
+    unsigned short int src_width = (unsigned short int)Xres;
+    unsigned short int src_height = (unsigned short int)Yres;
+    unsigned short int dst_width = src_width * 3;
+    //	unsigned short int dst_height = src_height * 3;
+    unsigned short int complete_line_src, complete_line_dst;
+    unsigned short int src_pitch = (unsigned short int)srcPitch;
+    unsigned char pprev;
     unsigned int ad, bc;
     unsigned int td, ts;
 
     if (!initialized)
     {
-       ddt_red_blue_mask   = RED_BLUE_MASK565;
-       ddt_green_mask = GREEN_MASK565;
-       
-       initialized = 1;
+        ddt_red_blue_mask   = RED_BLUE_MASK565;
+        ddt_green_mask = GREEN_MASK565;
+
+        initialized = 1;
     }
-	
-	nl_src = src_pitch >> 1;
-	nl = (unsigned short int)dstPitch >> 1;
-	nl1= (unsigned short int)dstPitch;
 
-	// fixed by Steve Snake
-	complete_line_src = (src_pitch>>1) - src_width;
-	complete_line_dst = ((dstPitch*3)>>1) - dst_width;
-	
-	sa2 = (unsigned short int *)(src - 4);
+    nl_src = src_pitch >> 1;
+    nl = (unsigned short int)dstPitch >> 1;
+    nl1 = (unsigned short int)dstPitch;
+
+    // fixed by Steve Snake
+    complete_line_src = (src_pitch >> 1) - src_width;
+    complete_line_dst = ((dstPitch * 3) >> 1) - dst_width;
+
+    sa2 = (unsigned short int *)(src - 4);
     sa1 = sa2;
-	sa3 = sa2 + src_pitch;
-	
-	E = (unsigned short int *)(dest);	
-	
-	y = src_height;
+    sa3 = sa2 + src_pitch;
 
-	while(y--)
-	{	
+    E = (unsigned short int *)(dest);
+
+    y = src_height;
+
+    while(y--)
+    {
         if (!y) sa3 = sa2;
         pprev = 2;
         x = src_width;
-		
-		while(x--) 
-		{			
+
+        while(x--)
+        {
             PB = sa1[2];
-			PE = sa2[2];			
-			PH = sa3[2];
-			
-			PA = sa1[pprev];
-			PD = sa2[pprev];			
-			PG = sa3[pprev];
-			
-    		PC = sa1[3];
-			PF = sa2[3];
-			PI = sa3[3];
-				
-            if (!x)				
+            PE = sa2[2];
+            PH = sa3[2];
+
+            PA = sa1[pprev];
+            PD = sa2[pprev];
+            PG = sa3[pprev];
+
+            PC = sa1[3];
+            PF = sa2[3];
+            PI = sa3[3];
+
+            if (!x)
             {
-   				PC = sa1[2];
-   				PF = sa2[2];
-   				PI = sa3[2];
-   			}
+                PC = sa1[2];
+                PF = sa2[2];
+                PI = sa3[2];
+            }
 
-			E[0]   = E[1]     = E[2]     = PE;
-			E[nl]  = E[nl+1]  = E[nl+2]  = PE; // 3, 4, 5
-			E[nl1] = E[nl1+1] = E[nl1+2] = PE; // 6, 7, 8
-			
-if (PE!=PH || PE!=PI || PE!=PF || PE!=PC || PE!=PB || PE!=PA || PE!=PD || PE!=PG) 
-{
-			
-FILTRO(PE, PI, PH, PF, PG, PC, PD, PB, PA, 0, 1, 2, nl, nl+1, nl+2, nl1, nl1+1, nl1+2);
-FILTRO(PE, PC, PF, PB, PI, PA, PH, PD, PG, nl1, nl, 0, nl1+1, nl+1, 1, nl1+2, nl+2, 2);
-FILTRO(PE, PA, PB, PD, PC, PG, PF, PH, PI, nl1+2, nl1+1, nl1, nl+2, nl+1, nl, 2, 1, 0);
-FILTRO(PE, PG, PD, PH, PA, PI, PB, PF, PC, 2, nl+2, nl1+2, 1, nl+1, nl1+1, 0, nl, nl1);
+            E[0]   = E[1]     = E[2]     = PE;
+            E[nl]  = E[nl + 1]  = E[nl + 2]  = PE; // 3, 4, 5
+            E[nl1] = E[nl1 + 1] = E[nl1 + 2] = PE; // 6, 7, 8
 
-}
-			sa1++;
-			sa2++;
-			sa3++;
-			
-            E+=3;
-			
+            if (PE != PH || PE != PI || PE != PF || PE != PC || PE != PB || PE != PA || PE != PD || PE != PG)
+            {
+
+                FILTRO(PE, PI, PH, PF, PG, PC, PD, PB, PA, 0, 1, 2, nl, nl + 1, nl + 2, nl1, nl1 + 1, nl1 + 2);
+                FILTRO(PE, PC, PF, PB, PI, PA, PH, PD, PG, nl1, nl, 0, nl1 + 1, nl + 1, 1, nl1 + 2, nl + 2, 2);
+                FILTRO(PE, PA, PB, PD, PC, PG, PF, PH, PI, nl1 + 2, nl1 + 1, nl1, nl + 2, nl + 1, nl, 2, 1, 0);
+                FILTRO(PE, PG, PD, PH, PA, PI, PB, PF, PC, 2, nl + 2, nl1 + 2, 1, nl + 1, nl1 + 1, 0, nl, nl1);
+
+            }
+            sa1++;
+            sa2++;
+            sa3++;
+
+            E += 3;
+
             pprev = 1;
-		}
-		
+        }
+
         sa2 += complete_line_src;
-		sa1 = sa2 - nl_src;		
-		sa3 = sa2 + nl_src;
-		
-        E += complete_line_dst;				
-	}
+        sa1 = sa2 - nl_src;
+        sa3 = sa2 + nl_src;
+
+        E += complete_line_dst;
+    }
 }

@@ -36,7 +36,8 @@ static int pas_blank_sound()
 static int pas_sound_check()
 {
     // 5 segments ahead...
-    if (buffer->size() >= (samples_per_segment * nAudSegCount)) {
+    if (buffer->size() >= (samples_per_segment * nAudSegCount))
+    {
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
         return 0;
     }
@@ -54,9 +55,12 @@ static int pas_exit()
 
 static int pas_set_callback(int (*callback)(int))
 {
-    if (callback == NULL) {
+    if (callback == NULL)
+    {
         pas_get_next_sound = pas_default_sound_filler;
-    } else {
+    }
+    else
+    {
         pas_get_next_sound = callback;
     }
     return 0;
@@ -67,18 +71,25 @@ static void pas_audio_streamer(void)
     short *buf = new short[samples_per_segment];
     streamer_is_running = true;
 
-    while (!streamer_stop) {
+    while (!streamer_stop)
+    {
         // playing...
-        if (bAudPlaying) {
+        if (bAudPlaying)
+        {
 
-            if (buffer->size() >= samples_per_segment) {
+            if (buffer->size() >= samples_per_segment)
+            {
                 buffer->read(buf, samples_per_segment);
-            } else {
+            }
+            else
+            {
                 memset(buf, 0, samples_per_segment * 2);
             }
 
             pa_simple_write(pa_stream, buf, samples_per_segment * 2, NULL);
-        } else {
+        }
+        else
+        {
             std::this_thread::sleep_for(std::chrono::microseconds(10));
         }
     }
@@ -118,9 +129,11 @@ static int pas_init()
     attributes.prebuf = -1;
     attributes.tlength = nAudAllocSegLen * nAudSegCount;
 
-    if (streamer_thread) {
+    if (streamer_thread)
+    {
         streamer_stop = true;
-        while (streamer_is_running) {
+        while (streamer_is_running)
+        {
             std::this_thread::yield();
         }
         streamer_stop = false;
@@ -128,13 +141,15 @@ static int pas_init()
     }
 
     // destroy previous pulse audio stream
-    if (pa_stream) {
+    if (pa_stream)
+    {
         pa_simple_flush(pa_stream, NULL);
         pa_simple_free(pa_stream);
     }
 
     // destroy previous ring buffer
-    if (buffer) {
+    if (buffer)
+    {
         delete buffer;
     }
 
@@ -178,7 +193,8 @@ static int pas_get_settings(InterfaceInfo *)
     return 0;
 }
 
-struct AudOut AudOutPulseSimple = {
+struct AudOut AudOutPulseSimple =
+{
     pas_blank_sound,
     pas_sound_check,
     pas_init,

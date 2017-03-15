@@ -11,4 +11,4 @@ void NMK004NmiWrite(INT32 data);
 void NMK004Write(INT32, INT32 data);
 UINT8 NMK004Read();
 
-INT32 NMK004Scan(INT32 nAction, INT32* pnMin);
+INT32 NMK004Scan(INT32 nAction, INT32 *pnMin);

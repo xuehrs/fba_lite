@@ -48,7 +48,7 @@ extern UINT8 PgmReset;
 
 extern void (*pPgmInitCallback)();
 extern void (*pPgmResetCallback)();
-extern INT32 (*pPgmScanCallback)(INT32, INT32*);
+extern INT32 (*pPgmScanCallback)(INT32, INT32 *);
 extern void (*pPgmProtCallback)();
 
 extern INT32 nPGMDisableIRQ4;

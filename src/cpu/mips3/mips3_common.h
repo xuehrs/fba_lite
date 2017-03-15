@@ -11,9 +11,9 @@
 #endif
 namespace mips
 {
-using namespace std;
+    using namespace std;
 
-typedef uint64_t addr_t;
+    typedef uint64_t addr_t;
 
 }
 

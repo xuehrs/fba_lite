@@ -8,7 +8,7 @@
 #define NM_FIRST				(0U - 0U)
 
 #if (_WIN32_IE >= 0x0300)
- #define NMLVKEYDOWN			LV_KEYDOWN
+#define NMLVKEYDOWN			LV_KEYDOWN
 #endif
 
 #ifndef MNS_NOCHECK
@@ -56,21 +56,21 @@
 #if __W32API_MAJOR_VERSION >=3 && __W32API_MINOR_VERSION < 8
 typedef struct _settextex
 {
-	DWORD	flags;
-	UINT	codepage;
+    DWORD	flags;
+    UINT	codepage;
 } SETTEXTEX;
 #endif
 
 // Macro used for handling Window Messages
 #if not defined HANDLE_WM_DISPLAYCHANGE
- #define HANDLE_WM_DISPLAYCHANGE(hwnd, wParam, lParam, fn)		((fn)((hwnd), (UINT)(wParam), (UINT)LOWORD(lParam), (UINT)HIWORD(wParam)), 0L)
+#define HANDLE_WM_DISPLAYCHANGE(hwnd, wParam, lParam, fn)		((fn)((hwnd), (UINT)(wParam), (UINT)LOWORD(lParam), (UINT)HIWORD(wParam)), 0L)
 #endif
 
 #if _WIN32_WINNT < 0x0500
- #define VK_OEM_PLUS	0xBB
- #define VK_OEM_COMMA	0xBC
- #define VK_OEM_MINUS	0xBD
- #define VK_OEM_PERIOD	0xBE
+#define VK_OEM_PLUS	0xBB
+#define VK_OEM_COMMA	0xBC
+#define VK_OEM_MINUS	0xBD
+#define VK_OEM_PERIOD	0xBE
 #endif
 
 #ifndef LVM_SORTITEMSEX

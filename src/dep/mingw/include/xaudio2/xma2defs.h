@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
   Moddified by CaptainCPS for use with MinGW / GCC 4.6.1
-  
+
   Thanks to PortAudio for their 'sal.h' compatible with MinGW !
 -------------------------------------------------------------------------*/
 
@@ -208,7 +208,7 @@ typedef struct XMA2WAVEFORMATEX
 
     WORD  NumStreams;        // Number of audio streams (1 or 2 channels each)
     DWORD ChannelMask;       // Spatial positions of the channels in this file,
-                             // stored as SPEAKER_xxx values (see audiodefs.h)
+    // stored as SPEAKER_xxx values (see audiodefs.h)
     DWORD SamplesEncoded;    // Total number of PCM samples the file decodes to
     DWORD BytesPerBlock;     // XMA block size (but the last one may be shorter)
     DWORD PlayBegin;         // First valid sample in the decoded audio
@@ -232,14 +232,14 @@ typedef struct XMA2WAVEFORMATEX
 // Values used in the ChannelMask fields below.  Similar to the SPEAKER_xxx
 // values defined in audiodefs.h, but modified to fit in a single byte.
 #ifndef XMA_SPEAKER_LEFT
-    #define XMA_SPEAKER_LEFT            0x01
-    #define XMA_SPEAKER_RIGHT           0x02
-    #define XMA_SPEAKER_CENTER          0x04
-    #define XMA_SPEAKER_LFE             0x08
-    #define XMA_SPEAKER_LEFT_SURROUND   0x10
-    #define XMA_SPEAKER_RIGHT_SURROUND  0x20
-    #define XMA_SPEAKER_LEFT_BACK       0x40
-    #define XMA_SPEAKER_RIGHT_BACK      0x80
+#define XMA_SPEAKER_LEFT            0x01
+#define XMA_SPEAKER_RIGHT           0x02
+#define XMA_SPEAKER_CENTER          0x04
+#define XMA_SPEAKER_LFE             0x08
+#define XMA_SPEAKER_LEFT_SURROUND   0x10
+#define XMA_SPEAKER_RIGHT_SURROUND  0x20
+#define XMA_SPEAKER_LEFT_BACK       0x40
+#define XMA_SPEAKER_RIGHT_BACK      0x80
 #endif
 
 
@@ -248,16 +248,16 @@ typedef struct XMASTREAMFORMAT
 {
     DWORD PsuedoBytesPerSec; // Used by the XMA encoder (typo preserved for legacy reasons)
     DWORD SampleRate;        // The stream's decoded sample rate (in XMA2 files,
-                             // this is the same for all streams in the file).
+    // this is the same for all streams in the file).
     DWORD LoopStart;         // Bit offset of the frame containing the loop start
-                             // point, relative to the beginning of the stream.
+    // point, relative to the beginning of the stream.
     DWORD LoopEnd;           // Bit offset of the frame containing the loop end.
     BYTE  SubframeData;      // Two 4-bit numbers specifying the exact location of
-                             // the loop points within the frames that contain them.
-                             //   SubframeEnd: Subframe of the loop end frame where
-                             //                the loop ends.  Ranges from 0 to 3.
-                             //   SubframeSkip: Subframes to skip in the start frame to
-                             //                 reach the loop.  Ranges from 0 to 4.
+    // the loop points within the frames that contain them.
+    //   SubframeEnd: Subframe of the loop end frame where
+    //                the loop ends.  Ranges from 0 to 3.
+    //   SubframeSkip: Subframes to skip in the start frame to
+    //                 reach the loop.  Ranges from 0 to 4.
     BYTE  Channels;          // Number of channels in the stream (1 or 2)
     WORD  ChannelMask;       // Spatial positions of the channels in the stream
 } XMASTREAMFORMAT;
@@ -272,9 +272,9 @@ typedef struct XMAWAVEFORMAT
     WORD NumStreams;         // Number of interleaved audio streams
     BYTE LoopCount;          // Number of loop repetitions; 255 = infinite
     BYTE Version;            // XMA encoder version that generated the file.
-                             // Always 3 or higher for XMA2 files.
+    // Always 3 or higher for XMA2 files.
     XMASTREAMFORMAT XmaStreams[1]; // Per-stream format information; the actual
-                                   // array length is in the NumStreams field.
+    // array length is in the NumStreams field.
 } XMAWAVEFORMAT;
 
 
@@ -290,7 +290,7 @@ typedef struct XMA2STREAMFORMAT
 typedef struct XMA2WAVEFORMAT
 {
     BYTE  Version;           // XMA encoder version that generated the file.
-                             // Always 3 or higher for XMA2 files.
+    // Always 3 or higher for XMA2 files.
     BYTE  NumStreams;        // Number of interleaved audio streams
     BYTE  RESERVED;          // Reserved for future use
     BYTE  LoopCount;         // Number of loop repetitions; 255 = infinite
@@ -300,15 +300,15 @@ typedef struct XMA2WAVEFORMAT
     DWORD EncodeOptions;     // Options for the XMA encoder/decoder
     DWORD PsuedoBytesPerSec; // Used internally by the XMA encoder
     DWORD BlockSizeInBytes;  // Size in bytes of this file's XMA blocks (except
-                             // possibly the last one).  Always a multiple of
-                             // 2Kb, since XMA blocks are arrays of 2Kb packets.
+    // possibly the last one).  Always a multiple of
+    // 2Kb, since XMA blocks are arrays of 2Kb packets.
     DWORD SamplesEncoded;    // Total number of PCM samples encoded in this file
     DWORD SamplesInSource;   // Actual number of PCM samples in the source
-                             // material used to generate this file
+    // material used to generate this file
     DWORD BlockCount;        // Number of XMA blocks in this file (and hence
-                             // also the number of entries in its seek table)
+    // also the number of entries in its seek table)
     XMA2STREAMFORMAT Streams[1]; // Per-stream format information; the actual
-                                 // array length is in the NumStreams field.
+    // array length is in the NumStreams field.
 } XMA2WAVEFORMAT;
 
 #endif // #ifndef WAVE_FORMAT_XMA
@@ -325,7 +325,7 @@ typedef struct XMA2PACKET
     int FrameOffsetInBits : 15;  // Bit of XmaData where the first complete frame begins
     int PacketMetaData    :  3;  // Metadata stored in the packet (always 1 for XMA2)
     int PacketSkipCount   :  8;  // How many packets belonging to other streams must be
-                                 // skipped to find the next packet belonging to this one
+    // skipped to find the next packet belonging to this one
     BYTE XmaData[XMA_BYTES_PER_PACKET - sizeof(DWORD)];  // XMA encoded data
 } XMA2PACKET;
 
@@ -342,24 +342,24 @@ typedef struct XMA2PACKET
 // the bitfields cannot be read directly on little-endian architectures such as
 // the Intel x86, as they are laid out in big-endian form.)
 
-__inline DWORD GetXmaPacketFrameCount(__in_bcount(1) const BYTE* pPacket)
+__inline DWORD GetXmaPacketFrameCount(__in_bcount(1) const BYTE *pPacket)
 {
     return (DWORD)(pPacket[0] >> 2);
 }
 
-__inline DWORD GetXmaPacketFirstFrameOffsetInBits(__in_bcount(3) const BYTE* pPacket)
+__inline DWORD GetXmaPacketFirstFrameOffsetInBits(__in_bcount(3) const BYTE *pPacket)
 {
     return ((DWORD)(pPacket[0] & 0x3) << 13) |
            ((DWORD)(pPacket[1]) << 5) |
            ((DWORD)(pPacket[2]) >> 3);
 }
 
-__inline DWORD GetXmaPacketMetadata(__in_bcount(3) const BYTE* pPacket)
+__inline DWORD GetXmaPacketMetadata(__in_bcount(3) const BYTE *pPacket)
 {
     return (DWORD)(pPacket[2] & 0x7);
 }
 
-__inline DWORD GetXmaPacketSkipCount(__in_bcount(4) const BYTE* pPacket)
+__inline DWORD GetXmaPacketSkipCount(__in_bcount(4) const BYTE *pPacket)
 {
     return (DWORD)(pPacket[3]);
 }
@@ -395,11 +395,11 @@ __inline DWORD GetXmaPacketSkipCount(__in_bcount(4) const BYTE* pPacket)
 // We define a local ASSERT macro to equal the global one if it exists.
 // You can define XMA2DEFS_ASSERT in advance to override this default.
 #ifndef XMA2DEFS_ASSERT
-    #ifdef ASSERT
-        #define XMA2DEFS_ASSERT ASSERT
-    #else
-        #define XMA2DEFS_ASSERT(a) /* No-op by default */
-    #endif
+#ifdef ASSERT
+#define XMA2DEFS_ASSERT ASSERT
+#else
+#define XMA2DEFS_ASSERT(a) /* No-op by default */
+#endif
 #endif
 
 
@@ -411,10 +411,10 @@ __inline DWORD GetXmaPacketSkipCount(__in_bcount(4) const BYTE* pPacket)
 __inline HRESULT GetXmaBlockContainingSample
 (
     DWORD nBlockCount,                      // Blocks in the file (= seek table entries)
-    __in_ecount(nBlockCount) const DWORD* pSeekTable,  // Pointer to the seek table data
+    __in_ecount(nBlockCount) const DWORD *pSeekTable,  // Pointer to the seek table data
     DWORD nDesiredSample,                   // Decoded sample to locate
-    __out DWORD* pnBlockContainingSample,   // Index of the block containing the sample
-    __out DWORD* pnSampleOffsetWithinBlock  // Position of the sample in this block
+    __out DWORD *pnBlockContainingSample,   // Index of the block containing the sample
+    __out DWORD *pnSampleOffsetWithinBlock  // Position of the sample in this block
 )
 {
     DWORD nPreviousTotalSamples = 0;
@@ -446,7 +446,7 @@ __inline HRESULT GetXmaBlockContainingSample
 __inline DWORD GetXmaFrameLengthInBits
 (
     __in_bcount(nBitPosition / 8 + 3)
-    __in const BYTE* pPacket,  // Pointer to XMA packet[s] containing the frame
+    __in const BYTE *pPacket,  // Pointer to XMA packet[s] containing the frame
     DWORD nBitPosition         // Bit offset of the frame within this packet
 )
 {
@@ -456,15 +456,15 @@ __inline DWORD GetXmaFrameLengthInBits
 
     if (nBitOffset < 2) // Only need to read 2 bytes (and might not be safe to read more)
     {
-        nRegion = (DWORD)(pPacket[nBytePosition+0]) << 8 |
-                  (DWORD)(pPacket[nBytePosition+1]);
+        nRegion = (DWORD)(pPacket[nBytePosition + 0]) << 8 |
+                  (DWORD)(pPacket[nBytePosition + 1]);
         return (nRegion >> (1 - nBitOffset)) & 0x7FFF;  // Last 15 bits
     }
     else // Need to read 3 bytes
     {
-        nRegion = (DWORD)(pPacket[nBytePosition+0]) << 16 |
-                  (DWORD)(pPacket[nBytePosition+1]) << 8 |
-                  (DWORD)(pPacket[nBytePosition+2]);
+        nRegion = (DWORD)(pPacket[nBytePosition + 0]) << 16 |
+                  (DWORD)(pPacket[nBytePosition + 1]) << 8 |
+                  (DWORD)(pPacket[nBytePosition + 2]);
         return (nRegion >> (9 - nBitOffset)) & 0x7FFF;  // Last 15 bits
     }
 }
@@ -475,13 +475,13 @@ __inline DWORD GetXmaFrameLengthInBits
 
 __inline DWORD GetXmaFrameBitPosition
 (
-    __in_bcount(nXmaDataBytes) const BYTE* pXmaData,  // Pointer to XMA block[s]
+    __in_bcount(nXmaDataBytes) const BYTE *pXmaData,  // Pointer to XMA block[s]
     DWORD nXmaDataBytes,                              // Size of pXmaData in bytes
     DWORD nStreamIndex,                               // Stream within which to seek
     DWORD nDesiredFrame                               // Frame sought
 )
 {
-    const BYTE* pCurrentPacket;
+    const BYTE *pCurrentPacket;
     DWORD nPacketsExamined = 0;
     DWORD nFrameCountSoFar = 0;
     DWORD nFramesToSkip;
@@ -539,12 +539,12 @@ __inline DWORD GetXmaFrameBitPosition
 
 __inline DWORD GetLastXmaFrameBitPosition
 (
-    __in_bcount(nXmaDataBytes) const BYTE* pXmaData,  // Pointer to XMA block[s]
+    __in_bcount(nXmaDataBytes) const BYTE *pXmaData,  // Pointer to XMA block[s]
     DWORD nXmaDataBytes,                              // Size of pXmaData in bytes
     DWORD nStreamIndex                                // Stream within which to seek
 )
 {
-    const BYTE* pLastPacket;
+    const BYTE *pLastPacket;
     DWORD nBytesToNextPacket;
     DWORD nFrameBitOffset;
     DWORD nFramesInLastPacket;
@@ -601,13 +601,13 @@ __inline DWORD GetLastXmaFrameBitPosition
 
 __inline HRESULT GetXmaDecodePositionForSample
 (
-    __in_bcount(nXmaDataBytes) const BYTE* pXmaData,  // Pointer to XMA block[s]
+    __in_bcount(nXmaDataBytes) const BYTE *pXmaData,  // Pointer to XMA block[s]
     DWORD nXmaDataBytes,                              // Size of pXmaData in bytes
     DWORD nStreamIndex,                               // Stream within which to seek
     DWORD nDesiredSample,                             // Sample sought
-    __out DWORD* pnBitOffset,                         // Returns the bit offset within pXmaData of
-                                                      // the frame containing the sample sought
-    __out DWORD* pnSubFrame                           // Returns the subframe containing the sample
+    __out DWORD *pnBitOffset,                         // Returns the bit offset within pXmaData of
+    // the frame containing the sample sought
+    __out DWORD *pnSubFrame                           // Returns the subframe containing the sample
 )
 {
     DWORD nDesiredFrame = nDesiredSample / XMA_SAMPLES_PER_FRAME;
@@ -686,10 +686,10 @@ __inline BYTE GetXmaChannelMaskFromStandardMask(DWORD dwStandardMask)
 // LocalizeXma2Format: Modifies a XMA2WAVEFORMATEX structure in place to comply
 // with the current platform's byte-ordering rules (little- or big-endian).
 
-__inline HRESULT LocalizeXma2Format(__inout XMA2WAVEFORMATEX* pXma2Format)
+__inline HRESULT LocalizeXma2Format(__inout XMA2WAVEFORMATEX *pXma2Format)
 {
-    #define XMASWAP2BYTES(n) ((WORD)(((n) >> 8) | (((n) & 0xff) << 8)))
-    #define XMASWAP4BYTES(n) ((DWORD)((n) >> 24 | (n) << 24 | ((n) & 0xff00) << 8 | ((n) & 0xff0000) >> 8))
+#define XMASWAP2BYTES(n) ((WORD)(((n) >> 8) | (((n) & 0xff) << 8)))
+#define XMASWAP4BYTES(n) ((DWORD)((n) >> 24 | (n) << 24 | ((n) & 0xff00) << 8 | ((n) & 0xff0000) >> 8))
 
     if (pXma2Format->wfx.wFormatTag == WAVE_FORMAT_XMA2)
     {
@@ -720,8 +720,8 @@ __inline HRESULT LocalizeXma2Format(__inout XMA2WAVEFORMATEX* pXma2Format)
         return E_FAIL; // Not a recognizable XMA2 format
     }
 
-    #undef XMASWAP2BYTES
-    #undef XMASWAP4BYTES
+#undef XMASWAP2BYTES
+#undef XMASWAP4BYTES
 }
 
 

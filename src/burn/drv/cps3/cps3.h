@@ -1,11 +1,11 @@
 #include "burnint.h"
 
 #ifndef HARDWARE_CAPCOM_CPS3
-	#define HARDWARE_CAPCOM_CPS3		HARDWARE_MISC_MISC
+#define HARDWARE_CAPCOM_CPS3		HARDWARE_MISC_MISC
 #endif
 
 #ifndef HARDWARE_CAPCOM_CPS3_NO_CD
-	#define HARDWARE_CAPCOM_CPS3_NO_CD	HARDWARE_CAPCOM_CPS3
+#define HARDWARE_CAPCOM_CPS3_NO_CD	HARDWARE_CAPCOM_CPS3
 #endif
 
 extern UINT8 cps3_reset;
@@ -26,9 +26,9 @@ extern UINT8 Cps3But3[16];
 INT32 cps3Init();
 INT32 cps3Exit();
 INT32 cps3Frame();
-INT32 cps3Scan(INT32 nAction,INT32 *pnMin);
+INT32 cps3Scan(INT32 nAction, INT32 *pnMin);
 
-// sound 
+// sound
 
 UINT8 __fastcall cps3SndReadByte(UINT32 addr);
 UINT16 __fastcall cps3SndReadWord(UINT32 addr);

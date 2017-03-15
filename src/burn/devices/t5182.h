@@ -3,12 +3,12 @@
 
 enum
 {
-	VECTOR_INIT,
-	YM2151_ASSERT,
-	YM2151_CLEAR,
-	YM2151_ACK,
-	CPU_ASSERT,
-	CPU_CLEAR
+    VECTOR_INIT,
+    YM2151_ASSERT,
+    YM2151_CLEAR,
+    YM2151_ACK,
+    CPU_ASSERT,
+    CPU_CLEAR
 };
 
 extern UINT8 *t5182SharedRAM;	// allocate in driver

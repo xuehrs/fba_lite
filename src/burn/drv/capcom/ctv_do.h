@@ -10,172 +10,190 @@
 // CU_MASK CPS1 BgHi CPS2 Sprite Masking
 
 #ifndef CU_FLIPX
- #error "CU_FLIPX wasn\'t defined"
+#error "CU_FLIPX wasn\'t defined"
 #endif
 
 #ifndef CU_CARE
- #error "CU_CARE wasn\'t defined"
+#error "CU_CARE wasn\'t defined"
 #endif
 
 #ifndef CU_ROWS
- #error "CU_ROWS wasn\'t defined"
+#error "CU_ROWS wasn\'t defined"
 #endif
 
 #ifndef CU_SIZE
- #error "CU_SIZE wasn\'t defined"
+#error "CU_SIZE wasn\'t defined"
 #endif
 
 #ifndef CU_BPP
- #error "CU_BPP wasn\'t defined"
+#error "CU_BPP wasn\'t defined"
 #endif
 
 #ifndef CU_MASK
- #error "CU_MASK wasn\'t defined"
+#error "CU_MASK wasn\'t defined"
 #endif
 
 {
-  INT32 y;
-  UINT32 *ctp;
-  UINT32 nBlank = 0;
+    INT32 y;
+    UINT32 *ctp;
+    UINT32 nBlank = 0;
 
-  UINT32 b;      			// Eight bit-packed pixels (msb) AAAABBBB CCCCDDDD EEEEFFFF GGGGHHHH (lsb)
-  UINT32 c;				// 32-bit colour value
-  UINT8 *pPix;			// Pointer to output bitmap
+    UINT32 b;      			// Eight bit-packed pixels (msb) AAAABBBB CCCCDDDD EEEEFFFF GGGGHHHH (lsb)
+    UINT32 c;				// 32-bit colour value
+    UINT8 *pPix;			// Pointer to output bitmap
 
 #if CU_ROWS == 1
-  INT16 *Rows = CpstRowShift;
+    INT16 *Rows = CpstRowShift;
 #endif
 
-  ctp = CpstPal;
+    ctp = CpstPal;
 
-for (y = 0; y < CU_SIZE; y++, pCtvLine += nBurnPitch, pCtvTile += nCtvTileAdd
+    for (y = 0; y < CU_SIZE; y++, pCtvLine += nBurnPitch, pCtvTile += nCtvTileAdd
 
 #if CU_ROWS==1
-     ,Rows++
+    , Rows++
 #endif
 
 #if CU_MASK==1
-	 ,pZVal += 384
+    , pZVal += 384
 #endif
 
-)
-{
+        )
+    {
 #if CU_CARE==1
-  UINT32 rx = nCtvRollX;	// Copy of nCtvRollX
+        UINT32 rx = nCtvRollX;	// Copy of nCtvRollX
 #endif
 
 #if CU_MASK==1
-  UINT16 *pPixZ;
+        UINT16 *pPixZ;
 #endif
 
 #if CU_CARE==1
-  if (nCtvRollY & 0x20004000) { nCtvRollY += 0x7fff; continue; } else nCtvRollY += 0x7fff;	// okay to plot line
+        if (nCtvRollY & 0x20004000)
+        {
+            nCtvRollY += 0x7fff;
+            continue;
+        }
+        else nCtvRollY += 0x7fff;	// okay to plot line
 #endif
 
-  // Point to the line to draw
-  pPix = pCtvLine;
+        // Point to the line to draw
+        pPix = pCtvLine;
 #if CU_MASK==1
-  pPixZ = pZVal;
+        pPixZ = pZVal;
 #endif
 
 #if CU_ROWS==1
- #if CU_MASK==1
-  pPixZ += Rows[0];
- #endif
-  pPix += Rows[0] * nBurnBpp;
- #if CU_CARE==1
-  rx += Rows[0] * 0x7fff;
- #endif
+#if CU_MASK==1
+        pPixZ += Rows[0];
+#endif
+        pPix += Rows[0] * nBurnBpp;
+#if CU_CARE==1
+        rx += Rows[0] * 0x7fff;
+#endif
 #endif
 
-// Make macros for plotting c and advancing pPix by one pixel
+        // Make macros for plotting c and advancing pPix by one pixel
 #if CU_BPP==2
- #if   CU_MASK==1
-  #define PLOT { if(*pPixZ < ZValue) { *((UINT16 *)pPix)=(UINT16)c; *pPixZ=ZValue; } }
-  #define ADV { pPix+=2; pPixZ++; }
- #else
-  #define PLOT { *((UINT16 *)pPix)=(UINT16)c; }
-  #define ADV pPix+=2
- #endif
-#elif CU_BPP==3
- #if   CU_MASK==1
-  #define PLOT { if(*pPixZ < ZValue) { if (nCpsBlend) { c = alpha_blend(pPix[0]|(pPix[1]<<8)|(pPix[2]<<16), c, nCpsBlend); } pPix[0]=(UINT8)c; pPix[1]=(UINT8)(c>>8); pPix[2]=(UINT8)(c>>16); } }
-  #define ADV { pPix+=3; pPixZ++; }
- #else
-  #define PLOT { if (nCpsBlend) { c = alpha_blend(pPix[0]|(pPix[1]<<8)|(pPix[2]<<16), c, nCpsBlend); } pPix[0]=(UINT8)c; pPix[1]=(UINT8)(c>>8); pPix[2]=(UINT8)(c>>16); }
-  #define ADV pPix+=3
- #endif
-#elif CU_BPP==4
- #if   CU_MASK==1
-  #define PLOT { if(*pPixZ < ZValue) { if (nCpsBlend) { c = alpha_blend(*((UINT32 *)pPix), c, nCpsBlend); } *((UINT32 *)pPix)=c; *pPixZ=ZValue; } }
-  #define ADV { pPix+=4; pPixZ++; }
- #else
-  #define PLOT { if (nCpsBlend) { c = alpha_blend(*((UINT32 *)pPix), c, nCpsBlend); } *((UINT32 *)pPix)=c; }
-  #define ADV pPix+=4
- #endif
+#if   CU_MASK==1
+#define PLOT { if(*pPixZ < ZValue) { *((UINT16 *)pPix)=(UINT16)c; *pPixZ=ZValue; } }
+#define ADV { pPix+=2; pPixZ++; }
 #else
- #error Unsupported CU_BPP
+#define PLOT { *((UINT16 *)pPix)=(UINT16)c; }
+#define ADV pPix+=2
+#endif
+#elif CU_BPP==3
+#if   CU_MASK==1
+#define PLOT { if(*pPixZ < ZValue) { if (nCpsBlend) { c = alpha_blend(pPix[0]|(pPix[1]<<8)|(pPix[2]<<16), c, nCpsBlend); } pPix[0]=(UINT8)c; pPix[1]=(UINT8)(c>>8); pPix[2]=(UINT8)(c>>16); } }
+#define ADV { pPix+=3; pPixZ++; }
+#else
+#define PLOT { if (nCpsBlend) { c = alpha_blend(pPix[0]|(pPix[1]<<8)|(pPix[2]<<16), c, nCpsBlend); } pPix[0]=(UINT8)c; pPix[1]=(UINT8)(c>>8); pPix[2]=(UINT8)(c>>16); }
+#define ADV pPix+=3
+#endif
+#elif CU_BPP==4
+#if   CU_MASK==1
+#define PLOT { if(*pPixZ < ZValue) { if (nCpsBlend) { c = alpha_blend(*((UINT32 *)pPix), c, nCpsBlend); } *((UINT32 *)pPix)=c; *pPixZ=ZValue; } }
+#define ADV { pPix+=4; pPixZ++; }
+#else
+#define PLOT { if (nCpsBlend) { c = alpha_blend(*((UINT32 *)pPix), c, nCpsBlend); } *((UINT32 *)pPix)=c; }
+#define ADV pPix+=4
+#endif
+#else
+#error Unsupported CU_BPP
 #endif
 
-// Make macros for plotting the next pixel from 'b' (= 8 packed pixels)
-// or skipping the pixel.
+        // Make macros for plotting the next pixel from 'b' (= 8 packed pixels)
+        // or skipping the pixel.
 #if CU_FLIPX==0
- #define NEXTPIXEL ADV; b <<= 4;
- #if CU_MASK==2
-  #define DRAWPIXEL { c = (b >> 28); if (c && CpstPmsk & (1 << (c ^ 15))) { c = ctp[c]; PLOT } }
- #else
-  #define DRAWPIXEL { if (b & 0xf0000000) { c = ctp[b >> 28]; PLOT } }
- #endif
+#define NEXTPIXEL ADV; b <<= 4;
+#if CU_MASK==2
+#define DRAWPIXEL { c = (b >> 28); if (c && CpstPmsk & (1 << (c ^ 15))) { c = ctp[c]; PLOT } }
 #else
- #define NEXTPIXEL ADV; b >>= 4;
- #if CU_MASK==2
-  #define DRAWPIXEL { c = (b & 15); if (c && CpstPmsk & (1 << (c ^ 15))) { c = ctp[c]; PLOT } }
- #else
-  #define DRAWPIXEL { if (b & 0x0000000f) { c = ctp[b & 15]; PLOT } }
- #endif
+#define DRAWPIXEL { if (b & 0xf0000000) { c = ctp[b >> 28]; PLOT } }
+#endif
+#else
+#define NEXTPIXEL ADV; b >>= 4;
+#if CU_MASK==2
+#define DRAWPIXEL { c = (b & 15); if (c && CpstPmsk & (1 << (c ^ 15))) { c = ctp[c]; PLOT } }
+#else
+#define DRAWPIXEL { if (b & 0x0000000f) { c = ctp[b & 15]; PLOT } }
+#endif
 #endif
 
 #define EIGHT(x) x x x x x x x x
 
 #if CU_CARE==1
- // If we need to clip left or right, check nCtvRollX before plotting
- #define DO_PIX if ((rx & 0x20004000) == 0) DRAWPIXEL NEXTPIXEL rx += 0x7fff;
+        // If we need to clip left or right, check nCtvRollX before plotting
+#define DO_PIX if ((rx & 0x20004000) == 0) DRAWPIXEL NEXTPIXEL rx += 0x7fff;
 #else
- // Always plot
- #define DO_PIX DRAWPIXEL NEXTPIXEL
+        // Always plot
+#define DO_PIX DRAWPIXEL NEXTPIXEL
 #endif
 
 #define DRAW_8 nBlank |= b; EIGHT(DO_PIX)
 
 #if   CU_SIZE==8
-  // 8x8 tiles
-  b=*((UINT32 *)(pCtvTile+0)); DRAW_8
+        // 8x8 tiles
+        b = *((UINT32 *)(pCtvTile + 0));
+        DRAW_8
 #elif CU_SIZE==16
- // 16x16 tiles
- #if CU_FLIPX==0
-  b=*((UINT32 *)(pCtvTile+0)); DRAW_8
-  b=*((UINT32 *)(pCtvTile+4)); DRAW_8
- #else
-  b=*((UINT32 *)(pCtvTile+4)); DRAW_8
-  b=*((UINT32 *)(pCtvTile+0)); DRAW_8
- #endif
+        // 16x16 tiles
+#if CU_FLIPX==0
+        b = *((UINT32 *)(pCtvTile + 0));
+        DRAW_8
+        b = *((UINT32 *)(pCtvTile + 4));
+        DRAW_8
+#else
+        b = *((UINT32 *)(pCtvTile + 4));
+        DRAW_8
+        b = *((UINT32 *)(pCtvTile + 0));
+        DRAW_8
+#endif
 
 #elif CU_SIZE==32
- // 32x32 tiles
- #if CU_FLIPX==0
-  b=*((UINT32 *)(pCtvTile+ 0)); DRAW_8
-  b=*((UINT32 *)(pCtvTile+ 4)); DRAW_8
-  b=*((UINT32 *)(pCtvTile+ 8)); DRAW_8
-  b=*((UINT32 *)(pCtvTile+12)); DRAW_8
- #else
-  b=*((UINT32 *)(pCtvTile+12)); DRAW_8
-  b=*((UINT32 *)(pCtvTile+ 8)); DRAW_8
-  b=*((UINT32 *)(pCtvTile+ 4)); DRAW_8
-  b=*((UINT32 *)(pCtvTile+ 0)); DRAW_8
- #endif
+        // 32x32 tiles
+#if CU_FLIPX==0
+        b = *((UINT32 *)(pCtvTile + 0));
+        DRAW_8
+        b = *((UINT32 *)(pCtvTile + 4));
+        DRAW_8
+        b = *((UINT32 *)(pCtvTile + 8));
+        DRAW_8
+        b = *((UINT32 *)(pCtvTile + 12));
+        DRAW_8
+#else
+        b = *((UINT32 *)(pCtvTile + 12));
+        DRAW_8
+        b = *((UINT32 *)(pCtvTile + 8));
+        DRAW_8
+        b = *((UINT32 *)(pCtvTile + 4));
+        DRAW_8
+        b = *((UINT32 *)(pCtvTile + 0));
+        DRAW_8
+#endif
 
 #else
- #error Unsupported CU_SIZE
+#error Unsupported CU_SIZE
 #endif
 
 #undef DRAW_8
@@ -186,7 +204,7 @@ for (y = 0; y < CU_SIZE; y++, pCtvLine += nBurnPitch, pCtvTile += nCtvTileAdd
 
 #undef ADV
 #undef PLOT
-}
+    }
 
-  return nBlank == 0;
+    return nBlank == 0;
 }

@@ -49,21 +49,21 @@
 /* Konami Registers */
 typedef struct
 {
-	PAIR	pc; 		/* Program counter */
-	PAIR    ppc;        /* Previous program counter */
-	PAIR    d;          /* Accumulator a and b */
-	PAIR    dp;         /* Direct Page register (page in MSB) */
-	PAIR	u, s;		/* Stack pointers */
-	PAIR	x, y;		/* Index registers */
-	UINT8   cc;
-	UINT8	ireg;		/* first opcode */
-	UINT8   irq_state[2];
-	int     extra_cycles; /* cycles used up by interrupts */
-	UINT8   int_state;  /* SYNC and CWAI flags */
-	UINT8	nmi_state;
-	int	nTotalCycles;
-	int     (*irq_callback)(int irqline);
-	void 	(*setlines_callback)( int lines ); /* callback called when A16-A23 are set */
+    PAIR	pc; 		/* Program counter */
+    PAIR    ppc;        /* Previous program counter */
+    PAIR    d;          /* Accumulator a and b */
+    PAIR    dp;         /* Direct Page register (page in MSB) */
+    PAIR	u, s;		/* Stack pointers */
+    PAIR	x, y;		/* Index registers */
+    UINT8   cc;
+    UINT8	ireg;		/* first opcode */
+    UINT8   irq_state[2];
+    int     extra_cycles; /* cycles used up by interrupts */
+    UINT8   int_state;  /* SYNC and CWAI flags */
+    UINT8	nmi_state;
+    int	nTotalCycles;
+    int     (*irq_callback)(int irqline);
+    void 	(*setlines_callback)( int lines ); /* callback called when A16-A23 are set */
 } konami_Regs;
 
 /* flag bits in the cc register */
@@ -216,43 +216,43 @@ static int konami_ICount;
 #define SET_V8(a,b,r)	CC|=(((a^b^r^(r>>1))&0x80)>>6)
 #define SET_V16(a,b,r)	CC|=(((a^b^r^(r>>1))&0x8000)>>14)
 
-static const UINT8 flags8i[256]=	 /* increment */
+static const UINT8 flags8i[256] =	 /* increment */
 {
-CC_Z,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-CC_N|CC_V,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,
-CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,
-CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,
-CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,
-CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,
-CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,
-CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,
-CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N
+    CC_Z, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    CC_N | CC_V, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N,
+    CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N,
+    CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N,
+    CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N,
+    CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N,
+    CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N,
+    CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N,
+    CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N
 };
-static const UINT8 flags8d[256]= /* decrement */
+static const UINT8 flags8d[256] = /* decrement */
 {
-CC_Z,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,CC_V,
-CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,
-CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,
-CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,
-CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,
-CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,
-CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,
-CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,
-CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N
+    CC_Z, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, CC_V,
+    CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N,
+    CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N,
+    CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N,
+    CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N,
+    CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N,
+    CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N,
+    CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N,
+    CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N, CC_N
 };
 #define SET_FLAGS8I(a)		{CC|=flags8i[(a)&0xff];}
 #define SET_FLAGS8D(a)		{CC|=flags8d[(a)&0xff];}
@@ -340,35 +340,35 @@ CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N
 /* opcode timings */
 static const UINT8 cycles1[] =
 {
-	/*   0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
-  /*0*/  1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 5, 5, 5, 5,
-  /*1*/  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-  /*2*/  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-  /*3*/  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 7, 6,
-  /*4*/  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 3, 3, 4, 4,
-  /*5*/  4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 1, 1, 1,
-  /*6*/  3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5,
-  /*7*/  3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5,
-  /*8*/  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 5,
-  /*9*/  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 6,
-  /*A*/  2, 2, 2, 4, 4, 4, 4, 4, 2, 2, 2, 2, 3, 3, 2, 1,
-  /*B*/  3, 2, 2,11,22,11, 2, 4, 3, 3, 3, 3, 3, 3, 3, 3,
-  /*C*/  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 3, 2,
-  /*D*/  2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  /*E*/  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  /*F*/  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+    /*   0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+    /*0*/  1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 5, 5, 5, 5,
+    /*1*/  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+    /*2*/  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+    /*3*/  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 7, 6,
+    /*4*/  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 3, 3, 4, 4,
+    /*5*/  4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 1, 1, 1,
+    /*6*/  3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5,
+    /*7*/  3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5,
+    /*8*/  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 5,
+    /*9*/  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 6,
+    /*A*/  2, 2, 2, 4, 4, 4, 4, 4, 2, 2, 2, 2, 3, 3, 2, 1,
+    /*B*/  3, 2, 2, 11, 22, 11, 2, 4, 3, 3, 3, 3, 3, 3, 3, 3,
+    /*C*/  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 3, 2,
+    /*D*/  2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    /*E*/  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    /*F*/  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 };
 
 KONAMI_INLINE UINT32 RM16( UINT32 Addr )
 {
-	UINT32 result = RM(Addr) << 8;
-	return result | RM((Addr+1)&0xffff);
+    UINT32 result = RM(Addr) << 8;
+    return result | RM((Addr + 1) & 0xffff);
 }
 
 KONAMI_INLINE void WM16( UINT32 Addr, PAIR *p )
 {
-	WM( Addr, p->b.h );
-	WM( (Addr+1)&0xffff, p->b.l );
+    WM( Addr, p->b.h );
+    WM( (Addr + 1) & 0xffff, p->b.l );
 }
 
 /****************************************************************************
@@ -377,8 +377,8 @@ KONAMI_INLINE void WM16( UINT32 Addr, PAIR *p )
 #if 0
 static void konami_get_context(void *dst)
 {
-	if( dst )
-		*(konami_Regs*)dst = konami;
+    if( dst )
+        *(konami_Regs *)dst = konami;
 }
 #endif
 
@@ -388,8 +388,8 @@ static void konami_get_context(void *dst)
 #if 0
 static void konami_set_context(void *src)
 {
-	if( src )
-		konami = *(konami_Regs*)src;
+    if( src )
+        konami = *(konami_Regs *)src;
     change_pc(PC);    /* TS 971002 */
 
     CHECK_IRQ_LINES;
@@ -401,28 +401,28 @@ static void konami_set_context(void *src)
 /****************************************************************************/
 void konami_init(int (*irqcallback)(int))
 {
-	konami.irq_callback = irqcallback;
+    konami.irq_callback = irqcallback;
 }
 
 void konamiReset()
 {
 #if defined FBA_DEBUG
-	if (!DebugCPU_KonamiInitted) bprintf(PRINT_ERROR, _T("konamiReset called without init\n"));
+    if (!DebugCPU_KonamiInitted) bprintf(PRINT_ERROR, _T("konamiReset called without init\n"));
 #endif
 
-	konami.nTotalCycles = 0;
-	konami.int_state = 0;
-	konami.nmi_state = CPU_IRQSTATUS_NONE;
-	konami.irq_state[0] = CPU_IRQSTATUS_NONE;
-	konami.irq_state[1] = CPU_IRQSTATUS_NONE;
+    konami.nTotalCycles = 0;
+    konami.int_state = 0;
+    konami.nmi_state = CPU_IRQSTATUS_NONE;
+    konami.irq_state[0] = CPU_IRQSTATUS_NONE;
+    konami.irq_state[1] = CPU_IRQSTATUS_NONE;
 
-	DPD = 0;			/* Reset direct page register */
+    DPD = 0;			/* Reset direct page register */
 
-	CC |= CC_II;        /* IRQ disabled */
-	CC |= CC_IF;        /* FIRQ disabled */
+    CC |= CC_II;        /* IRQ disabled */
+    CC |= CC_IF;        /* FIRQ disabled */
 
-	PCD = RM16(0xfffe);
-	change_pc(PC);    /* TS 971002 */
+    PCD = RM16(0xfffe);
+    change_pc(PC);    /* TS 971002 */
 }
 
 #if 0
@@ -438,50 +438,50 @@ static void konami_exit(void)
 void konami_set_irq_line(int irqline, int state)
 {
 #if defined FBA_DEBUG
-	if (!DebugCPU_KonamiInitted) bprintf(PRINT_ERROR, _T("konami_set_irq_line called without init\n"));
+    if (!DebugCPU_KonamiInitted) bprintf(PRINT_ERROR, _T("konami_set_irq_line called without init\n"));
 #endif
 
-	if (irqline == KONAMI_INPUT_LINE_NMI)
-	{
-		if (konami.nmi_state == state) return;
-		konami.nmi_state = state;
-	//	LOG(("KONAMI#%d set_nmi_line %d\n", cpu_getactivecpu(), state));
-		if( state == CPU_IRQSTATUS_NONE ) return;
+    if (irqline == KONAMI_INPUT_LINE_NMI)
+    {
+        if (konami.nmi_state == state) return;
+        konami.nmi_state = state;
+        //	LOG(("KONAMI#%d set_nmi_line %d\n", cpu_getactivecpu(), state));
+        if( state == CPU_IRQSTATUS_NONE ) return;
 
-		/* if the stack was not yet initialized */
-	    if( !(konami.int_state & KONAMI_LDS) ) return;
+        /* if the stack was not yet initialized */
+        if( !(konami.int_state & KONAMI_LDS) ) return;
 
-	    konami.int_state &= ~KONAMI_SYNC;
-		/* state already saved by CWAI? */
-		if( konami.int_state & KONAMI_CWAI )
-		{
-			konami.int_state &= ~KONAMI_CWAI;
-			konami.extra_cycles += 7;	/* subtract +7 cycles next time */
-	    }
-		else
-		{
-			CC |= CC_E; 				/* save entire state */
-			PUSHWORD(pPC);
-			PUSHWORD(pU);
-			PUSHWORD(pY);
-			PUSHWORD(pX);
-			PUSHBYTE(DP);
-			PUSHBYTE(B);
-			PUSHBYTE(A);
-			PUSHBYTE(CC);
-			konami.extra_cycles += 19;	/* subtract +19 cycles next time */
-		}
-		CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */
-		PCD = RM16(0xfffc);
-		change_pc(PC);					/* TS 971002 */
-	}
-	else if (irqline < 2)
-	{
-	//	LOG(("KONAMI#%d set_irq_line %d, %d\n", cpu_getactivecpu(), irqline, state));
-		konami.irq_state[irqline] = state;
-		if (state == CPU_IRQSTATUS_NONE) return;
-		CHECK_IRQ_LINES;
-	}
+        konami.int_state &= ~KONAMI_SYNC;
+        /* state already saved by CWAI? */
+        if( konami.int_state & KONAMI_CWAI )
+        {
+            konami.int_state &= ~KONAMI_CWAI;
+            konami.extra_cycles += 7;	/* subtract +7 cycles next time */
+        }
+        else
+        {
+            CC |= CC_E; 				/* save entire state */
+            PUSHWORD(pPC);
+            PUSHWORD(pU);
+            PUSHWORD(pY);
+            PUSHWORD(pX);
+            PUSHBYTE(DP);
+            PUSHBYTE(B);
+            PUSHBYTE(A);
+            PUSHBYTE(CC);
+            konami.extra_cycles += 19;	/* subtract +19 cycles next time */
+        }
+        CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */
+        PCD = RM16(0xfffc);
+        change_pc(PC);					/* TS 971002 */
+    }
+    else if (irqline < 2)
+    {
+        //	LOG(("KONAMI#%d set_irq_line %d, %d\n", cpu_getactivecpu(), irqline, state));
+        konami.irq_state[irqline] = state;
+        if (state == CPU_IRQSTATUS_NONE) return;
+        CHECK_IRQ_LINES;
+    }
 }
 
 /* includes the static function prototypes and the master opcode table */
@@ -494,94 +494,96 @@ void konami_set_irq_line(int irqline, int state)
 int konamiRun(int cycles)
 {
 #if defined FBA_DEBUG
-	if (!DebugCPU_KonamiInitted) bprintf(PRINT_ERROR, _T("konamiRun called without init\n"));
+    if (!DebugCPU_KonamiInitted) bprintf(PRINT_ERROR, _T("konamiRun called without init\n"));
 #endif
 
-	konami_ICount = cycles - konami.extra_cycles;
-	nCyclesToDo = konami_ICount;
-	konami.extra_cycles = 0;
+    konami_ICount = cycles - konami.extra_cycles;
+    nCyclesToDo = konami_ICount;
+    konami.extra_cycles = 0;
 
-	if( konami.int_state & (KONAMI_CWAI | KONAMI_SYNC) )
-	{
-		konami_ICount = 0;
-	}
-	else
-	{
-		do
-		{
-			pPPC = pPC;
+    if( konami.int_state & (KONAMI_CWAI | KONAMI_SYNC) )
+    {
+        konami_ICount = 0;
+    }
+    else
+    {
+        do
+        {
+            pPPC = pPC;
 
-			konami.ireg = ROP(PCD);
-			PC++;
+            konami.ireg = ROP(PCD);
+            PC++;
 
-			(*konami_main[konami.ireg])();
+            (*konami_main[konami.ireg])();
 
-			konami_ICount -= cycles1[konami.ireg];
+            konami_ICount -= cycles1[konami.ireg];
 
-		} while( konami_ICount > 0 );
+        }
+        while( konami_ICount > 0 );
 
-		konami_ICount -= konami.extra_cycles;
-		konami.extra_cycles = 0;
-	}
+        konami_ICount -= konami.extra_cycles;
+        konami.extra_cycles = 0;
+    }
 
-	konami.nTotalCycles += cycles - konami_ICount;
-	return cycles - konami_ICount;
+    konami.nTotalCycles += cycles - konami_ICount;
+    return cycles - konami_ICount;
 }
 
 int konamiCpuScan(int nAction)
 {
 #if defined FBA_DEBUG
-	if (!DebugCPU_KonamiInitted) bprintf(PRINT_ERROR, _T("konamiCpuScan called without init\n"));
+    if (!DebugCPU_KonamiInitted) bprintf(PRINT_ERROR, _T("konamiCpuScan called without init\n"));
 #endif
 
-	struct BurnArea ba;
+    struct BurnArea ba;
 
-	int     (*irq_callback)(int irqline);
-	void 	(*setlines_callback)( int lines );
+    int     (*irq_callback)(int irqline);
+    void 	(*setlines_callback)( int lines );
 
-	irq_callback = konami.irq_callback;
-	setlines_callback = konami.setlines_callback;
+    irq_callback = konami.irq_callback;
+    setlines_callback = konami.setlines_callback;
 
-	if (nAction & ACB_DRIVER_DATA) {
-		memset(&ba, 0, sizeof(ba));
-		ba.Data	  = (unsigned char*)&konami;
-		ba.nLen	  = sizeof(konami_Regs);
-		ba.szName = "All Registers";
-		BurnAcb(&ba);
+    if (nAction & ACB_DRIVER_DATA)
+    {
+        memset(&ba, 0, sizeof(ba));
+        ba.Data	  = (unsigned char *)&konami;
+        ba.nLen	  = sizeof(konami_Regs);
+        ba.szName = "All Registers";
+        BurnAcb(&ba);
 
-		SCAN_VAR(ea.w.l);
-		SCAN_VAR(ea.d);
-	}
+        SCAN_VAR(ea.w.l);
+        SCAN_VAR(ea.d);
+    }
 
-	konami.irq_callback = irq_callback;
-	konami.setlines_callback = setlines_callback;
+    konami.irq_callback = irq_callback;
+    konami.setlines_callback = setlines_callback;
 
-	return 0;
+    return 0;
 }
 
 void konamiSetlinesCallback(void  (*setlines_callback)(int lines))
 {
 #if defined FBA_DEBUG
-	if (!DebugCPU_KonamiInitted) bprintf(PRINT_ERROR, _T("konamiSetlinesCallback called without init\n"));
+    if (!DebugCPU_KonamiInitted) bprintf(PRINT_ERROR, _T("konamiSetlinesCallback called without init\n"));
 #endif
 
-	konami.setlines_callback = setlines_callback;
+    konami.setlines_callback = setlines_callback;
 }
 
 int konamiTotalCycles()
 {
 #if defined FBA_DEBUG
-	if (!DebugCPU_KonamiInitted) bprintf(PRINT_ERROR, _T("konamiTotalCycles called without init\n"));
+    if (!DebugCPU_KonamiInitted) bprintf(PRINT_ERROR, _T("konamiTotalCycles called without init\n"));
 #endif
 
-	return konami.nTotalCycles;
+    return konami.nTotalCycles;
 }
 
 void konamiNewFrame()
 {
 #if defined FBA_DEBUG
-	if (!DebugCPU_KonamiInitted) bprintf(PRINT_ERROR, _T("konamiNewFrame called without init\n"));
+    if (!DebugCPU_KonamiInitted) bprintf(PRINT_ERROR, _T("konamiNewFrame called without init\n"));
 #endif
 
-	konami.nTotalCycles = 0;
+    konami.nTotalCycles = 0;
 }

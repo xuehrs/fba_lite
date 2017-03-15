@@ -5,11 +5,11 @@ void wav_exit()
 {
 }
 
-int wav_open(TCHAR* szFile)
+int wav_open(TCHAR *szFile)
 {
 }
 
-void wav_stop() 
+void wav_stop()
 {
 }
 

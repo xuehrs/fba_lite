@@ -1,7 +1,7 @@
 
 #ifndef FASTCALL
- #undef __fastcall
- #define __fastcall
+#undef __fastcall
+#define __fastcall
 #endif
 
 typedef unsigned char (__fastcall *pSh2ReadByteHandler)(unsigned int a);
@@ -28,7 +28,7 @@ void Sh2Reset();
 void Sh2Reset(unsigned int pc, unsigned r15); // hack
 int Sh2Run(int cycles);
 
-int Sh2MapMemory(unsigned char* pMemory, unsigned int nStart, unsigned int nEnd, int nType);
+int Sh2MapMemory(unsigned char *pMemory, unsigned int nStart, unsigned int nEnd, int nType);
 int Sh2MapHandler(uintptr_t nHandler, unsigned int nStart, unsigned int nEnd, int nType);
 
 int Sh2SetReadByteHandler(int i, pSh2ReadByteHandler pHandler);

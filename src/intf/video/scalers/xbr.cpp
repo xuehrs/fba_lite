@@ -1,6 +1,6 @@
 /*
    Hyllian's 2xBR v3.3b
-   
+
    Copyright (C) 2011, 2012 Hyllian/Jararaca - sergiogdb@gmail.com
 
    This program is free software; you can redistribute it and/or
@@ -24,8 +24,8 @@
 
 
 static unsigned int RGBtoYUV[65536];
-static unsigned int tbl_5_to_8[32]={0, 8, 16, 25, 33, 41, 49,  58, 66, 74, 82, 90, 99, 107, 115, 123, 132, 140, 148, 156, 165, 173, 181, 189,  197, 206, 214, 222, 230, 239, 247, 255};
-static unsigned int tbl_6_to_8[64]={0, 4, 8, 12, 16, 20, 24,  28, 32, 36, 40, 45, 49, 53, 57, 61, 65, 69, 73, 77, 81, 85, 89, 93, 97, 101,  105, 109, 113, 117, 121, 125, 130, 134, 138, 142, 146, 150, 154, 158, 162, 166,  170, 174, 178, 182, 186, 190, 194, 198, 202, 206, 210, 215, 219, 223, 227, 231,  235, 239, 243, 247, 251, 255};
+static unsigned int tbl_5_to_8[32] = {0, 8, 16, 25, 33, 41, 49,  58, 66, 74, 82, 90, 99, 107, 115, 123, 132, 140, 148, 156, 165, 173, 181, 189,  197, 206, 214, 222, 230, 239, 247, 255};
+static unsigned int tbl_6_to_8[64] = {0, 4, 8, 12, 16, 20, 24,  28, 32, 36, 40, 45, 49, 53, 57, 61, 65, 69, 73, 77, 81, 85, 89, 93, 97, 101,  105, 109, 113, 117, 121, 125, 130, 134, 138, 142, 146, 150, 154, 158, 162, 166,  170, 174, 178, 182, 186, 190, 194, 198, 202, 206, 210, 215, 219, 223, 227, 231,  235, 239, 243, 247, 251, 255};
 
 #define RED_MASK565   0xF800
 #define RED_BLUE_MASK565 0xF81F
@@ -89,7 +89,7 @@ static const unsigned short int pg_lbmask = PG_LBMASK565;
              ALPHA_BLEND_64_W( E[N2], PIXEL); \
              E[N1] = E[N2]; \
 
-        
+
 #define LEFT_2_2X(N3, N2, PIXEL)\
              ALPHA_BLEND_192_W(E[N3], PIXEL); \
              ALPHA_BLEND_64_W( E[N2], PIXEL); \
@@ -107,33 +107,40 @@ static const unsigned short int pg_lbmask = PG_LBMASK565;
 #define eq(A, B)\
         (df(A, B) < 155)\
 
-static void initialize(){
+static void initialize()
+{
     static int initialized;
-    if (initialized){
+    if (initialized)
+    {
         return;
     }
     initialized = 1;
 
     int format = 0;
 
-    if (format == 0){ //565
-        for (int c = 0; c < 65536; c++){
+    if (format == 0)  //565
+    {
+        for (int c = 0; c < 65536; c++)
+        {
             unsigned int r = tbl_5_to_8[(c &   RED_MASK565) >> 11];
             unsigned int g = tbl_6_to_8[(c & GREEN_MASK565) >>  5];
             unsigned int b = tbl_5_to_8[(c &  BLUE_MASK565)      ];
-            unsigned int y = ((r<<4) + (g<<5) + (b<<2));
-            unsigned int u = (   -r  - (g<<1) + (b<<2));
-            unsigned int v = ((r<<1) - (g<<1) - (b>>1));
+            unsigned int y = ((r << 4) + (g << 5) + (b << 2));
+            unsigned int u = (   -r  - (g << 1) + (b << 2));
+            unsigned int v = ((r << 1) - (g << 1) - (b >> 1));
             RGBtoYUV[c] = y + u + v;
         }
-    } else if (format == 1){ //555
-        for (int c = 0; c < 65536; c++) {
+    }
+    else if (format == 1)    //555
+    {
+        for (int c = 0; c < 65536; c++)
+        {
             unsigned int r = tbl_5_to_8[(c &   RED_MASK555) >> 10];
             unsigned int g = tbl_5_to_8[(c & GREEN_MASK555) >>  5];
             unsigned int b = tbl_5_to_8[(c &  BLUE_MASK555)      ];
-            unsigned int y = ((r<<4) + (g<<5) + (b<<2));
-            unsigned int u = (   -r  - (g<<1) + (b<<2));
-            unsigned int v = ((r<<1) - (g<<1) - (b>>1));
+            unsigned int y = ((r << 4) + (g << 5) + (b << 2));
+            unsigned int u = (   -r  - (g << 1) + (b << 2));
+            unsigned int v = ((r << 1) - (g << 1) - (b >> 1));
             RGBtoYUV[c] = y + u + v;
         }
     }
@@ -258,8 +265,8 @@ static void initialize(){
         } \
     } \
 
-void xbr2x_a(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, unsigned int dstPitch, int Xres, int Yres)
-{	
+void xbr2x_a(unsigned char *pIn,  unsigned int srcPitch, unsigned char *pOut, unsigned int dstPitch, int Xres, int Yres)
+{
 #define FILTRO(PE, PI, PH, PF, PG, PC, PD, PB, PA, G5, C4, G0, D0, C1, B1, F4, I4, H5, I5, A0, A1, N0, N1, N2, N3) \
      ex   = (PE!=PH && PE!=PF); \
      if ( ex )\
@@ -292,14 +299,14 @@ void xbr2x_a(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, 
                ALPHA_BLEND_128_W( E[N3], ((df(PE,PF) <= df(PE,PH)) ? PF : PH)); \
           }\
      }\
-	 
-	xbr2x_do
-	
+
+    xbr2x_do
+
 #undef FILTRO
 }
 
-void xbr2x_b(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, unsigned int dstPitch, int Xres, int Yres)
-{	
+void xbr2x_b(unsigned char *pIn,  unsigned int srcPitch, unsigned char *pOut, unsigned int dstPitch, int Xres, int Yres)
+{
 #define FILTRO(PE, PI, PH, PF, PG, PC, PD, PB, PA, G5, C4, G0, D0, C1, B1, F4, I4, H5, I5, A0, A1, N0, N1, N2, N3) \
      ex   = (PE!=PH && PE!=PF); \
      if ( ex )\
@@ -332,14 +339,14 @@ void xbr2x_b(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, 
                ALPHA_BLEND_128_W( E[N3], ((df(PE,PF) <= df(PE,PH)) ? PF : PH)); \
           }\
      }\
-	 
-	xbr2x_do
-	
+
+    xbr2x_do
+
 #undef FILTRO
 }
 
-void xbr2x_c(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, unsigned int dstPitch, int Xres, int Yres)
-{	
+void xbr2x_c(unsigned char *pIn,  unsigned int srcPitch, unsigned char *pOut, unsigned int dstPitch, int Xres, int Yres)
+{
 #define FILTRO(PE, PI, PH, PF, PG, PC, PD, PB, PA, G5, C4, G0, D0, C1, B1, F4, I4, H5, I5, A0, A1, N0, N1, N2, N3) \
      ex   = (PE!=PH && PE!=PF); \
      if ( ex )\
@@ -372,9 +379,9 @@ void xbr2x_c(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, 
                ALPHA_BLEND_128_W( E[N3], ((df(PE,PF) <= df(PE,PH)) ? PF : PH)); \
           }\
      }\
-	
-	xbr2x_do
-	
+
+    xbr2x_do
+
 #undef FILTRO
 }
 
@@ -387,7 +394,7 @@ void xbr2x_c(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, 
              E[N2] = E[N6]; \
              E[N8] =  PIXEL;\
 
-        
+
 #define LEFT_2_3X(N7, N5, N6, N8, PIXEL)\
              ALPHA_BLEND_192_W(E[N7], PIXEL); \
              ALPHA_BLEND_64_W( E[N5], PIXEL); \
@@ -527,8 +534,8 @@ void xbr2x_c(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, 
         } \
     } \
 
-void xbr3x_a(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, unsigned int dstPitch, int Xres, int Yres)
-{	
+void xbr3x_a(unsigned char *pIn,  unsigned int srcPitch, unsigned char *pOut, unsigned int dstPitch, int Xres, int Yres)
+{
 #define FILTRO(PE, PI, PH, PF, PG, PC, PD, PB, PA, G5, C4, G0, D0, C1, B1, F4, I4, H5, I5, A0, A1, N0, N1, N2, N3, N4, N5, N6, N7, N8) \
      ex   = (PE!=PH && PE!=PF); \
      if ( ex )\
@@ -561,14 +568,14 @@ void xbr3x_a(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, 
                ALPHA_BLEND_128_W( E[N8], ((df(PE,PF) <= df(PE,PH)) ? PF : PH)); \
           }\
      }\
-	 
-	xbr3x_do
-	
+
+    xbr3x_do
+
 #undef FILTRO
 }
 
-void xbr3x_b(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, unsigned int dstPitch, int Xres, int Yres)
-{	
+void xbr3x_b(unsigned char *pIn,  unsigned int srcPitch, unsigned char *pOut, unsigned int dstPitch, int Xres, int Yres)
+{
 #define FILTRO(PE, PI, PH, PF, PG, PC, PD, PB, PA, G5, C4, G0, D0, C1, B1, F4, I4, H5, I5, A0, A1, N0, N1, N2, N3, N4, N5, N6, N7, N8) \
      ex   = (PE!=PH && PE!=PF); \
      if ( ex )\
@@ -601,14 +608,14 @@ void xbr3x_b(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, 
                ALPHA_BLEND_128_W( E[N8], ((df(PE,PF) <= df(PE,PH)) ? PF : PH)); \
           }\
      }\
-	 
-	xbr3x_do
-	
+
+    xbr3x_do
+
 #undef FILTRO
 }
 
-void xbr3x_c(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, unsigned int dstPitch, int Xres, int Yres)
-{	
+void xbr3x_c(unsigned char *pIn,  unsigned int srcPitch, unsigned char *pOut, unsigned int dstPitch, int Xres, int Yres)
+{
 #define FILTRO(PE, PI, PH, PF, PG, PC, PD, PB, PA, G5, C4, G0, D0, C1, B1, F4, I4, H5, I5, A0, A1, N0, N1, N2, N3, N4, N5, N6, N7, N8) \
      ex   = (PE!=PH && PE!=PF); \
      if ( ex )\
@@ -642,13 +649,13 @@ void xbr3x_c(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, 
           }\
      }\
 
-	xbr3x_do
-	
+    xbr3x_do
+
 #undef FILTRO
 }
 
 #undef xbr3x_do
-	
+
 #define LEFT_UP_2(N15, N14, N11, N13, N12, N10, N7, N3, PIXEL)\
                                 ALPHA_BLEND_192_W(E[N13], PIXEL); \
                                 ALPHA_BLEND_64_W( E[N12], PIXEL); \
@@ -802,8 +809,8 @@ void xbr3x_c(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, 
     } \
 
 
-void xbr4x_a(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, unsigned int dstPitch, int Xres, int Yres)
-{	
+void xbr4x_a(unsigned char *pIn,  unsigned int srcPitch, unsigned char *pOut, unsigned int dstPitch, int Xres, int Yres)
+{
 #define FILTRO(PE, PI, PH, PF, PG, PC, PD, PB, PA, G5, C4, G0, D0, C1, B1, F4, I4, H5, I5, A0, A1, N15, N14, N11, N3, N7, N10, N13, N12, N9, N6, N2, N1, N5, N8, N4, N0) \
      ex   = (PE!=PH && PE!=PF); \
      if ( ex )\
@@ -837,13 +844,13 @@ void xbr4x_a(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, 
           }\
      }\
 
-	xbr4x_do
-	
+    xbr4x_do
+
 #undef FILTRO
 }
 
-void xbr4x_b(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, unsigned int dstPitch, int Xres, int Yres)
-{	
+void xbr4x_b(unsigned char *pIn,  unsigned int srcPitch, unsigned char *pOut, unsigned int dstPitch, int Xres, int Yres)
+{
 #define FILTRO(PE, PI, PH, PF, PG, PC, PD, PB, PA, G5, C4, G0, D0, C1, B1, F4, I4, H5, I5, A0, A1, N15, N14, N11, N3, N7, N10, N13, N12, N9, N6, N2, N1, N5, N8, N4, N0) \
      ex   = (PE!=PH && PE!=PF); \
      if ( ex )\
@@ -877,13 +884,13 @@ void xbr4x_b(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, 
           }\
      }\
 
-	xbr4x_do
-	
+    xbr4x_do
+
 #undef FILTRO
 }
 
-void xbr4x_c(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, unsigned int dstPitch, int Xres, int Yres)
-{	
+void xbr4x_c(unsigned char *pIn,  unsigned int srcPitch, unsigned char *pOut, unsigned int dstPitch, int Xres, int Yres)
+{
 #define FILTRO(PE, PI, PH, PF, PG, PC, PD, PB, PA, G5, C4, G0, D0, C1, B1, F4, I4, H5, I5, A0, A1, N15, N14, N11, N3, N7, N10, N13, N12, N9, N6, N2, N1, N5, N8, N4, N0) \
      ex   = (PE!=PH && PE!=PF); \
      if ( ex )\
@@ -917,8 +924,8 @@ void xbr4x_c(unsigned char * pIn,  unsigned int srcPitch, unsigned char * pOut, 
           }\
      }\
 
-	xbr4x_do
-	
+    xbr4x_do
+
 #undef FILTRO
 }
 

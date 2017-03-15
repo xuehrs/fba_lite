@@ -60,9 +60,15 @@ typedef union
 typedef union
 {
 #ifdef LSB_FIRST
-    struct { ADSPREG16 sr0, sr1; } srx;
+    struct
+    {
+        ADSPREG16 sr0, sr1;
+    } srx;
 #else
-    struct { ADSPREG16 sr1, sr0; } srx;
+    struct
+    {
+        ADSPREG16 sr1, sr0;
+    } srx;
 #endif
     UINT32 sr;
 } SHIFTRESULT;
@@ -72,11 +78,23 @@ typedef union
 typedef union
 {
 #ifdef LSB_FIRST
-    struct { ADSPREG16 mr0, mr1, mr2, mrzero; } mrx;
-    struct { UINT32 mr0, mr1; } mry;
+    struct
+    {
+        ADSPREG16 mr0, mr1, mr2, mrzero;
+    } mrx;
+    struct
+    {
+        UINT32 mr0, mr1;
+    } mry;
 #else
-    struct { ADSPREG16 mrzero, mr2, mr1, mr0; } mrx;
-    struct { UINT32 mr1, mr0; } mry;
+    struct
+    {
+        ADSPREG16 mrzero, mr2, mr1, mr0;
+    } mrx;
+    struct
+    {
+        UINT32 mr1, mr0;
+    } mry;
 #endif
     UINT64 mr;
 } MACRESULT;
@@ -173,11 +191,11 @@ typedef struct ADSP2100STATE
     int			imask_mask;
 
     /* register maps */
-    void *		alu_xregs[8];
-    void *		alu_yregs[4];
-    void *		mac_xregs[8];
-    void *		mac_yregs[4];
-    void *		shift_xregs[8];
+    void 		*alu_xregs[8];
+    void 		*alu_yregs[4];
+    void 		*mac_xregs[8];
+    void 		*mac_yregs[4];
+    void 		*shift_xregs[8];
 
     /* other callbacks */
     adsp21xx_rx_func sport_rx_callback;
@@ -185,10 +203,10 @@ typedef struct ADSP2100STATE
     adsp21xx_timer_func timer_fired;
 
     /* memory spaces */
-//    const address_space *program;
-//    const address_space *data;
-//    const address_space *io;
-//    cpu_state_table state;
+    //    const address_space *program;
+    //    const address_space *data;
+    //    const address_space *io;
+    //    cpu_state_table state;
 
 } adsp2100_state;
 

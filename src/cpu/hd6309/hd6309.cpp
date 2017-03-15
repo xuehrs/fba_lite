@@ -343,136 +343,135 @@ static UINT8 const *index_cycle;
 HD6309_INLINE UINT32 RM16( UINT32 mAddr );
 HD6309_INLINE UINT32 RM16( UINT32 mAddr )
 {
-	UINT32 result = RM(mAddr) << 8;
-	return result | RM((mAddr+1)&0xffff);
+    UINT32 result = RM(mAddr) << 8;
+    return result | RM((mAddr + 1) & 0xffff);
 }
 
 HD6309_INLINE UINT32 RM32( UINT32 mAddr );
 HD6309_INLINE UINT32 RM32( UINT32 mAddr )
 {
-	UINT32 result = RM(mAddr) << 24;
-	result += RM(mAddr+1) << 16;
-	result += RM(mAddr+2) << 8;
-	result += RM(mAddr+3);
-	return result;
+    UINT32 result = RM(mAddr) << 24;
+    result += RM(mAddr + 1) << 16;
+    result += RM(mAddr + 2) << 8;
+    result += RM(mAddr + 3);
+    return result;
 }
 
 HD6309_INLINE void WM16( UINT32 mAddr, PAIR *p );
 HD6309_INLINE void WM16( UINT32 mAddr, PAIR *p )
 {
-	WM( mAddr, p->b.h );
-	WM( (mAddr+1)&0xffff, p->b.l );
+    WM( mAddr, p->b.h );
+    WM( (mAddr + 1) & 0xffff, p->b.l );
 }
 
 HD6309_INLINE void WM32( UINT32 mAddr, PAIR *p );
 HD6309_INLINE void WM32( UINT32 mAddr, PAIR *p )
 {
-	WM( mAddr, p->b.h3 );
-	WM( (mAddr+1)&0xffff, p->b.h2 );
-	WM( (mAddr+2)&0xffff, p->b.h );
-	WM( (mAddr+3)&0xffff, p->b.l );
+    WM( mAddr, p->b.h3 );
+    WM( (mAddr + 1) & 0xffff, p->b.h2 );
+    WM( (mAddr + 2) & 0xffff, p->b.h );
+    WM( (mAddr + 3) & 0xffff, p->b.l );
 }
 
 static void UpdateState(void)
 {
-	if ( hd6309.md & MD_EM )
-	{
-		cycle_counts_page0  = ccounts_page0_na;
-		cycle_counts_page01 = ccounts_page01_na;
-		cycle_counts_page11 = ccounts_page11_na;
-		index_cycle         = index_cycle_na;
-	}
-	else
-	{
-		cycle_counts_page0  = ccounts_page0_em;
-		cycle_counts_page01 = ccounts_page01_em;
-		cycle_counts_page11 = ccounts_page11_em;
-		index_cycle         = index_cycle_em;
-	}
+    if ( hd6309.md & MD_EM )
+    {
+        cycle_counts_page0  = ccounts_page0_na;
+        cycle_counts_page01 = ccounts_page01_na;
+        cycle_counts_page11 = ccounts_page11_na;
+        index_cycle         = index_cycle_na;
+    }
+    else
+    {
+        cycle_counts_page0  = ccounts_page0_em;
+        cycle_counts_page01 = ccounts_page01_em;
+        cycle_counts_page11 = ccounts_page11_em;
+        index_cycle         = index_cycle_em;
+    }
 }
 
 static void CHECK_IRQ_LINES( void )
 {
-	if( hd6309.irq_state[HD6309_IRQ_LINE] != HD6309_CLEAR_LINE ||
-		hd6309.irq_state[HD6309_FIRQ_LINE] != HD6309_CLEAR_LINE )
-		hd6309.int_state &= ~HD6309_SYNC; /* clear SYNC flag */
-	if( hd6309.irq_state[HD6309_FIRQ_LINE]!=HD6309_CLEAR_LINE && !(CC & CC_IF))
-	{
-		/* fast IRQ */
-		/* HJB 990225: state already saved by CWAI? */
-		if( hd6309.int_state & HD6309_CWAI )
-		{
-			hd6309.int_state &= ~HD6309_CWAI;
-			hd6309.extra_cycles += 7;		 /* subtract +7 cycles */
-		}
-		else
-		{
-			if ( MD & MD_FM )
-			{
-				CC |= CC_E; 				/* save entire state */
-				PUSHWORD(pPC);
-				PUSHWORD(pU);
-				PUSHWORD(pY);
-				PUSHWORD(pX);
-				PUSHBYTE(DP);
-				if ( MD & MD_EM )
-				{
-					PUSHBYTE(F);
-					PUSHBYTE(E);
-					hd6309.extra_cycles += 2; /* subtract +2 cycles */
-				}
-				PUSHBYTE(B);
-				PUSHBYTE(A);
-				PUSHBYTE(CC);
-				hd6309.extra_cycles += 19;	 /* subtract +19 cycles */
-			}
-			else
-			{
-				CC &= ~CC_E;				/* save 'short' state */
-				PUSHWORD(pPC);
-				PUSHBYTE(CC);
-				hd6309.extra_cycles += 10;	/* subtract +10 cycles */
-			}
-		}
-		CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */
-		PCD=RM16(0xfff6);
-		CHANGE_PC;
-//		(void)(*hd6309.irq_callback)(HD6309_FIRQ_LINE);
-	}
-	else
-	if( hd6309.irq_state[HD6309_IRQ_LINE]!=HD6309_CLEAR_LINE && !(CC & CC_II) )
-	{
-		/* standard IRQ */
-		/* HJB 990225: state already saved by CWAI? */
-		if( hd6309.int_state & HD6309_CWAI )
-		{
-			hd6309.int_state &= ~HD6309_CWAI;  /* clear CWAI flag */
-			hd6309.extra_cycles += 7;		 /* subtract +7 cycles */
-		}
-		else
-		{
-			CC |= CC_E; 				/* save entire state */
-			PUSHWORD(pPC);
-			PUSHWORD(pU);
-			PUSHWORD(pY);
-			PUSHWORD(pX);
-			PUSHBYTE(DP);
-			if ( MD & MD_EM )
-			{
-				PUSHBYTE(F);
-				PUSHBYTE(E);
-				hd6309.extra_cycles += 2; /* subtract +2 cycles */
-			}
-			PUSHBYTE(B);
-			PUSHBYTE(A);
-			PUSHBYTE(CC);
-			hd6309.extra_cycles += 19;	 /* subtract +19 cycles */
-		}
-		CC |= CC_II;					/* inhibit IRQ */
-		PCD=RM16(0xfff8);
-		CHANGE_PC;
-//		(void)(*hd6309.irq_callback)(HD6309_IRQ_LINE);
-	}
+    if( hd6309.irq_state[HD6309_IRQ_LINE] != HD6309_CLEAR_LINE ||
+            hd6309.irq_state[HD6309_FIRQ_LINE] != HD6309_CLEAR_LINE )
+        hd6309.int_state &= ~HD6309_SYNC; /* clear SYNC flag */
+    if( hd6309.irq_state[HD6309_FIRQ_LINE] != HD6309_CLEAR_LINE && !(CC & CC_IF))
+    {
+        /* fast IRQ */
+        /* HJB 990225: state already saved by CWAI? */
+        if( hd6309.int_state & HD6309_CWAI )
+        {
+            hd6309.int_state &= ~HD6309_CWAI;
+            hd6309.extra_cycles += 7;		 /* subtract +7 cycles */
+        }
+        else
+        {
+            if ( MD & MD_FM )
+            {
+                CC |= CC_E; 				/* save entire state */
+                PUSHWORD(pPC);
+                PUSHWORD(pU);
+                PUSHWORD(pY);
+                PUSHWORD(pX);
+                PUSHBYTE(DP);
+                if ( MD & MD_EM )
+                {
+                    PUSHBYTE(F);
+                    PUSHBYTE(E);
+                    hd6309.extra_cycles += 2; /* subtract +2 cycles */
+                }
+                PUSHBYTE(B);
+                PUSHBYTE(A);
+                PUSHBYTE(CC);
+                hd6309.extra_cycles += 19;	 /* subtract +19 cycles */
+            }
+            else
+            {
+                CC &= ~CC_E;				/* save 'short' state */
+                PUSHWORD(pPC);
+                PUSHBYTE(CC);
+                hd6309.extra_cycles += 10;	/* subtract +10 cycles */
+            }
+        }
+        CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */
+        PCD = RM16(0xfff6);
+        CHANGE_PC;
+        //		(void)(*hd6309.irq_callback)(HD6309_FIRQ_LINE);
+    }
+    else if( hd6309.irq_state[HD6309_IRQ_LINE] != HD6309_CLEAR_LINE && !(CC & CC_II) )
+    {
+        /* standard IRQ */
+        /* HJB 990225: state already saved by CWAI? */
+        if( hd6309.int_state & HD6309_CWAI )
+        {
+            hd6309.int_state &= ~HD6309_CWAI;  /* clear CWAI flag */
+            hd6309.extra_cycles += 7;		 /* subtract +7 cycles */
+        }
+        else
+        {
+            CC |= CC_E; 				/* save entire state */
+            PUSHWORD(pPC);
+            PUSHWORD(pU);
+            PUSHWORD(pY);
+            PUSHWORD(pX);
+            PUSHBYTE(DP);
+            if ( MD & MD_EM )
+            {
+                PUSHBYTE(F);
+                PUSHBYTE(E);
+                hd6309.extra_cycles += 2; /* subtract +2 cycles */
+            }
+            PUSHBYTE(B);
+            PUSHBYTE(A);
+            PUSHBYTE(CC);
+            hd6309.extra_cycles += 19;	 /* subtract +19 cycles */
+        }
+        CC |= CC_II;					/* inhibit IRQ */
+        PCD = RM16(0xfff8);
+        CHANGE_PC;
+        //		(void)(*hd6309.irq_callback)(HD6309_IRQ_LINE);
+    }
 }
 
 /****************************************************************************
@@ -480,8 +479,8 @@ static void CHECK_IRQ_LINES( void )
  ****************************************************************************/
 void hd6309_get_context(void *dst)
 {
-	if( dst )
-		*(hd6309_Regs*)dst = hd6309;
+    if( dst )
+        *(hd6309_Regs *)dst = hd6309;
 }
 
 /****************************************************************************
@@ -489,12 +488,12 @@ void hd6309_get_context(void *dst)
  ****************************************************************************/
 void hd6309_set_context(void *src)
 {
-	if( src )
-		hd6309 = *(hd6309_Regs*)src;
-	CHANGE_PC;
+    if( src )
+        hd6309 = *(hd6309_Regs *)src;
+    CHANGE_PC;
 
-	CHECK_IRQ_LINES();
-	UpdateState();
+    CHECK_IRQ_LINES();
+    UpdateState();
 }
 
 //static STATE_POSTLOAD( hd6309_postload )
@@ -504,22 +503,22 @@ void hd6309_set_context(void *src)
 
 void hd6309_init()
 {
-//	hd6309.irq_callback = irqcallback;
+    //	hd6309.irq_callback = irqcallback;
 
-//	state_save_register_item("hd6309", index, PC);
-//	state_save_register_item("hd6309", index, U);
-//	state_save_register_item("hd6309", index, S);
-//	state_save_register_item("hd6309", index, X);
-//	state_save_register_item("hd6309", index, Y);
-//	state_save_register_item("hd6309", index, V);
-//	state_save_register_item("hd6309", index, DP);
-//	state_save_register_item("hd6309", index, CC);
-//	state_save_register_item("hd6309", index, MD);
-//	state_save_register_postload(Machine, hd6309_postload, NULL);
-//	state_save_register_item("hd6309", index, hd6309.int_state);
-//	state_save_register_item("hd6309", index, hd6309.nmi_state);
-//	state_save_register_item("hd6309", index, hd6309.irq_state[0]);
-//	state_save_register_item("hd6309", index, hd6309.irq_state[1]);
+    //	state_save_register_item("hd6309", index, PC);
+    //	state_save_register_item("hd6309", index, U);
+    //	state_save_register_item("hd6309", index, S);
+    //	state_save_register_item("hd6309", index, X);
+    //	state_save_register_item("hd6309", index, Y);
+    //	state_save_register_item("hd6309", index, V);
+    //	state_save_register_item("hd6309", index, DP);
+    //	state_save_register_item("hd6309", index, CC);
+    //	state_save_register_item("hd6309", index, MD);
+    //	state_save_register_postload(Machine, hd6309_postload, NULL);
+    //	state_save_register_item("hd6309", index, hd6309.int_state);
+    //	state_save_register_item("hd6309", index, hd6309.nmi_state);
+    //	state_save_register_item("hd6309", index, hd6309.irq_state[0]);
+    //	state_save_register_item("hd6309", index, hd6309.irq_state[1]);
 }
 
 /****************************************************************************/
@@ -527,25 +526,25 @@ void hd6309_init()
 /****************************************************************************/
 void hd6309_reset(void)
 {
-	hd6309.int_state = 0;
-	hd6309.nmi_state = HD6309_CLEAR_LINE;
-	hd6309.irq_state[0] = HD6309_CLEAR_LINE;
-	hd6309.irq_state[0] = HD6309_CLEAR_LINE;
+    hd6309.int_state = 0;
+    hd6309.nmi_state = HD6309_CLEAR_LINE;
+    hd6309.irq_state[0] = HD6309_CLEAR_LINE;
+    hd6309.irq_state[0] = HD6309_CLEAR_LINE;
 
-	DPD = 0;			/* Reset direct page register */
+    DPD = 0;			/* Reset direct page register */
 
-	MD = 0; 			/* Mode register gets reset */
-	CC |= CC_II;		/* IRQ disabled */
-	CC |= CC_IF;		/* FIRQ disabled */
+    MD = 0; 			/* Mode register gets reset */
+    CC |= CC_II;		/* IRQ disabled */
+    CC |= CC_IF;		/* FIRQ disabled */
 
-	PCD = RM16(0xfffe);
-	CHANGE_PC;
-	UpdateState();
+    PCD = RM16(0xfffe);
+    CHANGE_PC;
+    UpdateState();
 }
 
 int hd6309_get_pc()
 {
-	return PC;
+    return PC;
 }
 
 /*
@@ -560,54 +559,54 @@ static void hd6309_exit(void)
  ****************************************************************************/
 void hd6309_set_irq_line(int irqline, int state)
 {
-	if (irqline == HD6309_INPUT_LINE_NMI)
-	{
-		if (hd6309.nmi_state == state) return;
-		hd6309.nmi_state = state;
-//		LOG(("HD6309#%d set_irq_line (NMI) %d (PC=%4.4X)\n", cpu_getactivecpu(), state, pPC.d));
-		if( state == HD6309_CLEAR_LINE ) return;
+    if (irqline == HD6309_INPUT_LINE_NMI)
+    {
+        if (hd6309.nmi_state == state) return;
+        hd6309.nmi_state = state;
+        //		LOG(("HD6309#%d set_irq_line (NMI) %d (PC=%4.4X)\n", cpu_getactivecpu(), state, pPC.d));
+        if( state == HD6309_CLEAR_LINE ) return;
 
-		/* if the stack was not yet initialized */
-		if( !(hd6309.int_state & HD6309_LDS) ) return;
+        /* if the stack was not yet initialized */
+        if( !(hd6309.int_state & HD6309_LDS) ) return;
 
-		hd6309.int_state &= ~HD6309_SYNC;
-		/* HJB 990225: state already saved by CWAI? */
-		if( hd6309.int_state & HD6309_CWAI )
-		{
-			hd6309.int_state &= ~HD6309_CWAI;
-			hd6309.extra_cycles += 7;	/* subtract +7 cycles next time */
-		}
-		else
-		{
-			CC |= CC_E; 				/* save entire state */
-			PUSHWORD(pPC);
-			PUSHWORD(pU);
-			PUSHWORD(pY);
-			PUSHWORD(pX);
-			PUSHBYTE(DP);
-			if ( MD & MD_EM )
-			{
-				PUSHBYTE(F);
-				PUSHBYTE(E);
-				hd6309.extra_cycles += 2; /* subtract +2 cycles */
-			}
+        hd6309.int_state &= ~HD6309_SYNC;
+        /* HJB 990225: state already saved by CWAI? */
+        if( hd6309.int_state & HD6309_CWAI )
+        {
+            hd6309.int_state &= ~HD6309_CWAI;
+            hd6309.extra_cycles += 7;	/* subtract +7 cycles next time */
+        }
+        else
+        {
+            CC |= CC_E; 				/* save entire state */
+            PUSHWORD(pPC);
+            PUSHWORD(pU);
+            PUSHWORD(pY);
+            PUSHWORD(pX);
+            PUSHBYTE(DP);
+            if ( MD & MD_EM )
+            {
+                PUSHBYTE(F);
+                PUSHBYTE(E);
+                hd6309.extra_cycles += 2; /* subtract +2 cycles */
+            }
 
-			PUSHBYTE(B);
-			PUSHBYTE(A);
-			PUSHBYTE(CC);
-			hd6309.extra_cycles += 19;	/* subtract +19 cycles next time */
-		}
-		CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */
-		PCD = RM16(0xfffc);
-		CHANGE_PC;
-	}
-	else if (irqline < 2)
-	{
-//		LOG(("HD6309#%d set_irq_line %d, %d (PC=%4.4X)\n", cpu_getactivecpu(), irqline, state, pPC.d));
-		hd6309.irq_state[irqline] = state;
-		if (state == HD6309_CLEAR_LINE) return;
-		CHECK_IRQ_LINES();
-	}
+            PUSHBYTE(B);
+            PUSHBYTE(A);
+            PUSHBYTE(CC);
+            hd6309.extra_cycles += 19;	/* subtract +19 cycles next time */
+        }
+        CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */
+        PCD = RM16(0xfffc);
+        CHANGE_PC;
+    }
+    else if (irqline < 2)
+    {
+        //		LOG(("HD6309#%d set_irq_line %d, %d (PC=%4.4X)\n", cpu_getactivecpu(), irqline, state, pPC.d));
+        hd6309.irq_state[irqline] = state;
+        if (state == HD6309_CLEAR_LINE) return;
+        CHECK_IRQ_LINES();
+    }
 }
 
 /* includes the actual opcode implementations */
@@ -616,581 +615,1725 @@ void hd6309_set_irq_line(int irqline, int state)
 /* execute instructions on this CPU until icount expires */
 int hd6309_execute(int cycles)	/* NS 970908 */
 {
-	hd6309_ICount = cycles - hd6309.extra_cycles;
-	hd6309.extra_cycles = 0;
+    hd6309_ICount = cycles - hd6309.extra_cycles;
+    hd6309.extra_cycles = 0;
 
-	if (hd6309.int_state & (HD6309_CWAI | HD6309_SYNC))
-	{
-//		debugger_instruction_hook(Machine, PCD);
-		hd6309_ICount = 0;
-	}
-	else
-	{
-		do
-		{
-			pPPC = pPC;
+    if (hd6309.int_state & (HD6309_CWAI | HD6309_SYNC))
+    {
+        //		debugger_instruction_hook(Machine, PCD);
+        hd6309_ICount = 0;
+    }
+    else
+    {
+        do
+        {
+            pPPC = pPC;
 
-//			debugger_instruction_hook(Machine, PCD);
+            //			debugger_instruction_hook(Machine, PCD);
 
-			hd6309.ireg = ROP(PCD);
-			PC++;
+            hd6309.ireg = ROP(PCD);
+            PC++;
 
 #ifdef BIG_SWITCH
-			switch( hd6309.ireg )
-			{
-			case 0x00: neg_di();   				break;
-			case 0x01: oim_di();   				break;
-			case 0x02: aim_di();   				break;
-			case 0x03: com_di();   				break;
-			case 0x04: lsr_di();   				break;
-			case 0x05: eim_di();   				break;
-			case 0x06: ror_di();   				break;
-			case 0x07: asr_di();   				break;
-			case 0x08: asl_di();   				break;
-			case 0x09: rol_di();   				break;
-			case 0x0a: dec_di();   				break;
-			case 0x0b: tim_di();   				break;
-			case 0x0c: inc_di();   				break;
-			case 0x0d: tst_di();   				break;
-			case 0x0e: jmp_di();   				break;
-			case 0x0f: clr_di();   				break;
-			case 0x10: pref10();				break;
-			case 0x11: pref11();				break;
-			case 0x12: nop();	   				break;
-			case 0x13: sync();	   				break;
-			case 0x14: sexw();	   				break;
-			case 0x15: IIError();				break;
-			case 0x16: lbra();	   				break;
-			case 0x17: lbsr();	   				break;
-			case 0x18: IIError();				break;
-			case 0x19: daa();	   				break;
-			case 0x1a: orcc();	   				break;
-			case 0x1b: IIError();				break;
-			case 0x1c: andcc();    				break;
-			case 0x1d: sex();	   				break;
-			case 0x1e: exg();	   				break;
-			case 0x1f: tfr();	   				break;
-			case 0x20: bra();	   				break;
-			case 0x21: brn();	   				break;
-			case 0x22: bhi();	   				break;
-			case 0x23: bls();	   				break;
-			case 0x24: bcc();	   				break;
-			case 0x25: bcs();	   				break;
-			case 0x26: bne();	   				break;
-			case 0x27: beq();	   				break;
-			case 0x28: bvc();	   				break;
-			case 0x29: bvs();	   				break;
-			case 0x2a: bpl();	   				break;
-			case 0x2b: bmi();	   				break;
-			case 0x2c: bge();	   				break;
-			case 0x2d: blt();	   				break;
-			case 0x2e: bgt();	   				break;
-			case 0x2f: ble();	   				break;
-			case 0x30: leax();	   				break;
-			case 0x31: leay();	   				break;
-			case 0x32: leas();	   				break;
-			case 0x33: leau();	   				break;
-			case 0x34: pshs();	   				break;
-			case 0x35: puls();	   				break;
-			case 0x36: pshu();	   				break;
-			case 0x37: pulu();	   				break;
-			case 0x38: IIError();				break;
-			case 0x39: rts();	   				break;
-			case 0x3a: abx();	   				break;
-			case 0x3b: rti();	   				break;
-			case 0x3c: cwai();					break;
-			case 0x3d: mul();					break;
-			case 0x3e: IIError();				break;
-			case 0x3f: swi();					break;
-			case 0x40: nega();	   				break;
-			case 0x41: IIError();				break;
-			case 0x42: IIError();				break;
-			case 0x43: coma();	   				break;
-			case 0x44: lsra();	   				break;
-			case 0x45: IIError();				break;
-			case 0x46: rora();	   				break;
-			case 0x47: asra();	   				break;
-			case 0x48: asla();	   				break;
-			case 0x49: rola();	   				break;
-			case 0x4a: deca();	   				break;
-			case 0x4b: IIError();				break;
-			case 0x4c: inca();	   				break;
-			case 0x4d: tsta();	   				break;
-			case 0x4e: IIError();				break;
-			case 0x4f: clra();	   				break;
-			case 0x50: negb();	   				break;
-			case 0x51: IIError();				break;
-			case 0x52: IIError();				break;
-			case 0x53: comb();	   				break;
-			case 0x54: lsrb();	   				break;
-			case 0x55: IIError();				break;
-			case 0x56: rorb();	   				break;
-			case 0x57: asrb();	   				break;
-			case 0x58: aslb();	   				break;
-			case 0x59: rolb();	   				break;
-			case 0x5a: decb();	   				break;
-			case 0x5b: IIError();				break;
-			case 0x5c: incb();	   				break;
-			case 0x5d: tstb();	   				break;
-			case 0x5e: IIError();				break;
-			case 0x5f: clrb();	   				break;
-			case 0x60: neg_ix();   				break;
-			case 0x61: oim_ix();   				break;
-			case 0x62: aim_ix();   				break;
-			case 0x63: com_ix();   				break;
-			case 0x64: lsr_ix();   				break;
-			case 0x65: eim_ix();   				break;
-			case 0x66: ror_ix();   				break;
-			case 0x67: asr_ix();   				break;
-			case 0x68: asl_ix();   				break;
-			case 0x69: rol_ix();   				break;
-			case 0x6a: dec_ix();   				break;
-			case 0x6b: tim_ix();   				break;
-			case 0x6c: inc_ix();   				break;
-			case 0x6d: tst_ix();   				break;
-			case 0x6e: jmp_ix();   				break;
-			case 0x6f: clr_ix();   				break;
-			case 0x70: neg_ex();   				break;
-			case 0x71: oim_ex();   				break;
-			case 0x72: aim_ex();   				break;
-			case 0x73: com_ex();   				break;
-			case 0x74: lsr_ex();   				break;
-			case 0x75: eim_ex();   				break;
-			case 0x76: ror_ex();   				break;
-			case 0x77: asr_ex();   				break;
-			case 0x78: asl_ex();   				break;
-			case 0x79: rol_ex();   				break;
-			case 0x7a: dec_ex();   				break;
-			case 0x7b: tim_ex();   				break;
-			case 0x7c: inc_ex();   				break;
-			case 0x7d: tst_ex();   				break;
-			case 0x7e: jmp_ex();   				break;
-			case 0x7f: clr_ex();   				break;
-			case 0x80: suba_im();  				break;
-			case 0x81: cmpa_im();  				break;
-			case 0x82: sbca_im();  				break;
-			case 0x83: subd_im();  				break;
-			case 0x84: anda_im();  				break;
-			case 0x85: bita_im();  				break;
-			case 0x86: lda_im();   				break;
-			case 0x87: IIError(); 				break;
-			case 0x88: eora_im();  				break;
-			case 0x89: adca_im();  				break;
-			case 0x8a: ora_im();   				break;
-			case 0x8b: adda_im();  				break;
-			case 0x8c: cmpx_im();  				break;
-			case 0x8d: bsr();	   				break;
-			case 0x8e: ldx_im();   				break;
-			case 0x8f: IIError();  				break;
-			case 0x90: suba_di();  				break;
-			case 0x91: cmpa_di();  				break;
-			case 0x92: sbca_di();  				break;
-			case 0x93: subd_di();  				break;
-			case 0x94: anda_di();  				break;
-			case 0x95: bita_di();  				break;
-			case 0x96: lda_di();   				break;
-			case 0x97: sta_di();   				break;
-			case 0x98: eora_di();  				break;
-			case 0x99: adca_di();  				break;
-			case 0x9a: ora_di();   				break;
-			case 0x9b: adda_di();  				break;
-			case 0x9c: cmpx_di();  				break;
-			case 0x9d: jsr_di();   				break;
-			case 0x9e: ldx_di();   				break;
-			case 0x9f: stx_di();   				break;
-			case 0xa0: suba_ix();  				break;
-			case 0xa1: cmpa_ix();  				break;
-			case 0xa2: sbca_ix();  				break;
-			case 0xa3: subd_ix();  				break;
-			case 0xa4: anda_ix();  				break;
-			case 0xa5: bita_ix();  				break;
-			case 0xa6: lda_ix();   				break;
-			case 0xa7: sta_ix();   				break;
-			case 0xa8: eora_ix();  				break;
-			case 0xa9: adca_ix();  				break;
-			case 0xaa: ora_ix();   				break;
-			case 0xab: adda_ix();  				break;
-			case 0xac: cmpx_ix();  				break;
-			case 0xad: jsr_ix();   				break;
-			case 0xae: ldx_ix();   				break;
-			case 0xaf: stx_ix();   				break;
-			case 0xb0: suba_ex();  				break;
-			case 0xb1: cmpa_ex();  				break;
-			case 0xb2: sbca_ex();  				break;
-			case 0xb3: subd_ex();  				break;
-			case 0xb4: anda_ex();  				break;
-			case 0xb5: bita_ex();  				break;
-			case 0xb6: lda_ex();   				break;
-			case 0xb7: sta_ex();   				break;
-			case 0xb8: eora_ex();  				break;
-			case 0xb9: adca_ex();  				break;
-			case 0xba: ora_ex();   				break;
-			case 0xbb: adda_ex();  				break;
-			case 0xbc: cmpx_ex();  				break;
-			case 0xbd: jsr_ex();   				break;
-			case 0xbe: ldx_ex();   				break;
-			case 0xbf: stx_ex();   				break;
-			case 0xc0: subb_im();  				break;
-			case 0xc1: cmpb_im();  				break;
-			case 0xc2: sbcb_im();  				break;
-			case 0xc3: addd_im();  				break;
-			case 0xc4: andb_im();  				break;
-			case 0xc5: bitb_im();  				break;
-			case 0xc6: ldb_im();   				break;
-			case 0xc7: IIError(); 				break;
-			case 0xc8: eorb_im();  				break;
-			case 0xc9: adcb_im();  				break;
-			case 0xca: orb_im();   				break;
-			case 0xcb: addb_im();  				break;
-			case 0xcc: ldd_im();   				break;
-			case 0xcd: ldq_im();   				break; /* in m6809 was std_im */
-			case 0xce: ldu_im();   				break;
-			case 0xcf: IIError();  				break;
-			case 0xd0: subb_di();  				break;
-			case 0xd1: cmpb_di();  				break;
-			case 0xd2: sbcb_di();  				break;
-			case 0xd3: addd_di();  				break;
-			case 0xd4: andb_di();  				break;
-			case 0xd5: bitb_di();  				break;
-			case 0xd6: ldb_di();   				break;
-			case 0xd7: stb_di();   				break;
-			case 0xd8: eorb_di();  				break;
-			case 0xd9: adcb_di();  				break;
-			case 0xda: orb_di();   				break;
-			case 0xdb: addb_di();  				break;
-			case 0xdc: ldd_di();   				break;
-			case 0xdd: std_di();   				break;
-			case 0xde: ldu_di();   				break;
-			case 0xdf: stu_di();   				break;
-			case 0xe0: subb_ix();  				break;
-			case 0xe1: cmpb_ix();  				break;
-			case 0xe2: sbcb_ix();  				break;
-			case 0xe3: addd_ix();  				break;
-			case 0xe4: andb_ix();  				break;
-			case 0xe5: bitb_ix();  				break;
-			case 0xe6: ldb_ix();   				break;
-			case 0xe7: stb_ix();   				break;
-			case 0xe8: eorb_ix();  				break;
-			case 0xe9: adcb_ix();  				break;
-			case 0xea: orb_ix();   				break;
-			case 0xeb: addb_ix();  				break;
-			case 0xec: ldd_ix();   				break;
-			case 0xed: std_ix();   				break;
-			case 0xee: ldu_ix();   				break;
-			case 0xef: stu_ix();   				break;
-			case 0xf0: subb_ex();  				break;
-			case 0xf1: cmpb_ex();  				break;
-			case 0xf2: sbcb_ex();  				break;
-			case 0xf3: addd_ex();  				break;
-			case 0xf4: andb_ex();  				break;
-			case 0xf5: bitb_ex();  				break;
-			case 0xf6: ldb_ex();   				break;
-			case 0xf7: stb_ex();   				break;
-			case 0xf8: eorb_ex();  				break;
-			case 0xf9: adcb_ex();  				break;
-			case 0xfa: orb_ex();   				break;
-			case 0xfb: addb_ex();  				break;
-			case 0xfc: ldd_ex();   				break;
-			case 0xfd: std_ex();   				break;
-			case 0xfe: ldu_ex();   				break;
-			case 0xff: stu_ex();   				break;
-			}
+            switch( hd6309.ireg )
+            {
+            case 0x00:
+                neg_di();
+                break;
+            case 0x01:
+                oim_di();
+                break;
+            case 0x02:
+                aim_di();
+                break;
+            case 0x03:
+                com_di();
+                break;
+            case 0x04:
+                lsr_di();
+                break;
+            case 0x05:
+                eim_di();
+                break;
+            case 0x06:
+                ror_di();
+                break;
+            case 0x07:
+                asr_di();
+                break;
+            case 0x08:
+                asl_di();
+                break;
+            case 0x09:
+                rol_di();
+                break;
+            case 0x0a:
+                dec_di();
+                break;
+            case 0x0b:
+                tim_di();
+                break;
+            case 0x0c:
+                inc_di();
+                break;
+            case 0x0d:
+                tst_di();
+                break;
+            case 0x0e:
+                jmp_di();
+                break;
+            case 0x0f:
+                clr_di();
+                break;
+            case 0x10:
+                pref10();
+                break;
+            case 0x11:
+                pref11();
+                break;
+            case 0x12:
+                nop();
+                break;
+            case 0x13:
+                sync();
+                break;
+            case 0x14:
+                sexw();
+                break;
+            case 0x15:
+                IIError();
+                break;
+            case 0x16:
+                lbra();
+                break;
+            case 0x17:
+                lbsr();
+                break;
+            case 0x18:
+                IIError();
+                break;
+            case 0x19:
+                daa();
+                break;
+            case 0x1a:
+                orcc();
+                break;
+            case 0x1b:
+                IIError();
+                break;
+            case 0x1c:
+                andcc();
+                break;
+            case 0x1d:
+                sex();
+                break;
+            case 0x1e:
+                exg();
+                break;
+            case 0x1f:
+                tfr();
+                break;
+            case 0x20:
+                bra();
+                break;
+            case 0x21:
+                brn();
+                break;
+            case 0x22:
+                bhi();
+                break;
+            case 0x23:
+                bls();
+                break;
+            case 0x24:
+                bcc();
+                break;
+            case 0x25:
+                bcs();
+                break;
+            case 0x26:
+                bne();
+                break;
+            case 0x27:
+                beq();
+                break;
+            case 0x28:
+                bvc();
+                break;
+            case 0x29:
+                bvs();
+                break;
+            case 0x2a:
+                bpl();
+                break;
+            case 0x2b:
+                bmi();
+                break;
+            case 0x2c:
+                bge();
+                break;
+            case 0x2d:
+                blt();
+                break;
+            case 0x2e:
+                bgt();
+                break;
+            case 0x2f:
+                ble();
+                break;
+            case 0x30:
+                leax();
+                break;
+            case 0x31:
+                leay();
+                break;
+            case 0x32:
+                leas();
+                break;
+            case 0x33:
+                leau();
+                break;
+            case 0x34:
+                pshs();
+                break;
+            case 0x35:
+                puls();
+                break;
+            case 0x36:
+                pshu();
+                break;
+            case 0x37:
+                pulu();
+                break;
+            case 0x38:
+                IIError();
+                break;
+            case 0x39:
+                rts();
+                break;
+            case 0x3a:
+                abx();
+                break;
+            case 0x3b:
+                rti();
+                break;
+            case 0x3c:
+                cwai();
+                break;
+            case 0x3d:
+                mul();
+                break;
+            case 0x3e:
+                IIError();
+                break;
+            case 0x3f:
+                swi();
+                break;
+            case 0x40:
+                nega();
+                break;
+            case 0x41:
+                IIError();
+                break;
+            case 0x42:
+                IIError();
+                break;
+            case 0x43:
+                coma();
+                break;
+            case 0x44:
+                lsra();
+                break;
+            case 0x45:
+                IIError();
+                break;
+            case 0x46:
+                rora();
+                break;
+            case 0x47:
+                asra();
+                break;
+            case 0x48:
+                asla();
+                break;
+            case 0x49:
+                rola();
+                break;
+            case 0x4a:
+                deca();
+                break;
+            case 0x4b:
+                IIError();
+                break;
+            case 0x4c:
+                inca();
+                break;
+            case 0x4d:
+                tsta();
+                break;
+            case 0x4e:
+                IIError();
+                break;
+            case 0x4f:
+                clra();
+                break;
+            case 0x50:
+                negb();
+                break;
+            case 0x51:
+                IIError();
+                break;
+            case 0x52:
+                IIError();
+                break;
+            case 0x53:
+                comb();
+                break;
+            case 0x54:
+                lsrb();
+                break;
+            case 0x55:
+                IIError();
+                break;
+            case 0x56:
+                rorb();
+                break;
+            case 0x57:
+                asrb();
+                break;
+            case 0x58:
+                aslb();
+                break;
+            case 0x59:
+                rolb();
+                break;
+            case 0x5a:
+                decb();
+                break;
+            case 0x5b:
+                IIError();
+                break;
+            case 0x5c:
+                incb();
+                break;
+            case 0x5d:
+                tstb();
+                break;
+            case 0x5e:
+                IIError();
+                break;
+            case 0x5f:
+                clrb();
+                break;
+            case 0x60:
+                neg_ix();
+                break;
+            case 0x61:
+                oim_ix();
+                break;
+            case 0x62:
+                aim_ix();
+                break;
+            case 0x63:
+                com_ix();
+                break;
+            case 0x64:
+                lsr_ix();
+                break;
+            case 0x65:
+                eim_ix();
+                break;
+            case 0x66:
+                ror_ix();
+                break;
+            case 0x67:
+                asr_ix();
+                break;
+            case 0x68:
+                asl_ix();
+                break;
+            case 0x69:
+                rol_ix();
+                break;
+            case 0x6a:
+                dec_ix();
+                break;
+            case 0x6b:
+                tim_ix();
+                break;
+            case 0x6c:
+                inc_ix();
+                break;
+            case 0x6d:
+                tst_ix();
+                break;
+            case 0x6e:
+                jmp_ix();
+                break;
+            case 0x6f:
+                clr_ix();
+                break;
+            case 0x70:
+                neg_ex();
+                break;
+            case 0x71:
+                oim_ex();
+                break;
+            case 0x72:
+                aim_ex();
+                break;
+            case 0x73:
+                com_ex();
+                break;
+            case 0x74:
+                lsr_ex();
+                break;
+            case 0x75:
+                eim_ex();
+                break;
+            case 0x76:
+                ror_ex();
+                break;
+            case 0x77:
+                asr_ex();
+                break;
+            case 0x78:
+                asl_ex();
+                break;
+            case 0x79:
+                rol_ex();
+                break;
+            case 0x7a:
+                dec_ex();
+                break;
+            case 0x7b:
+                tim_ex();
+                break;
+            case 0x7c:
+                inc_ex();
+                break;
+            case 0x7d:
+                tst_ex();
+                break;
+            case 0x7e:
+                jmp_ex();
+                break;
+            case 0x7f:
+                clr_ex();
+                break;
+            case 0x80:
+                suba_im();
+                break;
+            case 0x81:
+                cmpa_im();
+                break;
+            case 0x82:
+                sbca_im();
+                break;
+            case 0x83:
+                subd_im();
+                break;
+            case 0x84:
+                anda_im();
+                break;
+            case 0x85:
+                bita_im();
+                break;
+            case 0x86:
+                lda_im();
+                break;
+            case 0x87:
+                IIError();
+                break;
+            case 0x88:
+                eora_im();
+                break;
+            case 0x89:
+                adca_im();
+                break;
+            case 0x8a:
+                ora_im();
+                break;
+            case 0x8b:
+                adda_im();
+                break;
+            case 0x8c:
+                cmpx_im();
+                break;
+            case 0x8d:
+                bsr();
+                break;
+            case 0x8e:
+                ldx_im();
+                break;
+            case 0x8f:
+                IIError();
+                break;
+            case 0x90:
+                suba_di();
+                break;
+            case 0x91:
+                cmpa_di();
+                break;
+            case 0x92:
+                sbca_di();
+                break;
+            case 0x93:
+                subd_di();
+                break;
+            case 0x94:
+                anda_di();
+                break;
+            case 0x95:
+                bita_di();
+                break;
+            case 0x96:
+                lda_di();
+                break;
+            case 0x97:
+                sta_di();
+                break;
+            case 0x98:
+                eora_di();
+                break;
+            case 0x99:
+                adca_di();
+                break;
+            case 0x9a:
+                ora_di();
+                break;
+            case 0x9b:
+                adda_di();
+                break;
+            case 0x9c:
+                cmpx_di();
+                break;
+            case 0x9d:
+                jsr_di();
+                break;
+            case 0x9e:
+                ldx_di();
+                break;
+            case 0x9f:
+                stx_di();
+                break;
+            case 0xa0:
+                suba_ix();
+                break;
+            case 0xa1:
+                cmpa_ix();
+                break;
+            case 0xa2:
+                sbca_ix();
+                break;
+            case 0xa3:
+                subd_ix();
+                break;
+            case 0xa4:
+                anda_ix();
+                break;
+            case 0xa5:
+                bita_ix();
+                break;
+            case 0xa6:
+                lda_ix();
+                break;
+            case 0xa7:
+                sta_ix();
+                break;
+            case 0xa8:
+                eora_ix();
+                break;
+            case 0xa9:
+                adca_ix();
+                break;
+            case 0xaa:
+                ora_ix();
+                break;
+            case 0xab:
+                adda_ix();
+                break;
+            case 0xac:
+                cmpx_ix();
+                break;
+            case 0xad:
+                jsr_ix();
+                break;
+            case 0xae:
+                ldx_ix();
+                break;
+            case 0xaf:
+                stx_ix();
+                break;
+            case 0xb0:
+                suba_ex();
+                break;
+            case 0xb1:
+                cmpa_ex();
+                break;
+            case 0xb2:
+                sbca_ex();
+                break;
+            case 0xb3:
+                subd_ex();
+                break;
+            case 0xb4:
+                anda_ex();
+                break;
+            case 0xb5:
+                bita_ex();
+                break;
+            case 0xb6:
+                lda_ex();
+                break;
+            case 0xb7:
+                sta_ex();
+                break;
+            case 0xb8:
+                eora_ex();
+                break;
+            case 0xb9:
+                adca_ex();
+                break;
+            case 0xba:
+                ora_ex();
+                break;
+            case 0xbb:
+                adda_ex();
+                break;
+            case 0xbc:
+                cmpx_ex();
+                break;
+            case 0xbd:
+                jsr_ex();
+                break;
+            case 0xbe:
+                ldx_ex();
+                break;
+            case 0xbf:
+                stx_ex();
+                break;
+            case 0xc0:
+                subb_im();
+                break;
+            case 0xc1:
+                cmpb_im();
+                break;
+            case 0xc2:
+                sbcb_im();
+                break;
+            case 0xc3:
+                addd_im();
+                break;
+            case 0xc4:
+                andb_im();
+                break;
+            case 0xc5:
+                bitb_im();
+                break;
+            case 0xc6:
+                ldb_im();
+                break;
+            case 0xc7:
+                IIError();
+                break;
+            case 0xc8:
+                eorb_im();
+                break;
+            case 0xc9:
+                adcb_im();
+                break;
+            case 0xca:
+                orb_im();
+                break;
+            case 0xcb:
+                addb_im();
+                break;
+            case 0xcc:
+                ldd_im();
+                break;
+            case 0xcd:
+                ldq_im();
+                break; /* in m6809 was std_im */
+            case 0xce:
+                ldu_im();
+                break;
+            case 0xcf:
+                IIError();
+                break;
+            case 0xd0:
+                subb_di();
+                break;
+            case 0xd1:
+                cmpb_di();
+                break;
+            case 0xd2:
+                sbcb_di();
+                break;
+            case 0xd3:
+                addd_di();
+                break;
+            case 0xd4:
+                andb_di();
+                break;
+            case 0xd5:
+                bitb_di();
+                break;
+            case 0xd6:
+                ldb_di();
+                break;
+            case 0xd7:
+                stb_di();
+                break;
+            case 0xd8:
+                eorb_di();
+                break;
+            case 0xd9:
+                adcb_di();
+                break;
+            case 0xda:
+                orb_di();
+                break;
+            case 0xdb:
+                addb_di();
+                break;
+            case 0xdc:
+                ldd_di();
+                break;
+            case 0xdd:
+                std_di();
+                break;
+            case 0xde:
+                ldu_di();
+                break;
+            case 0xdf:
+                stu_di();
+                break;
+            case 0xe0:
+                subb_ix();
+                break;
+            case 0xe1:
+                cmpb_ix();
+                break;
+            case 0xe2:
+                sbcb_ix();
+                break;
+            case 0xe3:
+                addd_ix();
+                break;
+            case 0xe4:
+                andb_ix();
+                break;
+            case 0xe5:
+                bitb_ix();
+                break;
+            case 0xe6:
+                ldb_ix();
+                break;
+            case 0xe7:
+                stb_ix();
+                break;
+            case 0xe8:
+                eorb_ix();
+                break;
+            case 0xe9:
+                adcb_ix();
+                break;
+            case 0xea:
+                orb_ix();
+                break;
+            case 0xeb:
+                addb_ix();
+                break;
+            case 0xec:
+                ldd_ix();
+                break;
+            case 0xed:
+                std_ix();
+                break;
+            case 0xee:
+                ldu_ix();
+                break;
+            case 0xef:
+                stu_ix();
+                break;
+            case 0xf0:
+                subb_ex();
+                break;
+            case 0xf1:
+                cmpb_ex();
+                break;
+            case 0xf2:
+                sbcb_ex();
+                break;
+            case 0xf3:
+                addd_ex();
+                break;
+            case 0xf4:
+                andb_ex();
+                break;
+            case 0xf5:
+                bitb_ex();
+                break;
+            case 0xf6:
+                ldb_ex();
+                break;
+            case 0xf7:
+                stb_ex();
+                break;
+            case 0xf8:
+                eorb_ex();
+                break;
+            case 0xf9:
+                adcb_ex();
+                break;
+            case 0xfa:
+                orb_ex();
+                break;
+            case 0xfb:
+                addb_ex();
+                break;
+            case 0xfc:
+                ldd_ex();
+                break;
+            case 0xfd:
+                std_ex();
+                break;
+            case 0xfe:
+                ldu_ex();
+                break;
+            case 0xff:
+                stu_ex();
+                break;
+            }
 #else
-			(*hd6309_main[hd6309.ireg])();
+            (*hd6309_main[hd6309.ireg])();
 #endif    /* BIG_SWITCH */
 
-			hd6309_ICount -= cycle_counts_page0[hd6309.ireg];
+            hd6309_ICount -= cycle_counts_page0[hd6309.ireg];
 
-		} while( hd6309_ICount > 0 );
+        }
+        while( hd6309_ICount > 0 );
 
-		hd6309_ICount -= hd6309.extra_cycles;
-		hd6309.extra_cycles = 0;
-	}
+        hd6309_ICount -= hd6309.extra_cycles;
+        hd6309.extra_cycles = 0;
+    }
 
-	return cycles - hd6309_ICount;	 /* NS 970908 */
+    return cycles - hd6309_ICount;	 /* NS 970908 */
 }
 
 HD6309_INLINE void fetch_effective_address( void )
 {
-	UINT8 postbyte = ROP_ARG(PCD);
-	PC++;
+    UINT8 postbyte = ROP_ARG(PCD);
+    PC++;
 
-	switch(postbyte)
-	{
-	case 0x00: EA=X;													break;
-	case 0x01: EA=X+1;													break;
-	case 0x02: EA=X+2;													break;
-	case 0x03: EA=X+3;													break;
-	case 0x04: EA=X+4;													break;
-	case 0x05: EA=X+5;													break;
-	case 0x06: EA=X+6;													break;
-	case 0x07: EA=X+7;													break;
-	case 0x08: EA=X+8;													break;
-	case 0x09: EA=X+9;													break;
-	case 0x0a: EA=X+10; 												break;
-	case 0x0b: EA=X+11; 												break;
-	case 0x0c: EA=X+12; 												break;
-	case 0x0d: EA=X+13; 												break;
-	case 0x0e: EA=X+14; 												break;
-	case 0x0f: EA=X+15; 												break;
+    switch(postbyte)
+    {
+    case 0x00:
+        EA = X;
+        break;
+    case 0x01:
+        EA = X + 1;
+        break;
+    case 0x02:
+        EA = X + 2;
+        break;
+    case 0x03:
+        EA = X + 3;
+        break;
+    case 0x04:
+        EA = X + 4;
+        break;
+    case 0x05:
+        EA = X + 5;
+        break;
+    case 0x06:
+        EA = X + 6;
+        break;
+    case 0x07:
+        EA = X + 7;
+        break;
+    case 0x08:
+        EA = X + 8;
+        break;
+    case 0x09:
+        EA = X + 9;
+        break;
+    case 0x0a:
+        EA = X + 10;
+        break;
+    case 0x0b:
+        EA = X + 11;
+        break;
+    case 0x0c:
+        EA = X + 12;
+        break;
+    case 0x0d:
+        EA = X + 13;
+        break;
+    case 0x0e:
+        EA = X + 14;
+        break;
+    case 0x0f:
+        EA = X + 15;
+        break;
 
-	case 0x10: EA=X-16; 												break;
-	case 0x11: EA=X-15; 												break;
-	case 0x12: EA=X-14; 												break;
-	case 0x13: EA=X-13; 												break;
-	case 0x14: EA=X-12; 												break;
-	case 0x15: EA=X-11; 												break;
-	case 0x16: EA=X-10; 												break;
-	case 0x17: EA=X-9;													break;
-	case 0x18: EA=X-8;													break;
-	case 0x19: EA=X-7;													break;
-	case 0x1a: EA=X-6;													break;
-	case 0x1b: EA=X-5;													break;
-	case 0x1c: EA=X-4;													break;
-	case 0x1d: EA=X-3;													break;
-	case 0x1e: EA=X-2;													break;
-	case 0x1f: EA=X-1;													break;
+    case 0x10:
+        EA = X - 16;
+        break;
+    case 0x11:
+        EA = X - 15;
+        break;
+    case 0x12:
+        EA = X - 14;
+        break;
+    case 0x13:
+        EA = X - 13;
+        break;
+    case 0x14:
+        EA = X - 12;
+        break;
+    case 0x15:
+        EA = X - 11;
+        break;
+    case 0x16:
+        EA = X - 10;
+        break;
+    case 0x17:
+        EA = X - 9;
+        break;
+    case 0x18:
+        EA = X - 8;
+        break;
+    case 0x19:
+        EA = X - 7;
+        break;
+    case 0x1a:
+        EA = X - 6;
+        break;
+    case 0x1b:
+        EA = X - 5;
+        break;
+    case 0x1c:
+        EA = X - 4;
+        break;
+    case 0x1d:
+        EA = X - 3;
+        break;
+    case 0x1e:
+        EA = X - 2;
+        break;
+    case 0x1f:
+        EA = X - 1;
+        break;
 
-	case 0x20: EA=Y;													break;
-	case 0x21: EA=Y+1;													break;
-	case 0x22: EA=Y+2;													break;
-	case 0x23: EA=Y+3;													break;
-	case 0x24: EA=Y+4;													break;
-	case 0x25: EA=Y+5;													break;
-	case 0x26: EA=Y+6;													break;
-	case 0x27: EA=Y+7;													break;
-	case 0x28: EA=Y+8;													break;
-	case 0x29: EA=Y+9;													break;
-	case 0x2a: EA=Y+10; 												break;
-	case 0x2b: EA=Y+11; 												break;
-	case 0x2c: EA=Y+12; 												break;
-	case 0x2d: EA=Y+13; 												break;
-	case 0x2e: EA=Y+14; 												break;
-	case 0x2f: EA=Y+15; 												break;
+    case 0x20:
+        EA = Y;
+        break;
+    case 0x21:
+        EA = Y + 1;
+        break;
+    case 0x22:
+        EA = Y + 2;
+        break;
+    case 0x23:
+        EA = Y + 3;
+        break;
+    case 0x24:
+        EA = Y + 4;
+        break;
+    case 0x25:
+        EA = Y + 5;
+        break;
+    case 0x26:
+        EA = Y + 6;
+        break;
+    case 0x27:
+        EA = Y + 7;
+        break;
+    case 0x28:
+        EA = Y + 8;
+        break;
+    case 0x29:
+        EA = Y + 9;
+        break;
+    case 0x2a:
+        EA = Y + 10;
+        break;
+    case 0x2b:
+        EA = Y + 11;
+        break;
+    case 0x2c:
+        EA = Y + 12;
+        break;
+    case 0x2d:
+        EA = Y + 13;
+        break;
+    case 0x2e:
+        EA = Y + 14;
+        break;
+    case 0x2f:
+        EA = Y + 15;
+        break;
 
-	case 0x30: EA=Y-16; 												break;
-	case 0x31: EA=Y-15; 												break;
-	case 0x32: EA=Y-14; 												break;
-	case 0x33: EA=Y-13; 												break;
-	case 0x34: EA=Y-12; 												break;
-	case 0x35: EA=Y-11; 												break;
-	case 0x36: EA=Y-10; 												break;
-	case 0x37: EA=Y-9;													break;
-	case 0x38: EA=Y-8;													break;
-	case 0x39: EA=Y-7;													break;
-	case 0x3a: EA=Y-6;													break;
-	case 0x3b: EA=Y-5;													break;
-	case 0x3c: EA=Y-4;													break;
-	case 0x3d: EA=Y-3;													break;
-	case 0x3e: EA=Y-2;													break;
-	case 0x3f: EA=Y-1;													break;
+    case 0x30:
+        EA = Y - 16;
+        break;
+    case 0x31:
+        EA = Y - 15;
+        break;
+    case 0x32:
+        EA = Y - 14;
+        break;
+    case 0x33:
+        EA = Y - 13;
+        break;
+    case 0x34:
+        EA = Y - 12;
+        break;
+    case 0x35:
+        EA = Y - 11;
+        break;
+    case 0x36:
+        EA = Y - 10;
+        break;
+    case 0x37:
+        EA = Y - 9;
+        break;
+    case 0x38:
+        EA = Y - 8;
+        break;
+    case 0x39:
+        EA = Y - 7;
+        break;
+    case 0x3a:
+        EA = Y - 6;
+        break;
+    case 0x3b:
+        EA = Y - 5;
+        break;
+    case 0x3c:
+        EA = Y - 4;
+        break;
+    case 0x3d:
+        EA = Y - 3;
+        break;
+    case 0x3e:
+        EA = Y - 2;
+        break;
+    case 0x3f:
+        EA = Y - 1;
+        break;
 
-	case 0x40: EA=U;													break;
-	case 0x41: EA=U+1;													break;
-	case 0x42: EA=U+2;													break;
-	case 0x43: EA=U+3;													break;
-	case 0x44: EA=U+4;													break;
-	case 0x45: EA=U+5;													break;
-	case 0x46: EA=U+6;													break;
-	case 0x47: EA=U+7;													break;
-	case 0x48: EA=U+8;													break;
-	case 0x49: EA=U+9;													break;
-	case 0x4a: EA=U+10; 												break;
-	case 0x4b: EA=U+11; 												break;
-	case 0x4c: EA=U+12; 												break;
-	case 0x4d: EA=U+13; 												break;
-	case 0x4e: EA=U+14; 												break;
-	case 0x4f: EA=U+15; 												break;
+    case 0x40:
+        EA = U;
+        break;
+    case 0x41:
+        EA = U + 1;
+        break;
+    case 0x42:
+        EA = U + 2;
+        break;
+    case 0x43:
+        EA = U + 3;
+        break;
+    case 0x44:
+        EA = U + 4;
+        break;
+    case 0x45:
+        EA = U + 5;
+        break;
+    case 0x46:
+        EA = U + 6;
+        break;
+    case 0x47:
+        EA = U + 7;
+        break;
+    case 0x48:
+        EA = U + 8;
+        break;
+    case 0x49:
+        EA = U + 9;
+        break;
+    case 0x4a:
+        EA = U + 10;
+        break;
+    case 0x4b:
+        EA = U + 11;
+        break;
+    case 0x4c:
+        EA = U + 12;
+        break;
+    case 0x4d:
+        EA = U + 13;
+        break;
+    case 0x4e:
+        EA = U + 14;
+        break;
+    case 0x4f:
+        EA = U + 15;
+        break;
 
-	case 0x50: EA=U-16; 												break;
-	case 0x51: EA=U-15; 												break;
-	case 0x52: EA=U-14; 												break;
-	case 0x53: EA=U-13; 												break;
-	case 0x54: EA=U-12; 												break;
-	case 0x55: EA=U-11; 												break;
-	case 0x56: EA=U-10; 												break;
-	case 0x57: EA=U-9;													break;
-	case 0x58: EA=U-8;													break;
-	case 0x59: EA=U-7;													break;
-	case 0x5a: EA=U-6;													break;
-	case 0x5b: EA=U-5;													break;
-	case 0x5c: EA=U-4;													break;
-	case 0x5d: EA=U-3;													break;
-	case 0x5e: EA=U-2;													break;
-	case 0x5f: EA=U-1;													break;
+    case 0x50:
+        EA = U - 16;
+        break;
+    case 0x51:
+        EA = U - 15;
+        break;
+    case 0x52:
+        EA = U - 14;
+        break;
+    case 0x53:
+        EA = U - 13;
+        break;
+    case 0x54:
+        EA = U - 12;
+        break;
+    case 0x55:
+        EA = U - 11;
+        break;
+    case 0x56:
+        EA = U - 10;
+        break;
+    case 0x57:
+        EA = U - 9;
+        break;
+    case 0x58:
+        EA = U - 8;
+        break;
+    case 0x59:
+        EA = U - 7;
+        break;
+    case 0x5a:
+        EA = U - 6;
+        break;
+    case 0x5b:
+        EA = U - 5;
+        break;
+    case 0x5c:
+        EA = U - 4;
+        break;
+    case 0x5d:
+        EA = U - 3;
+        break;
+    case 0x5e:
+        EA = U - 2;
+        break;
+    case 0x5f:
+        EA = U - 1;
+        break;
 
-	case 0x60: EA=S;													break;
-	case 0x61: EA=S+1;													break;
-	case 0x62: EA=S+2;													break;
-	case 0x63: EA=S+3;													break;
-	case 0x64: EA=S+4;													break;
-	case 0x65: EA=S+5;													break;
-	case 0x66: EA=S+6;													break;
-	case 0x67: EA=S+7;													break;
-	case 0x68: EA=S+8;													break;
-	case 0x69: EA=S+9;													break;
-	case 0x6a: EA=S+10; 												break;
-	case 0x6b: EA=S+11; 												break;
-	case 0x6c: EA=S+12; 												break;
-	case 0x6d: EA=S+13; 												break;
-	case 0x6e: EA=S+14; 												break;
-	case 0x6f: EA=S+15; 												break;
+    case 0x60:
+        EA = S;
+        break;
+    case 0x61:
+        EA = S + 1;
+        break;
+    case 0x62:
+        EA = S + 2;
+        break;
+    case 0x63:
+        EA = S + 3;
+        break;
+    case 0x64:
+        EA = S + 4;
+        break;
+    case 0x65:
+        EA = S + 5;
+        break;
+    case 0x66:
+        EA = S + 6;
+        break;
+    case 0x67:
+        EA = S + 7;
+        break;
+    case 0x68:
+        EA = S + 8;
+        break;
+    case 0x69:
+        EA = S + 9;
+        break;
+    case 0x6a:
+        EA = S + 10;
+        break;
+    case 0x6b:
+        EA = S + 11;
+        break;
+    case 0x6c:
+        EA = S + 12;
+        break;
+    case 0x6d:
+        EA = S + 13;
+        break;
+    case 0x6e:
+        EA = S + 14;
+        break;
+    case 0x6f:
+        EA = S + 15;
+        break;
 
-	case 0x70: EA=S-16; 												break;
-	case 0x71: EA=S-15; 												break;
-	case 0x72: EA=S-14; 												break;
-	case 0x73: EA=S-13; 												break;
-	case 0x74: EA=S-12; 												break;
-	case 0x75: EA=S-11; 												break;
-	case 0x76: EA=S-10; 												break;
-	case 0x77: EA=S-9;													break;
-	case 0x78: EA=S-8;													break;
-	case 0x79: EA=S-7;													break;
-	case 0x7a: EA=S-6;													break;
-	case 0x7b: EA=S-5;													break;
-	case 0x7c: EA=S-4;													break;
-	case 0x7d: EA=S-3;													break;
-	case 0x7e: EA=S-2;													break;
-	case 0x7f: EA=S-1;													break;
+    case 0x70:
+        EA = S - 16;
+        break;
+    case 0x71:
+        EA = S - 15;
+        break;
+    case 0x72:
+        EA = S - 14;
+        break;
+    case 0x73:
+        EA = S - 13;
+        break;
+    case 0x74:
+        EA = S - 12;
+        break;
+    case 0x75:
+        EA = S - 11;
+        break;
+    case 0x76:
+        EA = S - 10;
+        break;
+    case 0x77:
+        EA = S - 9;
+        break;
+    case 0x78:
+        EA = S - 8;
+        break;
+    case 0x79:
+        EA = S - 7;
+        break;
+    case 0x7a:
+        EA = S - 6;
+        break;
+    case 0x7b:
+        EA = S - 5;
+        break;
+    case 0x7c:
+        EA = S - 4;
+        break;
+    case 0x7d:
+        EA = S - 3;
+        break;
+    case 0x7e:
+        EA = S - 2;
+        break;
+    case 0x7f:
+        EA = S - 1;
+        break;
 
-	case 0x80: EA=X;	X++;											break;
-	case 0x81: EA=X;	X+=2;											break;
-	case 0x82: X--; 	EA=X;											break;
-	case 0x83: X-=2;	EA=X;											break;
-	case 0x84: EA=X;													break;
-	case 0x85: EA=X+SIGNED(B);											break;
-	case 0x86: EA=X+SIGNED(A);											break;
-	case 0x87: EA=X+SIGNED(E);											break;
-	case 0x88: IMMBYTE(EA); 	EA=X+SIGNED(EA);						break;
-	case 0x89: IMMWORD(ea); 	EA+=X;									break;
-	case 0x8a: EA=X+SIGNED(F);											break;
-	case 0x8b: EA=X+D;													break;
-	case 0x8c: IMMBYTE(EA); 	EA=PC+SIGNED(EA);						break;
-	case 0x8d: IMMWORD(ea); 	EA+=PC; 								break;
-	case 0x8e: EA=X+W;													break;
-	case 0x8f: EA=W;		 											break;
+    case 0x80:
+        EA = X;
+        X++;
+        break;
+    case 0x81:
+        EA = X;
+        X += 2;
+        break;
+    case 0x82:
+        X--;
+        EA = X;
+        break;
+    case 0x83:
+        X -= 2;
+        EA = X;
+        break;
+    case 0x84:
+        EA = X;
+        break;
+    case 0x85:
+        EA = X + SIGNED(B);
+        break;
+    case 0x86:
+        EA = X + SIGNED(A);
+        break;
+    case 0x87:
+        EA = X + SIGNED(E);
+        break;
+    case 0x88:
+        IMMBYTE(EA);
+        EA = X + SIGNED(EA);
+        break;
+    case 0x89:
+        IMMWORD(ea);
+        EA += X;
+        break;
+    case 0x8a:
+        EA = X + SIGNED(F);
+        break;
+    case 0x8b:
+        EA = X + D;
+        break;
+    case 0x8c:
+        IMMBYTE(EA);
+        EA = PC + SIGNED(EA);
+        break;
+    case 0x8d:
+        IMMWORD(ea);
+        EA += PC;
+        break;
+    case 0x8e:
+        EA = X + W;
+        break;
+    case 0x8f:
+        EA = W;
+        break;
 
-	case 0x90: EA=W;								EAD=RM16(EAD);		break;
-	case 0x91: EA=X;	X+=2;						EAD=RM16(EAD);		break;
-	case 0x92: IIError();												break;
-	case 0x93: X-=2;	EA=X;						EAD=RM16(EAD);		break;
-	case 0x94: EA=X;								EAD=RM16(EAD);		break;
-	case 0x95: EA=X+SIGNED(B);						EAD=RM16(EAD);		break;
-	case 0x96: EA=X+SIGNED(A);						EAD=RM16(EAD);		break;
-	case 0x97: EA=X+SIGNED(E);						EAD=RM16(EAD);		break;
-	case 0x98: IMMBYTE(EA); 	EA=X+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0x99: IMMWORD(ea); 	EA+=X;				EAD=RM16(EAD);		break;
-	case 0x9a: EA=X+SIGNED(F);						EAD=RM16(EAD);		break;
-	case 0x9b: EA=X+D;								EAD=RM16(EAD);		break;
-	case 0x9c: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0x9d: IMMWORD(ea); 	EA+=PC; 			EAD=RM16(EAD);		break;
-	case 0x9e: EA=X+W;								EAD=RM16(EAD);		break;
-	case 0x9f: IMMWORD(ea); 						EAD=RM16(EAD);		break;
+    case 0x90:
+        EA = W;
+        EAD = RM16(EAD);
+        break;
+    case 0x91:
+        EA = X;
+        X += 2;
+        EAD = RM16(EAD);
+        break;
+    case 0x92:
+        IIError();
+        break;
+    case 0x93:
+        X -= 2;
+        EA = X;
+        EAD = RM16(EAD);
+        break;
+    case 0x94:
+        EA = X;
+        EAD = RM16(EAD);
+        break;
+    case 0x95:
+        EA = X + SIGNED(B);
+        EAD = RM16(EAD);
+        break;
+    case 0x96:
+        EA = X + SIGNED(A);
+        EAD = RM16(EAD);
+        break;
+    case 0x97:
+        EA = X + SIGNED(E);
+        EAD = RM16(EAD);
+        break;
+    case 0x98:
+        IMMBYTE(EA);
+        EA = X + SIGNED(EA);
+        EAD = RM16(EAD);
+        break;
+    case 0x99:
+        IMMWORD(ea);
+        EA += X;
+        EAD = RM16(EAD);
+        break;
+    case 0x9a:
+        EA = X + SIGNED(F);
+        EAD = RM16(EAD);
+        break;
+    case 0x9b:
+        EA = X + D;
+        EAD = RM16(EAD);
+        break;
+    case 0x9c:
+        IMMBYTE(EA);
+        EA = PC + SIGNED(EA);
+        EAD = RM16(EAD);
+        break;
+    case 0x9d:
+        IMMWORD(ea);
+        EA += PC;
+        EAD = RM16(EAD);
+        break;
+    case 0x9e:
+        EA = X + W;
+        EAD = RM16(EAD);
+        break;
+    case 0x9f:
+        IMMWORD(ea);
+        EAD = RM16(EAD);
+        break;
 
-	case 0xa0: EA=Y;	Y++;											break;
-	case 0xa1: EA=Y;	Y+=2;											break;
-	case 0xa2: Y--; 	EA=Y;											break;
-	case 0xa3: Y-=2;	EA=Y;											break;
-	case 0xa4: EA=Y;													break;
-	case 0xa5: EA=Y+SIGNED(B);											break;
-	case 0xa6: EA=Y+SIGNED(A);											break;
-	case 0xa7: EA=Y+SIGNED(E);											break;
-	case 0xa8: IMMBYTE(EA); 	EA=Y+SIGNED(EA);						break;
-	case 0xa9: IMMWORD(ea); 	EA+=Y;									break;
-	case 0xaa: EA=Y+SIGNED(F);											break;
-	case 0xab: EA=Y+D;													break;
-	case 0xac: IMMBYTE(EA); 	EA=PC+SIGNED(EA);						break;
-	case 0xad: IMMWORD(ea); 	EA+=PC; 								break;
-	case 0xae: EA=Y+W;													break;
-	case 0xaf: IMMWORD(ea);     EA+=W;									break;
+    case 0xa0:
+        EA = Y;
+        Y++;
+        break;
+    case 0xa1:
+        EA = Y;
+        Y += 2;
+        break;
+    case 0xa2:
+        Y--;
+        EA = Y;
+        break;
+    case 0xa3:
+        Y -= 2;
+        EA = Y;
+        break;
+    case 0xa4:
+        EA = Y;
+        break;
+    case 0xa5:
+        EA = Y + SIGNED(B);
+        break;
+    case 0xa6:
+        EA = Y + SIGNED(A);
+        break;
+    case 0xa7:
+        EA = Y + SIGNED(E);
+        break;
+    case 0xa8:
+        IMMBYTE(EA);
+        EA = Y + SIGNED(EA);
+        break;
+    case 0xa9:
+        IMMWORD(ea);
+        EA += Y;
+        break;
+    case 0xaa:
+        EA = Y + SIGNED(F);
+        break;
+    case 0xab:
+        EA = Y + D;
+        break;
+    case 0xac:
+        IMMBYTE(EA);
+        EA = PC + SIGNED(EA);
+        break;
+    case 0xad:
+        IMMWORD(ea);
+        EA += PC;
+        break;
+    case 0xae:
+        EA = Y + W;
+        break;
+    case 0xaf:
+        IMMWORD(ea);
+        EA += W;
+        break;
 
-	case 0xb0: IMMWORD(ea); 	EA+=W;				EAD=RM16(EAD);		break;
-	case 0xb1: EA=Y;	Y+=2;						EAD=RM16(EAD);		break;
-	case 0xb2: IIError();												break;
-	case 0xb3: Y-=2;	EA=Y;						EAD=RM16(EAD);		break;
-	case 0xb4: EA=Y;								EAD=RM16(EAD);		break;
-	case 0xb5: EA=Y+SIGNED(B);						EAD=RM16(EAD);		break;
-	case 0xb6: EA=Y+SIGNED(A);						EAD=RM16(EAD);		break;
-	case 0xb7: EA=Y+SIGNED(E);						EAD=RM16(EAD);		break;
-	case 0xb8: IMMBYTE(EA); 	EA=Y+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0xb9: IMMWORD(ea); 	EA+=Y;				EAD=RM16(EAD);		break;
-	case 0xba: EA=Y+SIGNED(F);						EAD=RM16(EAD);		break;
-	case 0xbb: EA=Y+D;								EAD=RM16(EAD);		break;
-	case 0xbc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0xbd: IMMWORD(ea); 	EA+=PC; 			EAD=RM16(EAD);		break;
-	case 0xbe: EA=Y+W;								EAD=RM16(EAD);		break;
-	case 0xbf: IIError();												break;
+    case 0xb0:
+        IMMWORD(ea);
+        EA += W;
+        EAD = RM16(EAD);
+        break;
+    case 0xb1:
+        EA = Y;
+        Y += 2;
+        EAD = RM16(EAD);
+        break;
+    case 0xb2:
+        IIError();
+        break;
+    case 0xb3:
+        Y -= 2;
+        EA = Y;
+        EAD = RM16(EAD);
+        break;
+    case 0xb4:
+        EA = Y;
+        EAD = RM16(EAD);
+        break;
+    case 0xb5:
+        EA = Y + SIGNED(B);
+        EAD = RM16(EAD);
+        break;
+    case 0xb6:
+        EA = Y + SIGNED(A);
+        EAD = RM16(EAD);
+        break;
+    case 0xb7:
+        EA = Y + SIGNED(E);
+        EAD = RM16(EAD);
+        break;
+    case 0xb8:
+        IMMBYTE(EA);
+        EA = Y + SIGNED(EA);
+        EAD = RM16(EAD);
+        break;
+    case 0xb9:
+        IMMWORD(ea);
+        EA += Y;
+        EAD = RM16(EAD);
+        break;
+    case 0xba:
+        EA = Y + SIGNED(F);
+        EAD = RM16(EAD);
+        break;
+    case 0xbb:
+        EA = Y + D;
+        EAD = RM16(EAD);
+        break;
+    case 0xbc:
+        IMMBYTE(EA);
+        EA = PC + SIGNED(EA);
+        EAD = RM16(EAD);
+        break;
+    case 0xbd:
+        IMMWORD(ea);
+        EA += PC;
+        EAD = RM16(EAD);
+        break;
+    case 0xbe:
+        EA = Y + W;
+        EAD = RM16(EAD);
+        break;
+    case 0xbf:
+        IIError();
+        break;
 
-	case 0xc0: EA=U;			U++;									break;
-	case 0xc1: EA=U;			U+=2;									break;
-	case 0xc2: U--; 			EA=U;									break;
-	case 0xc3: U-=2;			EA=U;									break;
-	case 0xc4: EA=U;													break;
-	case 0xc5: EA=U+SIGNED(B);											break;
-	case 0xc6: EA=U+SIGNED(A);											break;
-	case 0xc7: EA=U+SIGNED(E);											break;
-	case 0xc8: IMMBYTE(EA); 	EA=U+SIGNED(EA);						break;
-	case 0xc9: IMMWORD(ea); 	EA+=U;									break;
-	case 0xca: EA=U+SIGNED(F);											break;
-	case 0xcb: EA=U+D;													break;
-	case 0xcc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);						break;
-	case 0xcd: IMMWORD(ea); 	EA+=PC; 								break;
-	case 0xce: EA=U+W;													break;
-	case 0xcf: EA=W;            W+=2;									break;
+    case 0xc0:
+        EA = U;
+        U++;
+        break;
+    case 0xc1:
+        EA = U;
+        U += 2;
+        break;
+    case 0xc2:
+        U--;
+        EA = U;
+        break;
+    case 0xc3:
+        U -= 2;
+        EA = U;
+        break;
+    case 0xc4:
+        EA = U;
+        break;
+    case 0xc5:
+        EA = U + SIGNED(B);
+        break;
+    case 0xc6:
+        EA = U + SIGNED(A);
+        break;
+    case 0xc7:
+        EA = U + SIGNED(E);
+        break;
+    case 0xc8:
+        IMMBYTE(EA);
+        EA = U + SIGNED(EA);
+        break;
+    case 0xc9:
+        IMMWORD(ea);
+        EA += U;
+        break;
+    case 0xca:
+        EA = U + SIGNED(F);
+        break;
+    case 0xcb:
+        EA = U + D;
+        break;
+    case 0xcc:
+        IMMBYTE(EA);
+        EA = PC + SIGNED(EA);
+        break;
+    case 0xcd:
+        IMMWORD(ea);
+        EA += PC;
+        break;
+    case 0xce:
+        EA = U + W;
+        break;
+    case 0xcf:
+        EA = W;
+        W += 2;
+        break;
 
-	case 0xd0: EA=W;	W+=2;						EAD=RM16(EAD);		break;
-	case 0xd1: EA=U;	U+=2;						EAD=RM16(EAD);		break;
-	case 0xd2: IIError();												break;
-	case 0xd3: U-=2;	EA=U;						EAD=RM16(EAD);		break;
-	case 0xd4: EA=U;								EAD=RM16(EAD);		break;
-	case 0xd5: EA=U+SIGNED(B);						EAD=RM16(EAD);		break;
-	case 0xd6: EA=U+SIGNED(A);						EAD=RM16(EAD);		break;
-	case 0xd7: EA=U+SIGNED(E);						EAD=RM16(EAD);		break;
-	case 0xd8: IMMBYTE(EA); 	EA=U+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0xd9: IMMWORD(ea); 	EA+=U;				EAD=RM16(EAD);		break;
-	case 0xda: EA=U+SIGNED(F);						EAD=RM16(EAD);		break;
-	case 0xdb: EA=U+D;								EAD=RM16(EAD);		break;
-	case 0xdc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0xdd: IMMWORD(ea); 	EA+=PC; 			EAD=RM16(EAD);		break;
-	case 0xde: EA=U+W;								EAD=RM16(EAD);		break;
-	case 0xdf: IIError();												break;
+    case 0xd0:
+        EA = W;
+        W += 2;
+        EAD = RM16(EAD);
+        break;
+    case 0xd1:
+        EA = U;
+        U += 2;
+        EAD = RM16(EAD);
+        break;
+    case 0xd2:
+        IIError();
+        break;
+    case 0xd3:
+        U -= 2;
+        EA = U;
+        EAD = RM16(EAD);
+        break;
+    case 0xd4:
+        EA = U;
+        EAD = RM16(EAD);
+        break;
+    case 0xd5:
+        EA = U + SIGNED(B);
+        EAD = RM16(EAD);
+        break;
+    case 0xd6:
+        EA = U + SIGNED(A);
+        EAD = RM16(EAD);
+        break;
+    case 0xd7:
+        EA = U + SIGNED(E);
+        EAD = RM16(EAD);
+        break;
+    case 0xd8:
+        IMMBYTE(EA);
+        EA = U + SIGNED(EA);
+        EAD = RM16(EAD);
+        break;
+    case 0xd9:
+        IMMWORD(ea);
+        EA += U;
+        EAD = RM16(EAD);
+        break;
+    case 0xda:
+        EA = U + SIGNED(F);
+        EAD = RM16(EAD);
+        break;
+    case 0xdb:
+        EA = U + D;
+        EAD = RM16(EAD);
+        break;
+    case 0xdc:
+        IMMBYTE(EA);
+        EA = PC + SIGNED(EA);
+        EAD = RM16(EAD);
+        break;
+    case 0xdd:
+        IMMWORD(ea);
+        EA += PC;
+        EAD = RM16(EAD);
+        break;
+    case 0xde:
+        EA = U + W;
+        EAD = RM16(EAD);
+        break;
+    case 0xdf:
+        IIError();
+        break;
 
-	case 0xe0: EA=S;	S++;											break;
-	case 0xe1: EA=S;	S+=2;											break;
-	case 0xe2: S--; 	EA=S;											break;
-	case 0xe3: S-=2;	EA=S;											break;
-	case 0xe4: EA=S;													break;
-	case 0xe5: EA=S+SIGNED(B);											break;
-	case 0xe6: EA=S+SIGNED(A);											break;
-	case 0xe7: EA=S+SIGNED(E);											break;
-	case 0xe8: IMMBYTE(EA); 	EA=S+SIGNED(EA);						break;
-	case 0xe9: IMMWORD(ea); 	EA+=S;									break;
-	case 0xea: EA=S+SIGNED(F);											break;
-	case 0xeb: EA=S+D;													break;
-	case 0xec: IMMBYTE(EA); 	EA=PC+SIGNED(EA);						break;
-	case 0xed: IMMWORD(ea); 	EA+=PC; 								break;
-	case 0xee: EA=S+W;													break;
-	case 0xef: W-=2;	EA=W;											break;
+    case 0xe0:
+        EA = S;
+        S++;
+        break;
+    case 0xe1:
+        EA = S;
+        S += 2;
+        break;
+    case 0xe2:
+        S--;
+        EA = S;
+        break;
+    case 0xe3:
+        S -= 2;
+        EA = S;
+        break;
+    case 0xe4:
+        EA = S;
+        break;
+    case 0xe5:
+        EA = S + SIGNED(B);
+        break;
+    case 0xe6:
+        EA = S + SIGNED(A);
+        break;
+    case 0xe7:
+        EA = S + SIGNED(E);
+        break;
+    case 0xe8:
+        IMMBYTE(EA);
+        EA = S + SIGNED(EA);
+        break;
+    case 0xe9:
+        IMMWORD(ea);
+        EA += S;
+        break;
+    case 0xea:
+        EA = S + SIGNED(F);
+        break;
+    case 0xeb:
+        EA = S + D;
+        break;
+    case 0xec:
+        IMMBYTE(EA);
+        EA = PC + SIGNED(EA);
+        break;
+    case 0xed:
+        IMMWORD(ea);
+        EA += PC;
+        break;
+    case 0xee:
+        EA = S + W;
+        break;
+    case 0xef:
+        W -= 2;
+        EA = W;
+        break;
 
-	case 0xf0: W-=2;	EA=W;						EAD=RM16(EAD);		break;
-	case 0xf1: EA=S;	S+=2;						EAD=RM16(EAD);		break;
-	case 0xf2: IIError();												break;
-	case 0xf3: S-=2;	EA=S;						EAD=RM16(EAD);		break;
-	case 0xf4: EA=S;								EAD=RM16(EAD);		break;
-	case 0xf5: EA=S+SIGNED(B);						EAD=RM16(EAD);		break;
-	case 0xf6: EA=S+SIGNED(A);						EAD=RM16(EAD);		break;
-	case 0xf7: EA=S+SIGNED(E);						EAD=RM16(EAD);		break;
-	case 0xf8: IMMBYTE(EA); 	EA=S+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0xf9: IMMWORD(ea); 	EA+=S;				EAD=RM16(EAD);		break;
-	case 0xfa: EA=S+SIGNED(F);						EAD=RM16(EAD);		break;
-	case 0xfb: EA=S+D;								EAD=RM16(EAD);		break;
-	case 0xfc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0xfd: IMMWORD(ea); 	EA+=PC; 			EAD=RM16(EAD);		break;
-	case 0xfe: EA=S+W;								EAD=RM16(EAD);		break;
-	case 0xff: IIError();												break;
-	}
+    case 0xf0:
+        W -= 2;
+        EA = W;
+        EAD = RM16(EAD);
+        break;
+    case 0xf1:
+        EA = S;
+        S += 2;
+        EAD = RM16(EAD);
+        break;
+    case 0xf2:
+        IIError();
+        break;
+    case 0xf3:
+        S -= 2;
+        EA = S;
+        EAD = RM16(EAD);
+        break;
+    case 0xf4:
+        EA = S;
+        EAD = RM16(EAD);
+        break;
+    case 0xf5:
+        EA = S + SIGNED(B);
+        EAD = RM16(EAD);
+        break;
+    case 0xf6:
+        EA = S + SIGNED(A);
+        EAD = RM16(EAD);
+        break;
+    case 0xf7:
+        EA = S + SIGNED(E);
+        EAD = RM16(EAD);
+        break;
+    case 0xf8:
+        IMMBYTE(EA);
+        EA = S + SIGNED(EA);
+        EAD = RM16(EAD);
+        break;
+    case 0xf9:
+        IMMWORD(ea);
+        EA += S;
+        EAD = RM16(EAD);
+        break;
+    case 0xfa:
+        EA = S + SIGNED(F);
+        EAD = RM16(EAD);
+        break;
+    case 0xfb:
+        EA = S + D;
+        EAD = RM16(EAD);
+        break;
+    case 0xfc:
+        IMMBYTE(EA);
+        EA = PC + SIGNED(EA);
+        EAD = RM16(EAD);
+        break;
+    case 0xfd:
+        IMMWORD(ea);
+        EA += PC;
+        EAD = RM16(EAD);
+        break;
+    case 0xfe:
+        EA = S + W;
+        EAD = RM16(EAD);
+        break;
+    case 0xff:
+        IIError();
+        break;
+    }
 
-	hd6309_ICount -= index_cycle[postbyte];
+    hd6309_ICount -= index_cycle[postbyte];
 }
 
 #if 0
@@ -1200,29 +2343,64 @@ HD6309_INLINE void fetch_effective_address( void )
 
 static void hd6309_set_info(UINT32 state, cpuinfo *info)
 {
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + HD6309_IRQ_LINE:	set_irq_line(HD6309_IRQ_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + HD6309_FIRQ_LINE:set_irq_line(HD6309_FIRQ_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + HD6309_INPUT_LINE_NMI:	set_irq_line(HD6309_INPUT_LINE_NMI, info->i);	break;
+    switch (state)
+    {
+    /* --- the following bits of info are set as 64-bit signed integers --- */
+    case CPUINFO_INT_INPUT_STATE + HD6309_IRQ_LINE:
+        set_irq_line(HD6309_IRQ_LINE, info->i);
+        break;
+    case CPUINFO_INT_INPUT_STATE + HD6309_FIRQ_LINE:
+        set_irq_line(HD6309_FIRQ_LINE, info->i);
+        break;
+    case CPUINFO_INT_INPUT_STATE + HD6309_INPUT_LINE_NMI:
+        set_irq_line(HD6309_INPUT_LINE_NMI, info->i);
+        break;
 
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + HD6309_PC:		PC = info->i; CHANGE_PC;					break;
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + HD6309_S:		S = info->i;								break;
-		case CPUINFO_INT_REGISTER + HD6309_CC:		CC = info->i; CHECK_IRQ_LINES();			break;
-		case CPUINFO_INT_REGISTER + HD6309_MD:		MD = info->i; UpdateState();				break;
-		case CPUINFO_INT_REGISTER + HD6309_U: 		U = info->i;								break;
-		case CPUINFO_INT_REGISTER + HD6309_A: 		A = info->i;								break;
-		case CPUINFO_INT_REGISTER + HD6309_B: 		B = info->i;								break;
-		case CPUINFO_INT_REGISTER + HD6309_E: 		E = info->i;								break;
-		case CPUINFO_INT_REGISTER + HD6309_F: 		F = info->i;								break;
-		case CPUINFO_INT_REGISTER + HD6309_X: 		X = info->i;								break;
-		case CPUINFO_INT_REGISTER + HD6309_Y: 		Y = info->i;								break;
-		case CPUINFO_INT_REGISTER + HD6309_V: 		V = info->i;								break;
-		case CPUINFO_INT_REGISTER + HD6309_DP: 		DP = info->i;								break;
-	}
+    case CPUINFO_INT_PC:
+    case CPUINFO_INT_REGISTER + HD6309_PC:
+        PC = info->i;
+        CHANGE_PC;
+        break;
+    case CPUINFO_INT_SP:
+    case CPUINFO_INT_REGISTER + HD6309_S:
+        S = info->i;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_CC:
+        CC = info->i;
+        CHECK_IRQ_LINES();
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_MD:
+        MD = info->i;
+        UpdateState();
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_U:
+        U = info->i;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_A:
+        A = info->i;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_B:
+        B = info->i;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_E:
+        E = info->i;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_F:
+        F = info->i;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_X:
+        X = info->i;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_Y:
+        Y = info->i;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_V:
+        V = info->i;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_DP:
+        DP = info->i;
+        break;
+    }
 }
 
 
@@ -1233,101 +2411,229 @@ static void hd6309_set_info(UINT32 state, cpuinfo *info)
 
 void hd6309_get_info(UINT32 state, cpuinfo *info)
 {
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(hd6309);				break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 5;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 20;							break;
+    switch (state)
+    {
+    /* --- the following bits of info are returned as 64-bit signed integers --- */
+    case CPUINFO_INT_CONTEXT_SIZE:
+        info->i = sizeof(hd6309);
+        break;
+    case CPUINFO_INT_INPUT_LINES:
+        info->i = 2;
+        break;
+    case CPUINFO_INT_DEFAULT_IRQ_VECTOR:
+        info->i = 0;
+        break;
+    case CPUINFO_INT_ENDIANNESS:
+        info->i = CPU_IS_BE;
+        break;
+    case CPUINFO_INT_CLOCK_MULTIPLIER:
+        info->i = 1;
+        break;
+    case CPUINFO_INT_CLOCK_DIVIDER:
+        info->i = 4;
+        break;
+    case CPUINFO_INT_MIN_INSTRUCTION_BYTES:
+        info->i = 1;
+        break;
+    case CPUINFO_INT_MAX_INSTRUCTION_BYTES:
+        info->i = 5;
+        break;
+    case CPUINFO_INT_MIN_CYCLES:
+        info->i = 1;
+        break;
+    case CPUINFO_INT_MAX_CYCLES:
+        info->i = 20;
+        break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+    case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:
+        info->i = 8;
+        break;
+    case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:
+        info->i = 16;
+        break;
+    case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:
+        info->i = 0;
+        break;
+    case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:
+        info->i = 0;
+        break;
+    case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:
+        info->i = 0;
+        break;
+    case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:
+        info->i = 0;
+        break;
+    case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:
+        info->i = 0;
+        break;
+    case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:
+        info->i = 0;
+        break;
+    case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:
+        info->i = 0;
+        break;
 
-		case CPUINFO_INT_INPUT_STATE + HD6309_IRQ_LINE:	info->i = hd6309.irq_state[HD6309_IRQ_LINE]; break;
-		case CPUINFO_INT_INPUT_STATE + HD6309_FIRQ_LINE:info->i = hd6309.irq_state[HD6309_FIRQ_LINE]; break;
-		case CPUINFO_INT_INPUT_STATE + HD6309_INPUT_LINE_NMI:	info->i = hd6309.nmi_state;				break;
+    case CPUINFO_INT_INPUT_STATE + HD6309_IRQ_LINE:
+        info->i = hd6309.irq_state[HD6309_IRQ_LINE];
+        break;
+    case CPUINFO_INT_INPUT_STATE + HD6309_FIRQ_LINE:
+        info->i = hd6309.irq_state[HD6309_FIRQ_LINE];
+        break;
+    case CPUINFO_INT_INPUT_STATE + HD6309_INPUT_LINE_NMI:
+        info->i = hd6309.nmi_state;
+        break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = PPC;							break;
+    case CPUINFO_INT_PREVIOUSPC:
+        info->i = PPC;
+        break;
 
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + HD6309_PC:			info->i = PC;							break;
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + HD6309_S:			info->i = S;							break;
-		case CPUINFO_INT_REGISTER + HD6309_CC:			info->i = CC;							break;
-		case CPUINFO_INT_REGISTER + HD6309_MD:			info->i = MD;							break;
-		case CPUINFO_INT_REGISTER + HD6309_U:			info->i = U;							break;
-		case CPUINFO_INT_REGISTER + HD6309_A:			info->i = A;							break;
-		case CPUINFO_INT_REGISTER + HD6309_B:			info->i = B;							break;
-		case CPUINFO_INT_REGISTER + HD6309_E:			info->i = E;							break;
-		case CPUINFO_INT_REGISTER + HD6309_F:			info->i = F;							break;
-		case CPUINFO_INT_REGISTER + HD6309_X:			info->i = X;							break;
-		case CPUINFO_INT_REGISTER + HD6309_Y:			info->i = Y;							break;
-		case CPUINFO_INT_REGISTER + HD6309_V:			info->i = V;							break;
-		case CPUINFO_INT_REGISTER + HD6309_DP:			info->i = DP;							break;
+    case CPUINFO_INT_PC:
+    case CPUINFO_INT_REGISTER + HD6309_PC:
+        info->i = PC;
+        break;
+    case CPUINFO_INT_SP:
+    case CPUINFO_INT_REGISTER + HD6309_S:
+        info->i = S;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_CC:
+        info->i = CC;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_MD:
+        info->i = MD;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_U:
+        info->i = U;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_A:
+        info->i = A;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_B:
+        info->i = B;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_E:
+        info->i = E;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_F:
+        info->i = F;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_X:
+        info->i = X;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_Y:
+        info->i = Y;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_V:
+        info->i = V;
+        break;
+    case CPUINFO_INT_REGISTER + HD6309_DP:
+        info->i = DP;
+        break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = hd6309_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = hd6309_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = hd6309_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = hd6309_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = hd6309_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = hd6309_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = hd6309_execute;			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = hd6309_dasm;		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &hd6309_ICount;			break;
+    /* --- the following bits of info are returned as pointers to data or functions --- */
+    case CPUINFO_PTR_SET_INFO:
+        info->setinfo = hd6309_set_info;
+        break;
+    case CPUINFO_PTR_GET_CONTEXT:
+        info->getcontext = hd6309_get_context;
+        break;
+    case CPUINFO_PTR_SET_CONTEXT:
+        info->setcontext = hd6309_set_context;
+        break;
+    case CPUINFO_PTR_INIT:
+        info->init = hd6309_init;
+        break;
+    case CPUINFO_PTR_RESET:
+        info->reset = hd6309_reset;
+        break;
+    case CPUINFO_PTR_EXIT:
+        info->exit = hd6309_exit;
+        break;
+    case CPUINFO_PTR_EXECUTE:
+        info->execute = hd6309_execute;
+        break;
+    case CPUINFO_PTR_BURN:
+        info->burn = NULL;
+        break;
+    case CPUINFO_PTR_DISASSEMBLE:
+        info->disassemble = hd6309_dasm;
+        break;
+    case CPUINFO_PTR_INSTRUCTION_COUNTER:
+        info->icount = &hd6309_ICount;
+        break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "HD6309");				break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Hitachi 6309");		break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.01");				break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright John Butler and Tim Lindner"); break;
+    /* --- the following bits of info are returned as NULL-terminated strings --- */
+    case CPUINFO_STR_NAME:
+        strcpy(info->s, "HD6309");
+        break;
+    case CPUINFO_STR_CORE_FAMILY:
+        strcpy(info->s, "Hitachi 6309");
+        break;
+    case CPUINFO_STR_CORE_VERSION:
+        strcpy(info->s, "1.01");
+        break;
+    case CPUINFO_STR_CORE_FILE:
+        strcpy(info->s, __FILE__);
+        break;
+    case CPUINFO_STR_CORE_CREDITS:
+        strcpy(info->s, "Copyright John Butler and Tim Lindner");
+        break;
 
-		case CPUINFO_STR_FLAGS:
-			sprintf(info->s, "%c%c%c%c%c%c%c%c (MD:%c%c%c%c)",
-				hd6309.cc & 0x80 ? 'E':'.',
-				hd6309.cc & 0x40 ? 'F':'.',
-				hd6309.cc & 0x20 ? 'H':'.',
-				hd6309.cc & 0x10 ? 'I':'.',
-				hd6309.cc & 0x08 ? 'N':'.',
-				hd6309.cc & 0x04 ? 'Z':'.',
-				hd6309.cc & 0x02 ? 'V':'.',
-				hd6309.cc & 0x01 ? 'C':'.',
+    case CPUINFO_STR_FLAGS:
+        sprintf(info->s, "%c%c%c%c%c%c%c%c (MD:%c%c%c%c)",
+                hd6309.cc & 0x80 ? 'E' : '.',
+                hd6309.cc & 0x40 ? 'F' : '.',
+                hd6309.cc & 0x20 ? 'H' : '.',
+                hd6309.cc & 0x10 ? 'I' : '.',
+                hd6309.cc & 0x08 ? 'N' : '.',
+                hd6309.cc & 0x04 ? 'Z' : '.',
+                hd6309.cc & 0x02 ? 'V' : '.',
+                hd6309.cc & 0x01 ? 'C' : '.',
 
-				hd6309.md & 0x80 ? 'E':'e',
-				hd6309.md & 0x40 ? 'F':'f',
-				hd6309.md & 0x02 ? 'I':'i',
-				hd6309.md & 0x01 ? 'Z':'z');
-			break;
+                hd6309.md & 0x80 ? 'E' : 'e',
+                hd6309.md & 0x40 ? 'F' : 'f',
+                hd6309.md & 0x02 ? 'I' : 'i',
+                hd6309.md & 0x01 ? 'Z' : 'z');
+        break;
 
-		case CPUINFO_STR_REGISTER + HD6309_PC:			sprintf(info->s, "PC:%04X", hd6309.pc.w.l); break;
-		case CPUINFO_STR_REGISTER + HD6309_S:			sprintf(info->s, "S:%04X", hd6309.s.w.l); break;
-		case CPUINFO_STR_REGISTER + HD6309_CC:			sprintf(info->s, "CC:%02X", hd6309.cc); break;
-		case CPUINFO_STR_REGISTER + HD6309_MD:			sprintf(info->s, "MD:%02X", hd6309.md); break;
-		case CPUINFO_STR_REGISTER + HD6309_U:			sprintf(info->s, "U:%04X", hd6309.u.w.l); break;
-		case CPUINFO_STR_REGISTER + HD6309_A:			sprintf(info->s, "A:%02X", hd6309.d.b.h); break;
-		case CPUINFO_STR_REGISTER + HD6309_B:			sprintf(info->s, "B:%02X", hd6309.d.b.l); break;
-		case CPUINFO_STR_REGISTER + HD6309_E:			sprintf(info->s, "E:%02X", hd6309.w.b.h); break;
-		case CPUINFO_STR_REGISTER + HD6309_F:			sprintf(info->s, "F:%02X", hd6309.w.b.l); break;
-		case CPUINFO_STR_REGISTER + HD6309_X:			sprintf(info->s, "X:%04X", hd6309.x.w.l); break;
-		case CPUINFO_STR_REGISTER + HD6309_Y:			sprintf(info->s, "Y:%04X", hd6309.y.w.l); break;
-		case CPUINFO_STR_REGISTER + HD6309_V:			sprintf(info->s, "V:%04X", hd6309.v.w.l); break;
-		case CPUINFO_STR_REGISTER + HD6309_DP:			sprintf(info->s, "DP:%02X", hd6309.dp.b.h); break;
-	}
+    case CPUINFO_STR_REGISTER + HD6309_PC:
+        sprintf(info->s, "PC:%04X", hd6309.pc.w.l);
+        break;
+    case CPUINFO_STR_REGISTER + HD6309_S:
+        sprintf(info->s, "S:%04X", hd6309.s.w.l);
+        break;
+    case CPUINFO_STR_REGISTER + HD6309_CC:
+        sprintf(info->s, "CC:%02X", hd6309.cc);
+        break;
+    case CPUINFO_STR_REGISTER + HD6309_MD:
+        sprintf(info->s, "MD:%02X", hd6309.md);
+        break;
+    case CPUINFO_STR_REGISTER + HD6309_U:
+        sprintf(info->s, "U:%04X", hd6309.u.w.l);
+        break;
+    case CPUINFO_STR_REGISTER + HD6309_A:
+        sprintf(info->s, "A:%02X", hd6309.d.b.h);
+        break;
+    case CPUINFO_STR_REGISTER + HD6309_B:
+        sprintf(info->s, "B:%02X", hd6309.d.b.l);
+        break;
+    case CPUINFO_STR_REGISTER + HD6309_E:
+        sprintf(info->s, "E:%02X", hd6309.w.b.h);
+        break;
+    case CPUINFO_STR_REGISTER + HD6309_F:
+        sprintf(info->s, "F:%02X", hd6309.w.b.l);
+        break;
+    case CPUINFO_STR_REGISTER + HD6309_X:
+        sprintf(info->s, "X:%04X", hd6309.x.w.l);
+        break;
+    case CPUINFO_STR_REGISTER + HD6309_Y:
+        sprintf(info->s, "Y:%04X", hd6309.y.w.l);
+        break;
+    case CPUINFO_STR_REGISTER + HD6309_V:
+        sprintf(info->s, "V:%04X", hd6309.v.w.l);
+        break;
+    case CPUINFO_STR_REGISTER + HD6309_DP:
+        sprintf(info->s, "DP:%02X", hd6309.dp.b.h);
+        break;
+    }
 }
 #endif

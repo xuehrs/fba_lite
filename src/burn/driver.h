@@ -11,11 +11,11 @@
 #include <math.h>
 
 #if !defined (_WIN32)
- #define __cdecl
+#define __cdecl
 #endif
 
 #ifndef INLINE
- #define INLINE __inline static
+#define INLINE __inline static
 #endif
 
 #define FBA
@@ -56,11 +56,12 @@ __extension__ typedef long long				INT64;
 #define HAS_YM3526  1
 #define HAS_Y8950   1
 
-enum {
-	CLEAR_LINE = 0,
-	ASSERT_LINE,
-	HOLD_LINE,
-	PULSE_LINE
+enum
+{
+    CLEAR_LINE = 0,
+    ASSERT_LINE,
+    HOLD_LINE,
+    PULSE_LINE
 };
 
 #define timer_get_time() BurnTimerGetTime()
@@ -69,20 +70,20 @@ enum {
 #define WRITE8_HANDLER(name) 	void  name(UINT8 data)
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
-  double BurnTimerGetTime(void);
+double BurnTimerGetTime(void);
 
-  typedef UINT8 (*read8_handler)(UINT32 offset);
-  typedef void (*write8_handler)(UINT32 offset, UINT32 data);
+typedef UINT8 (*read8_handler)(UINT32 offset);
+typedef void (*write8_handler)(UINT32 offset, UINT32 data);
 
- #ifdef MAME_USE_LOGERROR
-  void __cdecl logerror(char* szFormat, ...);
- #else
-  #define logerror
- #endif
+#ifdef MAME_USE_LOGERROR
+void __cdecl logerror(char *szFormat, ...);
+#else
+#define logerror
+#endif
 #ifdef __cplusplus
- }
+}
 #endif
 
 #endif /* DRIVER_H */

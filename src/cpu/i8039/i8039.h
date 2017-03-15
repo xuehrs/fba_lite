@@ -25,11 +25,11 @@
 */
 
 
-enum { I8039_PC=1, I8039_SP, I8039_PSW, I8039_A,  I8039_TC,
-	   I8039_P1,   I8039_P2, I8039_R0,  I8039_R1, I8039_R2,
-	   I8039_R3,   I8039_R4, I8039_R5,  I8039_R6, I8039_R7,
-	   I8039_EA
-};
+enum { I8039_PC = 1, I8039_SP, I8039_PSW, I8039_A,  I8039_TC,
+       I8039_P1,   I8039_P2, I8039_R0,  I8039_R1, I8039_R2,
+       I8039_R3,   I8039_R4, I8039_R5,  I8039_R6, I8039_R7,
+       I8039_EA
+     };
 
 typedef unsigned char (__fastcall *i8039ReadIoHandler)(unsigned int a);
 typedef void (__fastcall *i8039WriteIoHandler)(unsigned int a, unsigned char v);
@@ -55,7 +55,7 @@ extern void I8039SetCPUOpReadArgHandler(i8039ReadOpArgHandler handler);
 extern void I8039Exit();
 extern void I8039Reset (void);
 extern void I8039SetIrqState(int state);
-extern int I8039Scan(int nAction,int *pnMin);
+extern int I8039Scan(int nAction, int *pnMin);
 
 extern int N7751Run(int cycles);
 extern void N7751Init(int (*irqcallback)(int));
@@ -68,7 +68,7 @@ extern void N7751SetCPUOpReadArgHandler(i8039ReadOpArgHandler handler);
 extern void N7751Exit();
 extern void N7751Reset (void);
 extern void N7751SetIrqState(int state);
-extern int N7751Scan(int nAction,int *pnMin);
+extern int N7751Scan(int nAction, int *pnMin);
 
 extern INT32 I8039TotalCycles();
 extern void I8039NewFrame();

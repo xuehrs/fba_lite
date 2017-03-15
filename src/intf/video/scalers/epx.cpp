@@ -28,13 +28,13 @@ typedef unsigned long long uint64;
 	 ((((((c1) & Mask13) *  3) + ((c2) & Mask13)) >> 2) & Mask13))))
 
 #ifdef LSB_FIRST
-	#define TWO_PIX(left,right) ((left) | ((right) << 16))
-	#define THREE_PIX(left,middle,right) uint48((left) | ((middle) << 16), (right))
-	#define TWO_PIX_32(left,right) (CONVERT_16_TO_32(left) | ((uint64)CONVERT_16_TO_32(right) << 32))
-	#define THREE_PIX_32(left,middle,right) uint96(CONVERT_16_TO_32(left) | ((uint64)CONVERT_16_TO_32(middle) << 32), CONVERT_16_TO_32(right))
+#define TWO_PIX(left,right) ((left) | ((right) << 16))
+#define THREE_PIX(left,middle,right) uint48((left) | ((middle) << 16), (right))
+#define TWO_PIX_32(left,right) (CONVERT_16_TO_32(left) | ((uint64)CONVERT_16_TO_32(right) << 32))
+#define THREE_PIX_32(left,middle,right) uint96(CONVERT_16_TO_32(left) | ((uint64)CONVERT_16_TO_32(middle) << 32), CONVERT_16_TO_32(right))
 #else
-	#define TWO_PIX(left,right) ((right) | ((left) << 16))
-	#define THREE_PIX(left,middle,right) uint48((middle) | ((left) << 16), (right)) // is this right?
+#define TWO_PIX(left,right) ((right) | ((left) << 16))
+#define THREE_PIX(left,middle,right) uint48((middle) | ((left) << 16), (right)) // is this right?
 //	#define THREE_PIX(left,middle,right) uint48((right) | ((middle) << 16), (left)) // or this?
 #endif
 
@@ -119,10 +119,10 @@ typedef unsigned long long uint64;
 // code for improved 2X EPX, which tends to do better with diagonal edges than regular EPX
 void RenderEPXB(unsigned char *src, unsigned int srcpitch, unsigned char *dst, unsigned int dstpitch, int nWidth, int nHeight, int vidDepth)
 {
-	// E D H
-	// A X C
-	// F B G
-	#define DrawPix(on00,on01,on10,on11) /* on00 on01 */                                                                                                       \
+    // E D H
+    // A X C
+    // F B G
+#define DrawPix(on00,on01,on10,on11) /* on00 on01 */                                                                                                       \
 	{                                    /* on10 on11 */                                                                                                       \
 		if ((((on00||on10)?colorA:colorX) != ((on01||on11)?colorC:colorX))                                                                                     \
 		&& (((on10||on11)?colorB:colorX) != ((on00||on01)?colorD:colorX))                                                                                      \
@@ -141,23 +141,23 @@ void RenderEPXB(unsigned char *src, unsigned int srcpitch, unsigned char *dst, u
 		}                                                                                                                                                      \
 	}
 
-	// again, this supports 32-bit or 16-bit rendering
-	if(vidDepth == 32)
-	{
+    // again, this supports 32-bit or 16-bit rendering
+    if(vidDepth == 32)
+    {
 #define _TWO_PIX TWO_PIX_32
-		DrawInit(2,uint64);
-		DrawRows(2,1); // 2x scale, and diags is on since we do use all 8 surrounding pixels
+        DrawInit(2, uint64);
+        DrawRows(2, 1); // 2x scale, and diags is on since we do use all 8 surrounding pixels
 #undef _TWO_PIX
-	}
-	else
-	{
+    }
+    else
+    {
 #define _TWO_PIX TWO_PIX
-		DrawInit(2,uint32);
-		DrawRows(2,1); // 2x scale, and diags is on since we do use all 8 surrounding pixels
+        DrawInit(2, uint32);
+        DrawRows(2, 1); // 2x scale, and diags is on since we do use all 8 surrounding pixels
 #undef _TWO_PIX
-	}
+    }
 
-	#undef DrawPix
+#undef DrawPix
 }
 
 #define Interp44(c1, c2, c3, c4) \
@@ -167,10 +167,10 @@ void RenderEPXB(unsigned char *src, unsigned int srcpitch, unsigned char *dst, u
 // EPX3 scaled down to 2X
 void RenderEPXC(unsigned char *src, unsigned int srcpitch, unsigned char *dst, unsigned int dstpitch, int nWidth, int nHeight, int vidDepth)
 {
-	// E D H
-	// A X C
-	// F B G
-	#define DrawPix(on00,on01,on10,on11) /* on00 on01 */ \
+    // E D H
+    // A X C
+    // F B G
+#define DrawPix(on00,on01,on10,on11) /* on00 on01 */ \
 	{                                    /* on10 on11 */ \
 		if ((((on00||on10)?colorA:colorX) != ((on01||on11)?colorC:colorX)) \
 		 && (((on10||on11)?colorB:colorX) != ((on00||on01)?colorD:colorX))) \
@@ -202,20 +202,20 @@ void RenderEPXC(unsigned char *src, unsigned int srcpitch, unsigned char *dst, u
 		} \
 	}
 
-	if(vidDepth == 32)
-	{
+    if(vidDepth == 32)
+    {
 #define _TWO_PIX TWO_PIX_32
-		DrawInit(2,uint64);
-		DrawRows(2,1); // 2x scale, and diags is on since we do use all 8 surrounding pixels
+        DrawInit(2, uint64);
+        DrawRows(2, 1); // 2x scale, and diags is on since we do use all 8 surrounding pixels
 #undef _TWO_PIX
-	}
-	else
-	{
+    }
+    else
+    {
 #define _TWO_PIX TWO_PIX
-		DrawInit(2,uint32);
-		DrawRows(2,1); // 2x scale, and diags is on since we do use all 8 surrounding pixels
+        DrawInit(2, uint32);
+        DrawRows(2, 1); // 2x scale, and diags is on since we do use all 8 surrounding pixels
 #undef _TWO_PIX
-	}
+    }
 
-	#undef DrawPix
+#undef DrawPix
 }

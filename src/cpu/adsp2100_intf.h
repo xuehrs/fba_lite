@@ -4,7 +4,8 @@
 
 #include "adsp2100/adsp2100_defs.h"
 
-enum {
+enum
+{
     ADSP21XX_CLEAR_LINE = 0,				/* clear (a fired, held or pulsed) line */
     ADSP21XX_ASSERT_LINE,				/* assert an interrupt immediately */
     ADSP21XX_HOLD_LINE,					/* hold interrupt line until acknowledged */
@@ -32,10 +33,10 @@ void Adsp2100SetTxCallback(pAdsp2100TxCallback cb);
 void Adsp2100SetTimerCallback(pAdsp2100TimerCallback cb);
 void Adsp2100SetIRQCallback(int (*irq)(int));
 
-int Adsp2100MapMemory(unsigned char* pMemory, unsigned int nStart, unsigned int nEnd, int nType);
+int Adsp2100MapMemory(unsigned char *pMemory, unsigned int nStart, unsigned int nEnd, int nType);
 int Adsp2100MapHandler(uintptr_t nHandler, unsigned int nStart, unsigned int nEnd, int nType);
 
-int Adsp2100MapData(unsigned char* pMemory, unsigned int nStart, unsigned int nEnd, int nType);
+int Adsp2100MapData(unsigned char *pMemory, unsigned int nStart, unsigned int nEnd, int nType);
 int Adsp2100MapDataHandler(uintptr_t nHandler, unsigned int nStart, unsigned int nEnd, int nType);
 
 int Adsp2100SetReadLongHandler(int i, pAdsp2100ReadLongHandler pHandler);

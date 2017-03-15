@@ -40,23 +40,39 @@ static pAdsp2100TimerCallback pTimerCallback;
 static FILE *pTrace;
 #endif
 
-static unsigned short DefReadWord(unsigned int a) { xlog("DefReadWord %x\n", a); return 0; }
-static unsigned int DefReadLong(unsigned int a) { xlog("DefReadLong %x\n", a); return 0; }
+static unsigned short DefReadWord(unsigned int a)
+{
+    xlog("DefReadWord %x\n", a);
+    return 0;
+}
+static unsigned int DefReadLong(unsigned int a)
+{
+    xlog("DefReadLong %x\n", a);
+    return 0;
+}
 
-static void DefWriteWord(unsigned int a, unsigned short value) { xlog("DefWriteWord %x - %x\n", a, value);  }
-static void DefWriteLong(unsigned int a, unsigned int value) { xlog("DefWriteLog %x - %x\n", a, value); }
+static void DefWriteWord(unsigned int a, unsigned short value)
+{
+    xlog("DefWriteWord %x - %x\n", a, value);
+}
+static void DefWriteLong(unsigned int a, unsigned int value)
+{
+    xlog("DefWriteLog %x - %x\n", a, value);
+}
 
 static void ResetMemoryMap()
 {
-    for (int page = 0; page < PAGE_COUNT; page++) {
-        pMemMap->PrgMap[page] = (unsigned char*) 0;
-        pMemMap->PrgMap[PAGE_WADD + page] = (unsigned char*) 0;
-        pMemMap->DataMap[page] = (unsigned char*) 0;
-        pMemMap->DataMap[PAGE_WADD + page] = (unsigned char*) 0;
+    for (int page = 0; page < PAGE_COUNT; page++)
+    {
+        pMemMap->PrgMap[page] = (unsigned char *) 0;
+        pMemMap->PrgMap[PAGE_WADD + page] = (unsigned char *) 0;
+        pMemMap->DataMap[page] = (unsigned char *) 0;
+        pMemMap->DataMap[PAGE_WADD + page] = (unsigned char *) 0;
 
     }
 
-    for (int i = 0; i < ADSP_MAXHANDLER; i++) {
+    for (int i = 0; i < ADSP_MAXHANDLER; i++)
+    {
         pMemMap->prgReadLong[i] = DefReadLong;
         pMemMap->prgWriteLong[i] = DefWriteLong;
 
@@ -89,7 +105,7 @@ int Adsp2100Init()
 {
     pMemMap = new Adsp2100MemoryMap;
     ResetMemoryMap();
-    pADSP = (adsp2100_state*) BurnMalloc(sizeof(adsp2100_state));
+    pADSP = (adsp2100_state *) BurnMalloc(sizeof(adsp2100_state));
     adsp2105_init(pADSP, nullptr);
     pADSP->sport_rx_callback = RxCallback;
     pADSP->sport_tx_callback = TxCallback;
@@ -156,16 +172,17 @@ void Adsp2100SetIRQLine(int line, int state)
 
 int Adsp2100LoadBootROM(void *src, void *dst)
 {
-    adsp2105_load_boot_data((UINT8*)src, (UINT32*)dst);
+    adsp2105_load_boot_data((UINT8 *)src, (UINT32 *)dst);
     return 0;
 }
 
-int Adsp2100MapMemory(unsigned char* pMemory, unsigned int nStart, unsigned int nEnd, int nType)
+int Adsp2100MapMemory(unsigned char *pMemory, unsigned int nStart, unsigned int nEnd, int nType)
 {
     const int maxPages = (PFN(nEnd) - PFN(nStart)) + 1;
 
     int page = PFN(nStart);
-    for (int i = 0; i < maxPages; i++, page++) {
+    for (int i = 0; i < maxPages; i++, page++)
+    {
 
         if (nType & MAP_READ)
             pMemMap->PrgMap[page] = pMemory + (PAGE_SIZE * i);
@@ -182,25 +199,27 @@ int Adsp2100MapHandler(uintptr_t nHandler, unsigned int nStart, unsigned int nEn
     const int maxPages = (PFN(nEnd) - PFN(nStart)) + 1;
 
     int page = PFN(nStart);
-    for (int i = 0; i < maxPages; i++, page++) {
+    for (int i = 0; i < maxPages; i++, page++)
+    {
 
         if (nType & MAP_READ)
-            pMemMap->PrgMap[page] = (UINT8*) nHandler;
+            pMemMap->PrgMap[page] = (UINT8 *) nHandler;
 
         if (nType & MAP_WRITE)
-            pMemMap->PrgMap[PAGE_WADD + page] = (UINT8*) nHandler;
+            pMemMap->PrgMap[PAGE_WADD + page] = (UINT8 *) nHandler;
     }
     return 0;
 }
 
 
 
-int Adsp2100MapData(unsigned char* pMemory, unsigned int nStart, unsigned int nEnd, int nType)
+int Adsp2100MapData(unsigned char *pMemory, unsigned int nStart, unsigned int nEnd, int nType)
 {
     const int maxPages = (PFN(nEnd) - PFN(nStart)) + 1;
 
     int page = PFN(nStart);
-    for (int i = 0; i < maxPages; i++, page++) {
+    for (int i = 0; i < maxPages; i++, page++)
+    {
 
         if (nType & MAP_READ)
             pMemMap->DataMap[page] = pMemory + (PAGE_SIZE * i);
@@ -217,13 +236,14 @@ int Adsp2100MapDataHandler(uintptr_t nHandler, unsigned int nStart, unsigned int
     const int maxPages = (PFN(nEnd) - PFN(nStart)) + 1;
 
     int page = PFN(nStart);
-    for (int i = 0; i < maxPages; i++, page++) {
+    for (int i = 0; i < maxPages; i++, page++)
+    {
 
         if (nType & MAP_READ)
-            pMemMap->DataMap[page] = (UINT8*) nHandler;
+            pMemMap->DataMap[page] = (UINT8 *) nHandler;
 
         if (nType & MAP_WRITE)
-            pMemMap->DataMap[PAGE_WADD + page] = (UINT8*) nHandler;
+            pMemMap->DataMap[PAGE_WADD + page] = (UINT8 *) nHandler;
     }
     return 0;
 }
@@ -272,24 +292,27 @@ int Adsp2100SetWriteDataWordHandler(int i, pAdsp2100WriteWordHandler pHandler)
 // ============================================================================
 
 template<typename T>
-inline T fast_read(uint8_t *ptr, unsigned adr) {
-    return *((T*)  ((uint8_t*) ptr + (adr & PAGE_MASK)));
+inline T fast_read(uint8_t *ptr, unsigned adr)
+{
+    return *((T *)  ((uint8_t *) ptr + (adr & PAGE_MASK)));
 }
 
 template<typename T>
-inline void fast_write(uint8_t *xptr, unsigned adr, T value) {
-    T *ptr = ((T*)  ((uint8_t*) xptr + (adr & PAGE_MASK)));
+inline void fast_write(uint8_t *xptr, unsigned adr, T value)
+{
+    T *ptr = ((T *)  ((uint8_t *) xptr + (adr & PAGE_MASK)));
     *ptr = value;
 }
 
 UINT16 adsp21xx_data_read_word_16le(UINT32 address)
 {
-//    address &= 0xFFFF;
+    //    address &= 0xFFFF;
     address >>= 1;
     address &= 0x3FFF;
 
     UINT8 *pr = pMemMap->DataMap[PFN(address)];
-    if ((uintptr_t)pr >= ADSP_MAXHANDLER) {
+    if ((uintptr_t)pr >= ADSP_MAXHANDLER)
+    {
         return BURN_ENDIAN_SWAP_INT16(fast_read<uint16_t>(pr, address));
     }
     return pMemMap->dataReadWord[(uintptr_t)pr](address);
@@ -297,12 +320,13 @@ UINT16 adsp21xx_data_read_word_16le(UINT32 address)
 
 void adsp21xx_data_write_word_16le(UINT32 address, UINT16 data)
 {
-//    address &= 0xFFFF;
+    //    address &= 0xFFFF;
     address >>= 1;
     address &= 0x3FFF;
 
     UINT8 *pr = pMemMap->DataMap[PAGE_WADD + PFN(address)];
-    if ((uintptr_t)pr >= ADSP_MAXHANDLER) {
+    if ((uintptr_t)pr >= ADSP_MAXHANDLER)
+    {
         fast_write<uint16_t>(pr, address, BURN_ENDIAN_SWAP_INT16(data));
         return;
     }
@@ -313,22 +337,25 @@ void adsp21xx_data_write_word_16le(UINT32 address, UINT16 data)
 extern int adsp21xx_dasm(char *buffer, UINT8 *oprom);
 UINT32 adsp21xx_read_dword_32le(UINT32 address)
 {
-//    address &= 0xFFFF;
+    //    address &= 0xFFFF;
     address >>= 2;
     address &= 0x3FFF;
 
     UINT32 value = 0;
 
     UINT8 *pr = pMemMap->PrgMap[PFN(address)];
-    if ((uintptr_t)pr >= ADSP_MAXHANDLER) {
+    if ((uintptr_t)pr >= ADSP_MAXHANDLER)
+    {
         value = BURN_ENDIAN_SWAP_INT32(fast_read<uint32_t>(pr, address));
-    } else
+    }
+    else
         value = pMemMap->prgReadLong[(uintptr_t)pr](address);
 #if ENABLE_TRACE
-    if (last_pc != pADSP->pc) {
+    if (last_pc != pADSP->pc)
+    {
         char buffer[1024];
-        adsp21xx_dasm(buffer, (UINT8*)&value);
-        fprintf(pTrace, "%04X: %s\n", address>>2, buffer);
+        adsp21xx_dasm(buffer, (UINT8 *)&value);
+        fprintf(pTrace, "%04X: %s\n", address >> 2, buffer);
         last_pc = pADSP->pc;
     }
 #endif
@@ -337,12 +364,13 @@ UINT32 adsp21xx_read_dword_32le(UINT32 address)
 
 void adsp21xx_write_dword_32le(UINT32 address, UINT32 data)
 {
-//    address &= 0xFFFF;
+    //    address &= 0xFFFF;
     address >>= 2;
     address &= 0x3FFF;
 
     UINT8 *pr = pMemMap->PrgMap[PAGE_WADD + PFN(address)];
-    if ((uintptr_t)pr >= ADSP_MAXHANDLER) {
+    if ((uintptr_t)pr >= ADSP_MAXHANDLER)
+    {
         fast_write<uint32_t>(pr, address, BURN_ENDIAN_SWAP_INT32(data));
         return;
     }

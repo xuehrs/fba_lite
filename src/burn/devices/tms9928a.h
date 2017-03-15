@@ -3,11 +3,11 @@
 
 typedef enum
 {
-	TMS_INVALID_MODEL,
-	TMS99x8,
-	TMS9929,
-	TMS99x8A,
-	TMS9929A
+    TMS_INVALID_MODEL,
+    TMS99x8,
+    TMS9929,
+    TMS99x8A,
+    TMS9929A
 } tms9928a_model;
 
 

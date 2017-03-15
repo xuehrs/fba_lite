@@ -12,27 +12,27 @@ EXTERN_C_BEGIN
 
 enum
 {
-  BCJ2_STREAM_MAIN,
-  BCJ2_STREAM_CALL,
-  BCJ2_STREAM_JUMP,
-  BCJ2_STREAM_RC
+    BCJ2_STREAM_MAIN,
+    BCJ2_STREAM_CALL,
+    BCJ2_STREAM_JUMP,
+    BCJ2_STREAM_RC
 };
 
 enum
 {
-  BCJ2_DEC_STATE_ORIG_0 = BCJ2_NUM_STREAMS,
-  BCJ2_DEC_STATE_ORIG_1,
-  BCJ2_DEC_STATE_ORIG_2,
-  BCJ2_DEC_STATE_ORIG_3,
-  
-  BCJ2_DEC_STATE_ORIG,
-  BCJ2_DEC_STATE_OK
+    BCJ2_DEC_STATE_ORIG_0 = BCJ2_NUM_STREAMS,
+    BCJ2_DEC_STATE_ORIG_1,
+    BCJ2_DEC_STATE_ORIG_2,
+    BCJ2_DEC_STATE_ORIG_3,
+
+    BCJ2_DEC_STATE_ORIG,
+    BCJ2_DEC_STATE_OK
 };
 
 enum
 {
-  BCJ2_ENC_STATE_ORIG = BCJ2_NUM_STREAMS,
-  BCJ2_ENC_STATE_OK
+    BCJ2_ENC_STATE_ORIG = BCJ2_NUM_STREAMS,
+    BCJ2_ENC_STATE_OK
 };
 
 
@@ -61,18 +61,18 @@ dest is allowed to overlap with bufs[BCJ2_STREAM_MAIN], with the following condi
 
 typedef struct
 {
-  const Byte *bufs[BCJ2_NUM_STREAMS];
-  const Byte *lims[BCJ2_NUM_STREAMS];
-  Byte *dest;
-  const Byte *destLim;
+    const Byte *bufs[BCJ2_NUM_STREAMS];
+    const Byte *lims[BCJ2_NUM_STREAMS];
+    Byte *dest;
+    const Byte *destLim;
 
-  unsigned state; /* BCJ2_STREAM_MAIN has more priority than BCJ2_STATE_ORIG */
+    unsigned state; /* BCJ2_STREAM_MAIN has more priority than BCJ2_STATE_ORIG */
 
-  UInt32 ip;
-  Byte temp[4];
-  UInt32 range;
-  UInt32 code;
-  UInt16 probs[2 + 256];
+    UInt32 ip;
+    Byte temp[4];
+    UInt32 range;
+    UInt32 code;
+    UInt16 probs[2 + 256];
 } CBcj2Dec;
 
 void Bcj2Dec_Init(CBcj2Dec *p);
@@ -86,46 +86,46 @@ SRes Bcj2Dec_Decode(CBcj2Dec *p);
 
 typedef enum
 {
-  BCJ2_ENC_FINISH_MODE_CONTINUE,
-  BCJ2_ENC_FINISH_MODE_END_BLOCK,
-  BCJ2_ENC_FINISH_MODE_END_STREAM
+    BCJ2_ENC_FINISH_MODE_CONTINUE,
+    BCJ2_ENC_FINISH_MODE_END_BLOCK,
+    BCJ2_ENC_FINISH_MODE_END_STREAM
 } EBcj2Enc_FinishMode;
 
 typedef struct
 {
-  Byte *bufs[BCJ2_NUM_STREAMS];
-  const Byte *lims[BCJ2_NUM_STREAMS];
-  const Byte *src;
-  const Byte *srcLim;
+    Byte *bufs[BCJ2_NUM_STREAMS];
+    const Byte *lims[BCJ2_NUM_STREAMS];
+    const Byte *src;
+    const Byte *srcLim;
 
-  unsigned state;
-  EBcj2Enc_FinishMode finishMode;
+    unsigned state;
+    EBcj2Enc_FinishMode finishMode;
 
-  Byte prevByte;
+    Byte prevByte;
 
-  Byte cache;
-  UInt32 range;
-  UInt64 low;
-  UInt64 cacheSize;
+    Byte cache;
+    UInt32 range;
+    UInt64 low;
+    UInt64 cacheSize;
 
-  UInt32 ip;
+    UInt32 ip;
 
-  /* 32-bit ralative offset in JUMP/CALL commands is
-       - (mod 4 GB)   in 32-bit mode
-       - signed Int32 in 64-bit mode
-     We use (mod 4 GB) check for fileSize.
-     Use fileSize up to 2 GB, if you want to support 32-bit and 64-bit code conversion. */
-  UInt32 fileIp;
-  UInt32 fileSize;    /* (fileSize <= ((UInt32)1 << 31)), 0 means no_limit */
-  UInt32 relatLimit;  /* (relatLimit <= ((UInt32)1 << 31)), 0 means desable_conversion */
+    /* 32-bit ralative offset in JUMP/CALL commands is
+         - (mod 4 GB)   in 32-bit mode
+         - signed Int32 in 64-bit mode
+       We use (mod 4 GB) check for fileSize.
+       Use fileSize up to 2 GB, if you want to support 32-bit and 64-bit code conversion. */
+    UInt32 fileIp;
+    UInt32 fileSize;    /* (fileSize <= ((UInt32)1 << 31)), 0 means no_limit */
+    UInt32 relatLimit;  /* (relatLimit <= ((UInt32)1 << 31)), 0 means desable_conversion */
 
-  UInt32 tempTarget;
-  unsigned tempPos;
-  Byte temp[4 * 2];
+    UInt32 tempTarget;
+    unsigned tempPos;
+    Byte temp[4 * 2];
 
-  unsigned flushPos;
-  
-  UInt16 probs[2 + 256];
+    unsigned flushPos;
+
+    UInt16 probs[2 + 256];
 } CBcj2Enc;
 
 void Bcj2Enc_Init(CBcj2Enc *p);

@@ -59,238 +59,241 @@ static UINT8 volume[2];
 /* build a table to divide by the number of voices */
 static void make_mixer_table(INT32 voices)
 {
-	INT32 count = voices * 128;
-	INT32 i;
-	INT32 ngain = 16;
+    INT32 count = voices * 128;
+    INT32 i;
+    INT32 ngain = 16;
 
-	/* allocate memory */
-	mixer_table = (INT16*)BurnMalloc(256 * voices * sizeof(INT16));
+    /* allocate memory */
+    mixer_table = (INT16 *)BurnMalloc(256 * voices * sizeof(INT16));
 
-	/* find the middle of the table */
-	mixer_lookup = mixer_table + (128 * voices);
+    /* find the middle of the table */
+    mixer_lookup = mixer_table + (128 * voices);
 
-	/* fill in the table - 16 bit case */
-	for (i = 0; i < count; i++)
-	{
-		INT32 val = i * ngain * 16 / voices;
-		if (val > 32767) val = 32767;
-		mixer_lookup[ i] = val;
-		mixer_lookup[-i] = -val;
-	}
+    /* fill in the table - 16 bit case */
+    for (i = 0; i < count; i++)
+    {
+        INT32 val = i * ngain * 16 / voices;
+        if (val > 32767) val = 32767;
+        mixer_lookup[ i] = val;
+        mixer_lookup[-i] = -val;
+    }
 }
 
 void K005289Reset()
 {
 #if defined FBA_DEBUG
-	if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289Reset called without init\n"));
+    if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289Reset called without init\n"));
 #endif
 
-	/* reset all the voices */
-	for (INT32 i = 0; i < 2; i++)
-	{
-		counter[i] = 0;
-		frequency[i] = 0;
-		freq_latch[i] = 0;
-		waveform[i] = i * 0x100;
-		volume[i] = 0;
-	}
+    /* reset all the voices */
+    for (INT32 i = 0; i < 2; i++)
+    {
+        counter[i] = 0;
+        frequency[i] = 0;
+        freq_latch[i] = 0;
+        waveform[i] = i * 0x100;
+        volume[i] = 0;
+    }
 }
 
 void K005289Init(INT32 clock, UINT8 *prom)
 {
-	/* get stream channels */
-	rate = ((clock / CLOCK_DIVIDER) * 100) / nBurnFPS;
+    /* get stream channels */
+    rate = ((clock / CLOCK_DIVIDER) * 100) / nBurnFPS;
 
-	/* allocate a pair of buffers to mix into - 1 frame's worth should be more than enough */
-	mixer_buffer = (INT16*)BurnMalloc(rate * sizeof(INT16));
+    /* allocate a pair of buffers to mix into - 1 frame's worth should be more than enough */
+    mixer_buffer = (INT16 *)BurnMalloc(rate * sizeof(INT16));
 
-	/* build the mixer table */
-	make_mixer_table(2);
+    /* build the mixer table */
+    make_mixer_table(2);
 
-	sound_prom = prom;
-	
-	DebugSnd_K005289Initted = 1;
+    sound_prom = prom;
+
+    DebugSnd_K005289Initted = 1;
 }
 
 void K005289SetRoute(INT32 nIndex, double nVolume, INT32 nRouteDir)
 {
 #if defined FBA_DEBUG
-	if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289SetRoute called without init\n"));
+    if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289SetRoute called without init\n"));
 #endif
 
-	gain[nIndex] = nVolume;
-	output_dir[nIndex] = nRouteDir;
+    gain[nIndex] = nVolume;
+    output_dir[nIndex] = nRouteDir;
 }
 
 void K005289Exit()
 {
 #if defined FBA_DEBUG
-	if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289Exit called without init\n"));
+    if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289Exit called without init\n"));
 #endif
 
-	BurnFree (mixer_buffer);
-	BurnFree (mixer_table);
-	
-	DebugSnd_K005289Initted = 0;
+    BurnFree (mixer_buffer);
+    BurnFree (mixer_table);
+
+    DebugSnd_K005289Initted = 0;
 }
 
 void K005289Update(INT16 *buffer, INT32 samples)
 {
 #if defined FBA_DEBUG
-	if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289Update called without init\n"));
+    if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289Update called without init\n"));
 #endif
 
-	INT16 *mix;
-	INT32 i,v,f;
+    INT16 *mix;
+    INT32 i, v, f;
 
-	/* zap the contents of the mixer buffer */
-	memset(mixer_buffer, 0, rate * sizeof(INT16));
+    /* zap the contents of the mixer buffer */
+    memset(mixer_buffer, 0, rate * sizeof(INT16));
 
-	v=volume[0];
-	f=frequency[0];
-	if (v && f)
-	{
-		const UINT8 *w = sound_prom + waveform[0];
-		INT32 c = counter[0];
+    v = volume[0];
+    f = frequency[0];
+    if (v && f)
+    {
+        const UINT8 *w = sound_prom + waveform[0];
+        INT32 c = counter[0];
 
-		mix = mixer_buffer;
+        mix = mixer_buffer;
 
-		/* add our contribution */
-		for (i = 0; i < rate; i++)
-		{
-			INT32 offs;
+        /* add our contribution */
+        for (i = 0; i < rate; i++)
+        {
+            INT32 offs;
 
-			c += CLOCK_DIVIDER;
-			offs = (c / f) & 0x1f;
-			*mix++ += ((w[offs] & 0x0f) - 8) * v;
-		}
+            c += CLOCK_DIVIDER;
+            offs = (c / f) & 0x1f;
+            *mix++ += ((w[offs] & 0x0f) - 8) * v;
+        }
 
-		/* update the counter for this voice */
-		counter[0] = c % (f * 0x20);
-	}
+        /* update the counter for this voice */
+        counter[0] = c % (f * 0x20);
+    }
 
-	v=volume[1];
-	f=frequency[1];
-	if (v && f)
-	{
-		const UINT8 *w = sound_prom + waveform[1];
-		INT32 c = counter[1];
+    v = volume[1];
+    f = frequency[1];
+    if (v && f)
+    {
+        const UINT8 *w = sound_prom + waveform[1];
+        INT32 c = counter[1];
 
-		mix = mixer_buffer;
+        mix = mixer_buffer;
 
-		/* add our contribution */
-		for (i = 0; i < rate; i++)
-		{
-			INT32 offs;
+        /* add our contribution */
+        for (i = 0; i < rate; i++)
+        {
+            INT32 offs;
 
-			c += CLOCK_DIVIDER;
-			offs = (c / f) & 0x1f;
-			*mix++ += ((w[offs] & 0x0f) - 8) * v;
-		}
+            c += CLOCK_DIVIDER;
+            offs = (c / f) & 0x1f;
+            *mix++ += ((w[offs] & 0x0f) - 8) * v;
+        }
 
-		/* update the counter for this voice */
-		counter[1] = c % (f * 0x20);
-	}
+        /* update the counter for this voice */
+        counter[1] = c % (f * 0x20);
+    }
 
-	/* mix it down */
-	mix = mixer_buffer;
-	for (i = 0; i < samples; i++)
-	{
-		INT32 nLeftSample = mixer_lookup[mix[(i * rate) / nBurnSoundLen]];
-		INT32 nRightSample = nLeftSample;
+    /* mix it down */
+    mix = mixer_buffer;
+    for (i = 0; i < samples; i++)
+    {
+        INT32 nLeftSample = mixer_lookup[mix[(i * rate) / nBurnSoundLen]];
+        INT32 nRightSample = nLeftSample;
 
-		if ((output_dir[BURN_SND_K005289_ROUTE_1] & BURN_SND_ROUTE_LEFT) == BURN_SND_ROUTE_LEFT) {
-			nLeftSample = (INT32)(nLeftSample * gain[BURN_SND_K005289_ROUTE_1]);
-		}
-		if ((output_dir[BURN_SND_K005289_ROUTE_1] & BURN_SND_ROUTE_RIGHT) == BURN_SND_ROUTE_RIGHT) {
-			nRightSample = (INT32)(nRightSample * gain[BURN_SND_K005289_ROUTE_1]);
-		}
+        if ((output_dir[BURN_SND_K005289_ROUTE_1] & BURN_SND_ROUTE_LEFT) == BURN_SND_ROUTE_LEFT)
+        {
+            nLeftSample = (INT32)(nLeftSample * gain[BURN_SND_K005289_ROUTE_1]);
+        }
+        if ((output_dir[BURN_SND_K005289_ROUTE_1] & BURN_SND_ROUTE_RIGHT) == BURN_SND_ROUTE_RIGHT)
+        {
+            nRightSample = (INT32)(nRightSample * gain[BURN_SND_K005289_ROUTE_1]);
+        }
 
-		nLeftSample = BURN_SND_CLIP(nLeftSample);
-		nRightSample = BURN_SND_CLIP(nRightSample);
+        nLeftSample = BURN_SND_CLIP(nLeftSample);
+        nRightSample = BURN_SND_CLIP(nRightSample);
 
-		buffer[0] = BURN_SND_CLIP(buffer[0] + nLeftSample);
-		buffer[1] = BURN_SND_CLIP(buffer[1] + nRightSample);
-		buffer+=2;
-	}
+        buffer[0] = BURN_SND_CLIP(buffer[0] + nLeftSample);
+        buffer[1] = BURN_SND_CLIP(buffer[1] + nRightSample);
+        buffer += 2;
+    }
 }
 
 void K005289ControlAWrite(UINT8 data)
 {
 #if defined FBA_DEBUG
-	if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289ControlAWrite called without init\n"));
+    if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289ControlAWrite called without init\n"));
 #endif
 
-	volume[0] = data & 0xf;
-	waveform[0] = data & 0xe0;
+    volume[0] = data & 0xf;
+    waveform[0] = data & 0xe0;
 }
 
 void K005289ControlBWrite(UINT8 data)
 {
 #if defined FBA_DEBUG
-	if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289ControlBWrite called without init\n"));
+    if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289ControlBWrite called without init\n"));
 #endif
 
-	volume[1] = data & 0xf;
-	waveform[1] = (data & 0xe0) + 0x100;
+    volume[1] = data & 0xf;
+    waveform[1] = (data & 0xe0) + 0x100;
 }
 
 void K005289Ld1Write(INT32 offset)
 {
 #if defined FBA_DEBUG
-	if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289Ld1 called without init\n"));
+    if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289Ld1 called without init\n"));
 #endif
 
-	offset &= 0xfff;
-	freq_latch[0] = 0xfff - offset;
+    offset &= 0xfff;
+    freq_latch[0] = 0xfff - offset;
 }
 
 void K005289Ld2Write(INT32 offset)
 {
 #if defined FBA_DEBUG
-	if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289Ld2 called without init\n"));
+    if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289Ld2 called without init\n"));
 #endif
 
-	offset &= 0xfff;
-	freq_latch[1] = 0xfff - offset;
+    offset &= 0xfff;
+    freq_latch[1] = 0xfff - offset;
 }
 
 void K005289Tg1Write()
 {
 #if defined FBA_DEBUG
-	if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289Tg1 called without init\n"));
+    if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289Tg1 called without init\n"));
 #endif
 
-	frequency[0] = freq_latch[0];
+    frequency[0] = freq_latch[0];
 }
 
 void K005289Tg2Write()
 {
 #if defined FBA_DEBUG
-	if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289Tg2 called without init\n"));
+    if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289Tg2 called without init\n"));
 #endif
 
-	frequency[1] = freq_latch[1];
+    frequency[1] = freq_latch[1];
 }
 
 INT32 K005289Scan(INT32 nAction, INT32 *)
 {
 #if defined FBA_DEBUG
-	if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289Scan called without init\n"));
+    if (!DebugSnd_K005289Initted) bprintf(PRINT_ERROR, _T("K005289Scan called without init\n"));
 #endif
 
-	if (nAction & ACB_DRIVER_DATA)
-	{
-		for (INT32 i = 0; i < 2; i++) {
-			SCAN_VAR(counter[i]);
-			SCAN_VAR(frequency[i]);
-			SCAN_VAR(freq_latch[i]);
-			SCAN_VAR(waveform[i]);
-			SCAN_VAR(volume[i]);
-		}
+    if (nAction & ACB_DRIVER_DATA)
+    {
+        for (INT32 i = 0; i < 2; i++)
+        {
+            SCAN_VAR(counter[i]);
+            SCAN_VAR(frequency[i]);
+            SCAN_VAR(freq_latch[i]);
+            SCAN_VAR(waveform[i]);
+            SCAN_VAR(volume[i]);
+        }
 
-		return 0;
-	}
+        return 0;
+    }
 
-	return 0;
+    return 0;
 }

@@ -1,4 +1,4 @@
-void RF5C68PCMUpdate(INT16* pSoundBuf, INT32 length);
+void RF5C68PCMUpdate(INT16 *pSoundBuf, INT32 length);
 void RF5C68PCMReset();
 void RF5C68PCMInit(INT32 clock);
 void RF5C68PCMSetRoute(INT32 nIndex, double nVolume, INT32 nRouteDir);

@@ -1,6 +1,6 @@
 #pragma once
 #ifdef FBA_DEBUG
- #define PRINT_DEBUG_INFO
+#define PRINT_DEBUG_INFO
 #endif
 #include <vector>
 
@@ -10,36 +10,38 @@
 #include "inp_keys.h"
 
 // Interface info (used for all modules)
-struct InterfaceInfo {
-	const TCHAR* pszModuleName;
-	TCHAR** ppszInterfaceSettings;
-	TCHAR** ppszModuleSettings;
+struct InterfaceInfo
+{
+    const TCHAR *pszModuleName;
+    TCHAR **ppszInterfaceSettings;
+    TCHAR **ppszModuleSettings;
 };
 
-INT32 IntInfoFree(InterfaceInfo* pInfo);
-INT32 IntInfoInit(InterfaceInfo* pInfo);
-INT32 IntInfoAddStringInterface(InterfaceInfo* pInfo, TCHAR* szString);
-INT32 IntInfoAddStringModule(InterfaceInfo* pInfo, TCHAR* szString);
+INT32 IntInfoFree(InterfaceInfo *pInfo);
+INT32 IntInfoInit(InterfaceInfo *pInfo);
+INT32 IntInfoAddStringInterface(InterfaceInfo *pInfo, TCHAR *szString);
+INT32 IntInfoAddStringModule(InterfaceInfo *pInfo, TCHAR *szString);
 
 // Input plugin:
-struct InputInOut {
-	INT32   (*Init)();
-	INT32   (*Exit)();
-	INT32   (*SetCooperativeLevel)(bool bExclusive, bool bForeground);
-	// Setup new frame
-	INT32   (*NewFrame)();
-	// Read digital
-	INT32   (*ReadSwitch)(INT32 nCode);
-	// Read analog
-	INT32   (*ReadJoyAxis)(INT32 i, INT32 nAxis);
-	INT32   (*ReadMouseAxis)(INT32 i, INT32 nAxis);
-	// Find out which control is activated
-	INT32   (*Find)(bool CreateBaseline);
-	// Get the name of a control
-	INT32   (*GetControlName)(INT32 nCode, TCHAR* pszDeviceName, TCHAR* pszControlName);
-	// Get plugin info
-	INT32   (*GetPluginSettings)(InterfaceInfo* pInfo);
-	const TCHAR* szModuleName;
+struct InputInOut
+{
+    INT32   (*Init)();
+    INT32   (*Exit)();
+    INT32   (*SetCooperativeLevel)(bool bExclusive, bool bForeground);
+    // Setup new frame
+    INT32   (*NewFrame)();
+    // Read digital
+    INT32   (*ReadSwitch)(INT32 nCode);
+    // Read analog
+    INT32   (*ReadJoyAxis)(INT32 i, INT32 nAxis);
+    INT32   (*ReadMouseAxis)(INT32 i, INT32 nAxis);
+    // Find out which control is activated
+    INT32   (*Find)(bool CreateBaseline);
+    // Get the name of a control
+    INT32   (*GetControlName)(INT32 nCode, TCHAR *pszDeviceName, TCHAR *pszControlName);
+    // Get plugin info
+    INT32   (*GetPluginSettings)(InterfaceInfo *pInfo);
+    const TCHAR *szModuleName;
 };
 
 INT32 InputInit();
@@ -47,8 +49,8 @@ INT32 InputExit();
 INT32 InputSetCooperativeLevel(const bool bExclusive, const bool bForeGround);
 INT32 InputMake(bool bCopy);
 INT32 InputFind(const INT32 nFlags);
-INT32 InputGetControlName(INT32 nCode, TCHAR* pszDeviceName, TCHAR* pszControlName);
-InterfaceInfo* InputGetInfo();
+INT32 InputGetControlName(INT32 nCode, TCHAR *pszDeviceName, TCHAR *pszControlName);
+InterfaceInfo *InputGetInfo();
 std::vector<const InputInOut *> InputGetInterfaces();
 
 extern bool bInputOkay;
@@ -56,23 +58,24 @@ extern UINT32 nInputSelect;
 
 // CD emulation module
 
-struct CDEmuDo {
-	INT32			   (*CDEmuExit)();
-	INT32			   (*CDEmuInit)();
-	INT32			   (*CDEmuStop)();
-	INT32			   (*CDEmuPlay)(UINT8 M, UINT8 S, UINT8 F);
-	INT32			   (*CDEmuLoadSector)(INT32 LBA, char* pBuffer);
-	UINT8* (*CDEmuReadTOC)(INT32 track);
-	UINT8* (*CDEmuReadQChannel)();
-	INT32			   (*CDEmuGetSoundBuffer)(INT16* buffer, INT32 samples);
-	// Get plugin info
-	INT32			   (*GetPluginSettings)(InterfaceInfo* pInfo);
-	const TCHAR*	 szModuleName;
+struct CDEmuDo
+{
+    INT32			   (*CDEmuExit)();
+    INT32			   (*CDEmuInit)();
+    INT32			   (*CDEmuStop)();
+    INT32			   (*CDEmuPlay)(UINT8 M, UINT8 S, UINT8 F);
+    INT32			   (*CDEmuLoadSector)(INT32 LBA, char *pBuffer);
+    UINT8 *(*CDEmuReadTOC)(INT32 track);
+    UINT8 *(*CDEmuReadQChannel)();
+    INT32			   (*CDEmuGetSoundBuffer)(INT16 *buffer, INT32 samples);
+    // Get plugin info
+    INT32			   (*GetPluginSettings)(InterfaceInfo *pInfo);
+    const TCHAR	 *szModuleName;
 };
 
 #include "cd_interface.h"
 
-InterfaceInfo* CDEmuGetInfo();
+InterfaceInfo *CDEmuGetInfo();
 
 extern bool bCDEmuOkay;
 extern UINT32 nCDEmuSelect;
@@ -80,16 +83,17 @@ extern UINT32 nCDEmuSelect;
 extern CDEmuStatusValue CDEmuStatus;
 
 // Profiling plugin
-struct ProfileDo {
-	INT32    (*ProfileExit)();
-	INT32    (*ProfileInit)();
-	INT32    (*ProfileStart)(INT32 nSubSystem);
-	INT32    (*ProfileEnd)(INT32 nSubSystem);
-	double (*ProfileReadLast)(INT32 nSubSystem);
-	double (*ProfileReadAverage)(INT32 nSubSystem);
-	// Get plugin info
-	INT32    (*GetPluginSettings)(InterfaceInfo* pInfo);
-	const  TCHAR* szModuleName;
+struct ProfileDo
+{
+    INT32    (*ProfileExit)();
+    INT32    (*ProfileInit)();
+    INT32    (*ProfileStart)(INT32 nSubSystem);
+    INT32    (*ProfileEnd)(INT32 nSubSystem);
+    double (*ProfileReadLast)(INT32 nSubSystem);
+    double (*ProfileReadAverage)(INT32 nSubSystem);
+    // Get plugin info
+    INT32    (*GetPluginSettings)(InterfaceInfo *pInfo);
+    const  TCHAR *szModuleName;
 };
 
 extern bool bProfileOkay;
@@ -101,21 +105,22 @@ INT32 ProfileProfileStart(INT32 nSubSystem);
 INT32 ProfileProfileEnd(INT32 nSubSustem);
 double ProfileProfileReadLast(INT32 nSubSustem);
 double ProfileProfileReadAverage(INT32 nSubSustem);
-InterfaceInfo* ProfileGetInfo();
+InterfaceInfo *ProfileGetInfo();
 
 // Audio Output plugin
-struct AudOut {
-	INT32   (*BlankSound)();
-	INT32   (*SoundCheck)();
-	INT32   (*SoundInit)();
-	INT32   (*SetCallback)(INT32 (*pCallback)(INT32));
-	INT32   (*SoundPlay)();
-	INT32   (*SoundStop)();
-	INT32   (*SoundExit)();
-	INT32   (*SoundSetVolume)();
-	// Get plugin info
-	INT32   (*GetPluginSettings)(InterfaceInfo* pInfo);
-	const TCHAR* szModuleName;
+struct AudOut
+{
+    INT32   (*BlankSound)();
+    INT32   (*SoundCheck)();
+    INT32   (*SoundInit)();
+    INT32   (*SetCallback)(INT32 (*pCallback)(INT32));
+    INT32   (*SoundPlay)();
+    INT32   (*SoundStop)();
+    INT32   (*SoundExit)();
+    INT32   (*SoundSetVolume)();
+    // Get plugin info
+    INT32   (*GetPluginSettings)(InterfaceInfo *pInfo);
+    const TCHAR *szModuleName;
 };
 
 INT32 AudSelect(UINT32 nPlugIn);
@@ -127,7 +132,7 @@ INT32 AudSoundStop();
 INT32 AudBlankSound();
 INT32 AudSoundCheck();
 INT32 AudSoundSetVolume();
-InterfaceInfo* AudGetInfo();
+InterfaceInfo *AudGetInfo();
 void AudWriteSilence();
 
 extern INT32 nAudSampleRate[8];          // sample rate
@@ -142,15 +147,16 @@ extern INT32 nAudDSPModule[8];			// DSP module to use: 0 = none, 1 = low-pass fi
 extern UINT32 nAudSelect;
 
 // Video Output plugin:
-struct VidOut {
-	INT32   (*Init)();
-	INT32   (*Exit)();
-	INT32   (*Frame)(bool bRedraw);
-	INT32   (*Paint)(INT32 bValidate);
-	INT32   (*ImageSize)(RECT* pRect, INT32 nGameWidth, INT32 nGameHeight);
-	// Get plugin info
-	INT32   (*GetPluginSettings)(InterfaceInfo* pInfo);
-	const TCHAR* szModuleName;
+struct VidOut
+{
+    INT32   (*Init)();
+    INT32   (*Exit)();
+    INT32   (*Frame)(bool bRedraw);
+    INT32   (*Paint)(INT32 bValidate);
+    INT32   (*ImageSize)(RECT *pRect, INT32 nGameWidth, INT32 nGameHeight);
+    // Get plugin info
+    INT32   (*GetPluginSettings)(InterfaceInfo *pInfo);
+    const TCHAR *szModuleName;
 };
 
 INT32 VidSelect(UINT32 nPlugin);
@@ -161,16 +167,16 @@ INT32 VidFrame();
 INT32 VidRedraw();
 INT32 VidRecalcPal();
 INT32 VidPaint(INT32 bValidate);
-INT32 VidImageSize(RECT* pRect, INT32 nGameWidth, INT32 nGameHeight);
-const TCHAR* VidGetModuleName();
-InterfaceInfo* VidGetInfo();
+INT32 VidImageSize(RECT *pRect, INT32 nGameWidth, INT32 nGameHeight);
+const TCHAR *VidGetModuleName();
+InterfaceInfo *VidGetInfo();
 
 #ifdef BUILD_WIN32
- extern HWND hVidWnd;
+extern HWND hVidWnd;
 #endif
 
 #if defined (_XBOX)
- extern HWND hVidWnd;
+extern HWND hVidWnd;
 #endif
 
 extern bool bVidOkay;
@@ -218,7 +224,7 @@ extern INT32 nVidScrnDepth;
 
 extern INT32 nVidScrnAspectX, nVidScrnAspectY;
 
-extern UINT8* pVidImage;
+extern UINT8 *pVidImage;
 extern INT32 nVidImageWidth, nVidImageHeight;
 extern INT32 nVidImageLeft, nVidImageTop;
 extern INT32 nVidImagePitch, nVidImageBPP;
@@ -228,12 +234,12 @@ extern "C" UINT32 (__cdecl *VidHighCol) (INT32 r, INT32 g, INT32 b, INT32 i);
 
 // vid_directx_support.cpp
 
-INT32 VidSNewTinyMsg(const TCHAR* pText, INT32 nRGB = 0, INT32 nDuration = 0, INT32 nPiority = 5);
+INT32 VidSNewTinyMsg(const TCHAR *pText, INT32 nRGB = 0, INT32 nDuration = 0, INT32 nPiority = 5);
 
-INT32 VidSNewShortMsg(const TCHAR* pText, INT32 nRGB = 0, INT32 nDuration = 0, INT32 nPiority = 5);
+INT32 VidSNewShortMsg(const TCHAR *pText, INT32 nRGB = 0, INT32 nDuration = 0, INT32 nPiority = 5);
 void VidSKillShortMsg();
 
-INT32 VidSAddChatMsg(const TCHAR* pID, INT32 nIDRGB, const TCHAR* pMain, INT32 nMainRGB);
+INT32 VidSAddChatMsg(const TCHAR *pID, INT32 nIDRGB, const TCHAR *pMain, INT32 nMainRGB);
 
 #define MAX_CHAT_SIZE (128)
 

@@ -1,7 +1,7 @@
 #include <exception>
 #include "shader.h"
 
-void Shader::buildProgram(const string& vsrc, const string& fsrc)
+void Shader::buildProgram(const string &vsrc, const string &fsrc)
 {
     GLuint vs = glCreateShader(GL_VERTEX_SHADER);
     GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
@@ -10,7 +10,8 @@ void Shader::buildProgram(const string& vsrc, const string& fsrc)
     bool vsLoaded = compileShader(vs, vsrc);
     bool fsLoaded = compileShader(fs, fsrc);
 
-    if (vsLoaded || fsLoaded) {
+    if (vsLoaded || fsLoaded)
+    {
         if (vsLoaded)
             glAttachShader(program, vs);
         if (fsLoaded)
@@ -21,20 +22,22 @@ void Shader::buildProgram(const string& vsrc, const string& fsrc)
         GLchar log[512];
         glGetProgramiv(program, GL_LINK_STATUS, &result);
 
-        if (!result) {
+        if (!result)
+        {
             glGetProgramInfoLog(program, sizeof(log), nullptr, log);
             cerr << "Erro ao ligar o programa: " << log << endl;
         }
     }
 
-    // Limpa o que não é mais necessário
+    // Limpa o que n?o é mais necessário
     glDeleteShader(vs);
     glDeleteShader(fs);
 }
 
 bool Shader::compileShader(GLuint shader, const string &source)
 {
-    if (source.empty()) {
+    if (source.empty())
+    {
         cerr  << "Shader erro: código fonte vazio!" << endl;
         return false;
     }
@@ -57,12 +60,16 @@ bool Shader::compileShader(GLuint shader, const string &source)
 
 Shader::Shader(const string &vertex, const string &fragment, bool isSource)
 {
-    if (isSource) {
+    if (isSource)
+    {
         buildProgram(vertex, fragment);
-    } else {
+    }
+    else
+    {
         string vertexSrc;
         string fragmentSrc;
-        try {
+        try
+        {
             ifstream vsFile(vertex);
             ifstream fsFile(fragment);
 
@@ -75,7 +82,9 @@ Shader::Shader(const string &vertex, const string &fragment, bool isSource)
 
             vertexSrc = vss.str();
             fragmentSrc = fss.str();
-        } catch (exception e) {
+        }
+        catch (exception e)
+        {
             cerr << "Falha ao carregar shader" << endl;
         }
         cout << "Shader carregado com sucesso!" << endl;

@@ -10,8 +10,8 @@ EXTERN_C_BEGIN
 
 typedef struct
 {
-  Byte *data;
-  size_t size;
+    Byte *data;
+    size_t size;
 } CBuf;
 
 void Buf_Init(CBuf *p);
@@ -20,9 +20,9 @@ void Buf_Free(CBuf *p, ISzAlloc *alloc);
 
 typedef struct
 {
-  Byte *data;
-  size_t size;
-  size_t pos;
+    Byte *data;
+    size_t size;
+    size_t pos;
 } CDynBuf;
 
 void DynBuf_Construct(CDynBuf *p);

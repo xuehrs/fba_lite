@@ -21,14 +21,14 @@ MY_CPU_LE_UNALIGN means that CPU is LITTLE ENDIAN and CPU supports unaligned mem
    || defined(__x86_64__) \
    || defined(__AMD64__) \
    || defined(__amd64__)
-  #define MY_CPU_AMD64
+#define MY_CPU_AMD64
 #endif
 
 #if defined(MY_CPU_AMD64) \
     || defined(_M_IA64) \
     || defined(__AARCH64EL__) \
     || defined(__AARCH64EB__)
-  #define MY_CPU_64BIT
+#define MY_CPU_64BIT
 #endif
 
 #if defined(_M_IX86) || defined(__i386__)
@@ -45,7 +45,7 @@ MY_CPU_LE_UNALIGN means that CPU is LITTLE ENDIAN and CPU supports unaligned mem
     || defined(__THUMBEL__) \
     || defined(__ARMEB__) \
     || defined(__THUMBEB__)
-  #define MY_CPU_32BIT
+#define MY_CPU_32BIT
 #endif
 
 #if defined(_WIN32) && defined(_M_ARM)
@@ -67,7 +67,7 @@ MY_CPU_LE_UNALIGN means that CPU is LITTLE ENDIAN and CPU supports unaligned mem
     || defined(__MIPSEL) \
     || defined(_MIPSEL) \
     || (defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__))
-  #define MY_CPU_LE
+#define MY_CPU_LE
 #endif
 
 #if defined(__BIG_ENDIAN__) \
@@ -82,7 +82,7 @@ MY_CPU_LE_UNALIGN means that CPU is LITTLE ENDIAN and CPU supports unaligned mem
     || defined(__s390x__) \
     || defined(__zarch__) \
     || (defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__))
-  #define MY_CPU_BE
+#define MY_CPU_BE
 #endif
 
 #if defined(MY_CPU_LE) && defined(MY_CPU_BE)
@@ -91,10 +91,10 @@ Stop_Compiling_Bad_Endian
 
 
 #ifdef MY_CPU_LE
-  #if defined(MY_CPU_X86_OR_AMD64) \
+#if defined(MY_CPU_X86_OR_AMD64) \
       /* || defined(__AARCH64EL__) */
-    #define MY_CPU_LE_UNALIGN
-  #endif
+#define MY_CPU_LE_UNALIGN
+#endif
 #endif
 
 
@@ -188,19 +188,19 @@ Stop_Compiling_Bad_Endian
 
 typedef struct
 {
-  UInt32 maxFunc;
-  UInt32 vendor[3];
-  UInt32 ver;
-  UInt32 b;
-  UInt32 c;
-  UInt32 d;
+    UInt32 maxFunc;
+    UInt32 vendor[3];
+    UInt32 ver;
+    UInt32 b;
+    UInt32 c;
+    UInt32 d;
 } Cx86cpuid;
 
 enum
 {
-  CPU_FIRM_INTEL,
-  CPU_FIRM_AMD,
-  CPU_FIRM_VIA
+    CPU_FIRM_INTEL,
+    CPU_FIRM_AMD,
+    CPU_FIRM_VIA
 };
 
 void MyCPUID(UInt32 function, UInt32 *a, UInt32 *b, UInt32 *c, UInt32 *d);

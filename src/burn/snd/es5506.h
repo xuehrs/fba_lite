@@ -18,10 +18,10 @@ typedef UINT16(port_read)();
 typedef struct _es5505_interface es5505_interface;
 struct _es5505_interface
 {
-	const INT8 * region0;						/* memory region where the sample ROM lives */
-	const INT8 * region1;						/* memory region where the sample ROM lives */
-	void (*irq_callback)(INT32 state);	/* irq callback */
-	UINT16 (*read_port)();			/* input port read */
+    const INT8 *region0;						/* memory region where the sample ROM lives */
+    const INT8 *region1;						/* memory region where the sample ROM lives */
+    void (*irq_callback)(INT32 state);	/* irq callback */
+    UINT16 (*read_port)();			/* input port read */
 };
 
 //READ16_DEVICE_HANDLER( es5505_r );
@@ -34,12 +34,12 @@ struct _es5505_interface
 typedef struct _es5506_interface es5506_interface;
 struct _es5506_interface
 {
-	const INT8 * region0;						/* memory region where the sample ROM lives */
-	const INT8 * region1;						/* memory region where the sample ROM lives */
-	const INT8 * region2;						/* memory region where the sample ROM lives */
-	const INT8 * region3;						/* memory region where the sample ROM lives */
-	void (*irq_callback)(INT32 state);	/* irq callback */
-	UINT16 (*read_port)();			/* input port read */
+    const INT8 *region0;						/* memory region where the sample ROM lives */
+    const INT8 *region1;						/* memory region where the sample ROM lives */
+    const INT8 *region2;						/* memory region where the sample ROM lives */
+    const INT8 *region3;						/* memory region where the sample ROM lives */
+    void (*irq_callback)(INT32 state);	/* irq callback */
+    UINT16 (*read_port)();			/* input port read */
 };
 
 //READ8_DEVICE_HANDLER( es5506_r );
@@ -56,7 +56,7 @@ void ES5506Reset();
 void ES5506Write(UINT32 offset, UINT8 data);
 UINT8 ES5506Read(UINT32 offset);
 void es5506_voice_bank_w(INT32 voice, INT32 bank);
-void ES5505Init(INT32 clock, UINT8 *region0, UINT8* region1, irq_callback callback);
+void ES5505Init(INT32 clock, UINT8 *region0, UINT8 *region1, irq_callback callback);
 #define ES5505Reset	ES5506Reset
 #define ES5505Exit	ES5505Exit
 void ES5505Write(UINT32 offset, UINT16 data);

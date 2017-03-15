@@ -31,11 +31,13 @@
 #define R_ref(n)    ((size_t)&m_core->m_state.r[n])
 #define ADR(n)      ((size_t)&n)
 
-namespace mips {	
-template<class C, class R, typename...Args>
-size_t get_method_addr(R (C::*f)(Args...)) {
-	return reinterpret_cast<size_t>((void* &)f);
-}
+namespace mips
+{
+    template<class C, class R, typename...Args>
+    size_t get_method_addr(R (C::*f)(Args...))
+    {
+        return reinterpret_cast<size_t>((void *&)f);
+    }
 }
 
 #define F_ADR(f)    ((size_t)(void*)&f)

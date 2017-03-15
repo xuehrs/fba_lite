@@ -1,8 +1,8 @@
 // Nec V20/V30/V33 interface
 
 #ifndef FASTCALL
- #undef __fastcall
- #define __fastcall
+#undef __fastcall
+#define __fastcall
 #endif
 
 #define V33_TYPE 0
@@ -30,12 +30,12 @@ INT32 VezGetActive();
 
 void VezSetDecode(UINT8 *decode); // set opcode decode
 
-INT32 VezMemCallback(INT32 nStart,INT32 nEnd,INT32 nMode);
+INT32 VezMemCallback(INT32 nStart, INT32 nEnd, INT32 nMode);
 INT32 VezMapArea(INT32 nStart, INT32 nEnd, INT32 nMode, UINT8 *Mem);
 INT32 VezMapArea(INT32 nStart, INT32 nEnd, INT32 nMode, UINT8 *Mem1, UINT8 *Mem2);
 
-void VezSetReadHandler(UINT8 (__fastcall*)(UINT32));
-void VezSetWriteHandler(void (__fastcall*)(UINT32, UINT8));
+void VezSetReadHandler(UINT8 (__fastcall *)(UINT32));
+void VezSetWriteHandler(void (__fastcall *)(UINT32, UINT8));
 
 void VezWriteByte(UINT32 a, UINT8 d);
 void VezWriteWord(UINT32 a, UINT16 d);
@@ -49,8 +49,8 @@ UINT32 VezReadLong(UINT32 a);
 #define V25_PORT_P2 0x10004
 #define V25_PORT_PT 0x10006
 
-void VezSetReadPort(UINT8 (__fastcall*)(UINT32));
-void VezSetWritePort(void (__fastcall*)(UINT32, UINT8));
+void VezSetReadPort(UINT8 (__fastcall *)(UINT32));
+void VezSetWritePort(void (__fastcall *)(UINT32, UINT8));
 void VezSetIrqCallBack(INT32 (*cb)(INT32));
 
 void VezReset();

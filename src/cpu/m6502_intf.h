@@ -9,29 +9,30 @@ typedef void (*pWriteMemIndexHandler)(UINT16 a, UINT8 d);
 typedef UINT8 (*pReadOpHandler)(UINT16 a);
 typedef UINT8 (*pReadOpArgHandler)(UINT16 a);
 
-struct M6502Ext {
+struct M6502Ext
+{
 
-	m6502_Regs reg;
-	
-	INT32 (*execute)(INT32 cycles);
-	void (*reset)();
-	void (*init)();
-	void (*set_irq_line)(INT32 irqline, INT32 state);
+    m6502_Regs reg;
 
-	UINT8* pMemMap[0x100 * 3];
+    INT32 (*execute)(INT32 cycles);
+    void (*reset)();
+    void (*init)();
+    void (*set_irq_line)(INT32 irqline, INT32 state);
 
-	pReadPortHandler ReadPort;
-	pWritePortHandler WritePort;
-	pReadByteHandler ReadByte;
-	pWriteByteHandler WriteByte;
-	pReadMemIndexHandler ReadMemIndex;
-	pWriteMemIndexHandler WriteMemIndex;
-	pReadOpHandler ReadOp;
-	pReadOpArgHandler ReadOpArg;
-	
-	INT32 nCyclesTotal;
-	INT32 nCyclesSegment;
-	INT32 nCyclesLeft;
+    UINT8 *pMemMap[0x100 * 3];
+
+    pReadPortHandler ReadPort;
+    pWritePortHandler WritePort;
+    pReadByteHandler ReadByte;
+    pWriteByteHandler WriteByte;
+    pReadMemIndexHandler ReadMemIndex;
+    pWriteMemIndexHandler WriteMemIndex;
+    pReadOpHandler ReadOp;
+    pReadOpArgHandler ReadOpArg;
+
+    INT32 nCyclesTotal;
+    INT32 nCyclesSegment;
+    INT32 nCyclesLeft;
 };
 
 extern INT32 nM6502Count;
@@ -49,9 +50,10 @@ void m6510_write_0000(UINT16 address, UINT8 data);
 
 // The M6504 only has 13 address bits! use address mirroring!
 
-enum { TYPE_M6502=0, TYPE_M6504, TYPE_M65C02, TYPE_M65SC02, TYPE_N2A03, TYPE_DECO16,
-//	 these are the same!
-	TYPE_M6510, TYPE_M6510T, TYPE_M7501, TYPE_M8502	 };
+enum { TYPE_M6502 = 0, TYPE_M6504, TYPE_M65C02, TYPE_M65SC02, TYPE_N2A03, TYPE_DECO16,
+       //	 these are the same!
+       TYPE_M6510, TYPE_M6510T, TYPE_M7501, TYPE_M8502
+     };
 
 INT32 M6502Init(INT32 cpu, INT32 type); // if you're using more than one type
 void M6502Exit();
@@ -62,7 +64,7 @@ void M6502Idle(INT32 nCycles);
 void M6502SetIRQLine(INT32 vector, INT32 status);
 INT32 M6502Run(INT32 cycles);
 void M6502RunEnd();
-INT32 M6502MapMemory(UINT8* pMemory, UINT16 nStart, UINT16 nEnd, INT32 nType);
+INT32 M6502MapMemory(UINT8 *pMemory, UINT16 nStart, UINT16 nEnd, INT32 nType);
 void M6502SetReadPortHandler(UINT8 (*pHandler)(UINT16));
 void M6502SetWritePortHandler(void (*pHandler)(UINT16, UINT8));
 void M6502SetReadHandler(UINT8 (*pHandler)(UINT16));
@@ -80,8 +82,8 @@ void M6502WriteRom(UINT32 Address, UINT8 Data);
 inline static INT32 M6502TotalCycles()
 {
 #if defined FBA_DEBUG
-	if (!DebugCPU_M6502Initted) bprintf(PRINT_ERROR, _T("M6502TotalCycles called without init\n"));
+    if (!DebugCPU_M6502Initted) bprintf(PRINT_ERROR, _T("M6502TotalCycles called without init\n"));
 #endif
 
-	return nM6502CyclesTotal;
+    return nM6502CyclesTotal;
 }

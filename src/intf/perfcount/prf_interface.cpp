@@ -7,21 +7,21 @@ UINT32 nProfileSelect = 0;
 static InterfaceInfo ProfileInfo = { NULL, NULL, NULL };
 
 #if defined (BUILD_WIN32)
-	extern struct ProfileDo cntDoPerfCount;
+extern struct ProfileDo cntDoPerfCount;
 #elif defined (BUILD_SDL)
-	extern struct ProfileDo cntDoPerfCount;
+extern struct ProfileDo cntDoPerfCount;
 #elif defined (_XBOX)
-	extern struct ProfileDo cntDoPerfCount;
+extern struct ProfileDo cntDoPerfCount;
 #endif
 
-static struct ProfileDo* pProfileDo[] =
+static struct ProfileDo *pProfileDo[] =
 {
 #if defined (BUILD_WIN32)
-	&cntDoPerfCount,
+    &cntDoPerfCount,
 #elif defined (BUILD_SDL)
-	&cntDoPerfCount,
+    &cntDoPerfCount,
 #elif defined (_XBOX)
-	&cntDoPerfCount,
+    &cntDoPerfCount,
 #endif
 };
 
@@ -29,84 +29,96 @@ static struct ProfileDo* pProfileDo[] =
 
 INT32 ProfileExit()
 {
-	IntInfoFree(&ProfileInfo);
+    IntInfoFree(&ProfileInfo);
 
-	if (!bProfileOkay || nProfileSelect >= PROFILE_LEN) {
-		return 1;
-	}
-	bProfileOkay = false;
+    if (!bProfileOkay || nProfileSelect >= PROFILE_LEN)
+    {
+        return 1;
+    }
+    bProfileOkay = false;
 
-	return pProfileDo[nProfileSelect]->ProfileExit();
+    return pProfileDo[nProfileSelect]->ProfileExit();
 }
 
 INT32 ProfileInit()
 {
-	INT32 nRet;
+    INT32 nRet;
 
-	if (nProfileSelect >= PROFILE_LEN) {
-		return 1;
-	}
+    if (nProfileSelect >= PROFILE_LEN)
+    {
+        return 1;
+    }
 
-	if ((nRet = pProfileDo[nProfileSelect]->ProfileInit()) == 0) {
-		bProfileOkay = true;
-	}
+    if ((nRet = pProfileDo[nProfileSelect]->ProfileInit()) == 0)
+    {
+        bProfileOkay = true;
+    }
 
-	return nRet;
+    return nRet;
 }
 
 INT32 ProfileProfileStart(INT32 nSubSystem)
 {
-	if (!bProfileOkay || nProfileSelect >= PROFILE_LEN) {
-		return 1;
-	}
+    if (!bProfileOkay || nProfileSelect >= PROFILE_LEN)
+    {
+        return 1;
+    }
 
-	return pProfileDo[nProfileSelect]->ProfileStart(nSubSystem);
+    return pProfileDo[nProfileSelect]->ProfileStart(nSubSystem);
 }
 
 INT32 ProfileProfileEnd(INT32 nSubSystem)
 {
-	if (!bProfileOkay || nProfileSelect >= PROFILE_LEN) {
-		return 1;
-	}
+    if (!bProfileOkay || nProfileSelect >= PROFILE_LEN)
+    {
+        return 1;
+    }
 
-	return pProfileDo[nProfileSelect]->ProfileEnd(nSubSystem);
+    return pProfileDo[nProfileSelect]->ProfileEnd(nSubSystem);
 }
 
 double ProfileProfileReadLast(INT32 nSubSystem)
 {
-	if (!bProfileOkay || nProfileSelect >= PROFILE_LEN) {
-		return 0.0;
-	}
+    if (!bProfileOkay || nProfileSelect >= PROFILE_LEN)
+    {
+        return 0.0;
+    }
 
-	return pProfileDo[nProfileSelect]->ProfileReadLast(nSubSystem);
+    return pProfileDo[nProfileSelect]->ProfileReadLast(nSubSystem);
 }
 
 double ProfileProfileReadAverage(INT32 nSubSystem)
 {
-	if (!bProfileOkay || nProfileSelect >= PROFILE_LEN) {
-		return 0.0;
-	}
+    if (!bProfileOkay || nProfileSelect >= PROFILE_LEN)
+    {
+        return 0.0;
+    }
 
-	return pProfileDo[nProfileSelect]->ProfileReadAverage(nSubSystem);
+    return pProfileDo[nProfileSelect]->ProfileReadAverage(nSubSystem);
 }
 
-InterfaceInfo* ProfileGetInfo()
+InterfaceInfo *ProfileGetInfo()
 {
-	if (IntInfoInit(&ProfileInfo)) {
-		IntInfoFree(&ProfileInfo);
-		return NULL;
-	}
+    if (IntInfoInit(&ProfileInfo))
+    {
+        IntInfoFree(&ProfileInfo);
+        return NULL;
+    }
 
-	if (bProfileOkay) {
+    if (bProfileOkay)
+    {
 
-		ProfileInfo.pszModuleName = pProfileDo[nProfileSelect]->szModuleName;
+        ProfileInfo.pszModuleName = pProfileDo[nProfileSelect]->szModuleName;
 
-	 	if (pProfileDo[nProfileSelect]->GetPluginSettings) {
-			pProfileDo[nProfileSelect]->GetPluginSettings(&ProfileInfo);
-		}
-	} else {
-		IntInfoAddStringInterface(&ProfileInfo, _T("Profiling module not initialised"));
-	}
+        if (pProfileDo[nProfileSelect]->GetPluginSettings)
+        {
+            pProfileDo[nProfileSelect]->GetPluginSettings(&ProfileInfo);
+        }
+    }
+    else
+    {
+        IntInfoAddStringInterface(&ProfileInfo, _T("Profiling module not initialised"));
+    }
 
-	return &ProfileInfo;
+    return &ProfileInfo;
 }

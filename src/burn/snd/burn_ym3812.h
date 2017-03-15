@@ -1,6 +1,6 @@
 #include "driver.h"
 extern "C" {
- #include "fmopl.h"
+#include "fmopl.h"
 }
 #include "timer.h"
 
@@ -23,15 +23,15 @@ INT32 BurnYM3812Init(INT32 num, INT32 nClockFrequency, OPL_IRQHANDLER IRQCallbac
 void BurnYM3812SetRoute(INT32 nChip, INT32 nIndex, double nVolume, INT32 nRouteDir);
 void BurnYM3812Reset();
 void BurnYM3812Exit();
-extern void (*BurnYM3812Update)(INT16* pSoundBuf, INT32 nSegmentEnd);
-void BurnYM3812Scan(INT32 nAction, INT32* pnMin);
+extern void (*BurnYM3812Update)(INT16 *pSoundBuf, INT32 nSegmentEnd);
+void BurnYM3812Scan(INT32 nAction, INT32 *pnMin);
 
 #define BURN_SND_YM3812_ROUTE			0
 
 #define BurnYM3812Read(i, a) YM3812Read(i, a)
 
 #if defined FBA_DEBUG
-	#define BurnYM3812Write(i, a, n) if (!DebugSnd_YM3812Initted) bprintf(PRINT_ERROR, _T("BurnYM3812Write called without init\n")); YM3812Write(i, a, n)
+#define BurnYM3812Write(i, a, n) if (!DebugSnd_YM3812Initted) bprintf(PRINT_ERROR, _T("BurnYM3812Write called without init\n")); YM3812Write(i, a, n)
 #else
-	#define BurnYM3812Write(i, a, n) YM3812Write(i, a, n)
+#define BurnYM3812Write(i, a, n) YM3812Write(i, a, n)
 #endif

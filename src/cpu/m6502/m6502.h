@@ -40,31 +40,31 @@
 
 typedef struct
 {
-	UINT8	subtype;		/* currently selected cpu sub type */
-//	void	(*const *insn)(void); /* pointer to the function pointer table */
-	PAIR	ppc;			/* previous program counter */
-	PAIR	pc; 			/* program counter */
-	PAIR	sp; 			/* stack pointer (always 100 - 1FF) */
-	PAIR	zp; 			/* zero page address */
-	PAIR	ea; 			/* effective address */
-	UINT8	a;				/* Accumulator */
-	UINT8	x;				/* X index register */
-	UINT8	y;				/* Y index register */
-	UINT8	p;				/* Processor status */
-	UINT8	pending_irq;	/* nonzero if an IRQ is pending */
-	UINT8	after_cli;		/* pending IRQ and last insn cleared I */
-	UINT8	nmi_state;
-	UINT8	irq_state;
-	UINT8   so_state;
-	int 	(*irq_callback)(int irqline);	/* IRQ callback */
-//	read8_machine_func rdmem_id;					/* readmem callback for indexed instructions */
-//	write8_machine_func wrmem_id;				/* writemem callback for indexed instructions */
+    UINT8	subtype;		/* currently selected cpu sub type */
+    //	void	(*const *insn)(void); /* pointer to the function pointer table */
+    PAIR	ppc;			/* previous program counter */
+    PAIR	pc; 			/* program counter */
+    PAIR	sp; 			/* stack pointer (always 100 - 1FF) */
+    PAIR	zp; 			/* zero page address */
+    PAIR	ea; 			/* effective address */
+    UINT8	a;				/* Accumulator */
+    UINT8	x;				/* X index register */
+    UINT8	y;				/* Y index register */
+    UINT8	p;				/* Processor status */
+    UINT8	pending_irq;	/* nonzero if an IRQ is pending */
+    UINT8	after_cli;		/* pending IRQ and last insn cleared I */
+    UINT8	nmi_state;
+    UINT8	irq_state;
+    UINT8   so_state;
+    int 	(*irq_callback)(int irqline);	/* IRQ callback */
+    //	read8_machine_func rdmem_id;					/* readmem callback for indexed instructions */
+    //	write8_machine_func wrmem_id;				/* writemem callback for indexed instructions */
 
 #if (HAS_M6510) || (HAS_M6510T) || (HAS_M8502) || (HAS_M7501)
-	UINT8    ddr;
-	UINT8    port;
-	UINT8	(*port_read)(UINT8 direction);
-	void	(*port_write)(UINT8 direction, UINT8 data);
+    UINT8    ddr;
+    UINT8    port;
+    UINT8	(*port_read)(UINT8 direction);
+    void	(*port_write)(UINT8 direction, UINT8 data);
 #endif
 
 }	m6502_Regs;
@@ -95,9 +95,9 @@ typedef struct
 
 enum
 {
-	M6502_PC=1, M6502_S, M6502_P, M6502_A, M6502_X, M6502_Y,
-	M6502_EA, M6502_ZP,
-	M6502_SUBTYPE
+    M6502_PC = 1, M6502_S, M6502_P, M6502_A, M6502_X, M6502_Y,
+    M6502_EA, M6502_ZP,
+    M6502_SUBTYPE
 };
 
 #define M6502_IRQ_LINE		0

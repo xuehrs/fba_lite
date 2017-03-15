@@ -18,9 +18,9 @@ static bool rotateVideo = false;
 static bool isGlewInitialized = false;
 static GLuint vao, texture;
 
-static void (*oglSwapBuffers)(void*) = nullptr;
-static void (*oglMakeCurrent)(void*) = nullptr;
-static void (*oglDoneCurrent)(void*) = nullptr;
+static void (*oglSwapBuffers)(void *) = nullptr;
+static void (*oglMakeCurrent)(void *) = nullptr;
+static void (*oglDoneCurrent)(void *) = nullptr;
 static void *oglContext = nullptr;
 static Shader *stockShader = nullptr;
 

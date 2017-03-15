@@ -41,7 +41,7 @@ void MSM5205Scan(INT32 nAction, INT32 *pnMin);
 	many cycles that the sound cpu has ran does
 	MSM5205Update need to be called. It returns how many
 	slices must be made of the sound cpu's cycles
-*/	
+*/
 
 INT32 MSM5205CalcInterleave(INT32 chip, INT32 cpu_speed);
 void MSM5205Update();

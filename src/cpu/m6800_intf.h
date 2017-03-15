@@ -7,22 +7,23 @@ typedef UINT8 (*pReadOpArgHandler)(UINT16 a);
 typedef UINT8 (*pReadPortHandler)(UINT16 a);
 typedef void (*pWritePortHandler)(UINT16 a, UINT8 d);
 
-struct M6800Ext {
+struct M6800Ext
+{
 
-	m6800_Regs reg;
-	
-	UINT8* pMemMap[0x100 * 3];
+    m6800_Regs reg;
 
-	pReadByteHandler ReadByte;
-	pWriteByteHandler WriteByte;
-	pReadOpHandler ReadOp;
-	pReadOpArgHandler ReadOpArg;
-	pReadPortHandler ReadPort;
-	pWritePortHandler WritePort;
-	
-	INT32 nCyclesTotal;
-	INT32 nCyclesSegment;
-	INT32 nCyclesLeft;
+    UINT8 *pMemMap[0x100 * 3];
+
+    pReadByteHandler ReadByte;
+    pWriteByteHandler WriteByte;
+    pReadOpHandler ReadOp;
+    pReadOpArgHandler ReadOpArg;
+    pReadPortHandler ReadPort;
+    pWritePortHandler WritePort;
+
+    INT32 nCyclesTotal;
+    INT32 nCyclesSegment;
+    INT32 nCyclesLeft;
 };
 
 
@@ -90,7 +91,7 @@ UINT32 M6800GetPC(INT32);
 #define M6803GetPC		M6800GetPC
 #define M6801GetPC		M6800GetPC
 
-INT32 M6800MapMemory(UINT8* pMemory, UINT16 nStart, UINT16 nEnd, INT32 nType);
+INT32 M6800MapMemory(UINT8 *pMemory, UINT16 nStart, UINT16 nEnd, INT32 nType);
 #define HD63701MapMemory	M6800MapMemory
 #define M6803MapMemory		M6800MapMemory
 #define M6801MapMemory		M6800MapMemory
@@ -135,8 +136,8 @@ void M6800WriteRom(UINT32 Address, UINT8 Data);
 inline static INT32 M6800TotalCycles()
 {
 #if defined FBA_DEBUG
-	if (!DebugCPU_M6800Initted) bprintf(PRINT_ERROR, _T("M6800TotalCycles called without init\n"));
+    if (!DebugCPU_M6800Initted) bprintf(PRINT_ERROR, _T("M6800TotalCycles called without init\n"));
 #endif
 
-	return nM6800CyclesTotal;
+    return nM6800CyclesTotal;
 }

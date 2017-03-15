@@ -22,7 +22,7 @@ void Mips3Reset();
 int Mips3Run(int cycles);
 unsigned int Mips3GetPC();
 
-int Mips3MapMemory(unsigned char* pMemory, unsigned int nStart, unsigned int nEnd, int nType);
+int Mips3MapMemory(unsigned char *pMemory, unsigned int nStart, unsigned int nEnd, int nType);
 int Mips3MapHandler(uintptr_t nHandler, unsigned int nStart, unsigned int nEnd, int nType);
 
 int Mips3SetReadByteHandler(int i, pMips3ReadByteHandler pHandler);

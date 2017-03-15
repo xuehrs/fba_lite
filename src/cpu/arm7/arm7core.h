@@ -37,7 +37,7 @@
  ***************************************************************************************************/
 enum
 {
-    ARM7_IRQ_LINE=0, ARM7_FIRQ_LINE,
+    ARM7_IRQ_LINE = 0, ARM7_FIRQ_LINE,
     ARM7_ABORT_EXCEPTION, ARM7_ABORT_PREFETCH_EXCEPTION, ARM7_UNDEFINE_EXCEPTION,
     ARM7_NUM_LINES
 };
@@ -117,7 +117,7 @@ enum
 
 static const int thumbCycles[256] =
 {
-//  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+    //  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 0
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 1
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 2
@@ -394,7 +394,7 @@ enum
 extern void((*arm7_coproc_do_callback)(unsigned int, unsigned int));
 extern unsigned int((*arm7_coproc_rt_r_callback)(unsigned int));
 extern void((*arm7_coproc_rt_w_callback)(unsigned int, unsigned int));
-extern void (*arm7_coproc_dt_r_callback)(UINT32 insn, UINT32* prn, UINT32 (*read32)(UINT32 addr));
-extern void (*arm7_coproc_dt_w_callback)(UINT32 insn, UINT32* prn, void (*write32)(UINT32 addr, UINT32 data));
+extern void (*arm7_coproc_dt_r_callback)(UINT32 insn, UINT32 *prn, UINT32 (*read32)(UINT32 addr));
+extern void (*arm7_coproc_dt_w_callback)(UINT32 insn, UINT32 *prn, void (*write32)(UINT32 addr, UINT32 data));
 
 #endif /* __ARM7CORE_H__ */

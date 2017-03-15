@@ -26,17 +26,17 @@
 
 #ifndef D3DXINLINE
 #ifdef _MSC_VER
-  #if (_MSC_VER >= 1200)
-  #define D3DXINLINE __forceinline
-  #else
-  #define D3DXINLINE __inline
-  #endif
+#if (_MSC_VER >= 1200)
+#define D3DXINLINE __forceinline
 #else
-  #ifdef __cplusplus
-  #define D3DXINLINE inline
-  #else
-  #define D3DXINLINE
-  #endif
+#define D3DXINLINE __inline
+#endif
+#else
+#ifdef __cplusplus
+#define D3DXINLINE inline
+#else
+#define D3DXINLINE
+#endif
 #endif
 #endif
 
@@ -61,7 +61,8 @@
 #define _FACDD  0x876
 #define MAKE_DDHRESULT( code )  MAKE_HRESULT( 1, _FACDD, code )
 
-enum _D3DXERR {
+enum _D3DXERR
+{
     D3DXERR_CANNOTMODIFYINDEXBUFFER     = MAKE_DDHRESULT(2900),
     D3DXERR_INVALIDMESH                 = MAKE_DDHRESULT(2901),
     D3DXERR_CANNOTATTRSORT              = MAKE_DDHRESULT(2902),
@@ -70,7 +71,7 @@ enum _D3DXERR {
     D3DXERR_INVALIDDATA                 = MAKE_DDHRESULT(2905),
     D3DXERR_LOADEDMESHASNODATA          = MAKE_DDHRESULT(2906),
     D3DXERR_DUPLICATENAMEDFRAGMENT      = MAKE_DDHRESULT(2907),
-	D3DXERR_CANNOTREMOVELASTITEM		= MAKE_DDHRESULT(2908)
+    D3DXERR_CANNOTREMOVELASTITEM		= MAKE_DDHRESULT(2908)
 };
 
 

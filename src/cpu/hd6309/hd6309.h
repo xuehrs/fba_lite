@@ -9,8 +9,8 @@
 
 enum
 {
-	HD6309_PC=1, HD6309_S, HD6309_CC ,HD6309_A, HD6309_B, HD6309_U, HD6309_X, HD6309_Y, HD6309_DP,
-	HD6309_E, HD6309_F, HD6309_V, HD6309_MD
+    HD6309_PC = 1, HD6309_S, HD6309_CC , HD6309_A, HD6309_B, HD6309_U, HD6309_X, HD6309_Y, HD6309_DP,
+    HD6309_E, HD6309_F, HD6309_V, HD6309_MD
 };
 
 #define HD6309_IRQ_LINE 0	/* IRQ line number */
@@ -20,21 +20,21 @@ enum
 /* 6309 Registers */
 typedef struct
 {
-	PAIR	pc; 		/* Program counter */
-	PAIR	ppc;		/* Previous program counter */
-	PAIR	d,w;		/* Accumlator d and w (ab = d, ef = w, abef = q) */
-	PAIR	dp; 		/* Direct Page register (page in MSB) */
-	PAIR	u, s;		/* Stack pointers */
-	PAIR	x, y;		/* Index registers */
-	PAIR	v;			/* New 6309 register */
-	UINT8	cc;
-	UINT8	md; 		/* Special mode register */
-	UINT8	ireg;		/* First opcode */
-	UINT8	irq_state[2];
-	int 	extra_cycles; /* cycles used up by interrupts */
-	int 	(*irq_callback)(int irqline);
-	UINT8	int_state;	/* SYNC and CWAI flags */
-	UINT8	nmi_state;
+    PAIR	pc; 		/* Program counter */
+    PAIR	ppc;		/* Previous program counter */
+    PAIR	d, w;		/* Accumlator d and w (ab = d, ef = w, abef = q) */
+    PAIR	dp; 		/* Direct Page register (page in MSB) */
+    PAIR	u, s;		/* Stack pointers */
+    PAIR	x, y;		/* Index registers */
+    PAIR	v;			/* New 6309 register */
+    UINT8	cc;
+    UINT8	md; 		/* Special mode register */
+    UINT8	ireg;		/* First opcode */
+    UINT8	irq_state[2];
+    int 	extra_cycles; /* cycles used up by interrupts */
+    int 	(*irq_callback)(int irqline);
+    UINT8	int_state;	/* SYNC and CWAI flags */
+    UINT8	nmi_state;
 } hd6309_Regs;
 
 unsigned char HD6309ReadByte(unsigned short Address);

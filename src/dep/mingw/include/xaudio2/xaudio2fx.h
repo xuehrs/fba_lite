@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
   Moddified by CaptainCPS for use with MinGW / GCC 4.6.1
-  
+
   Thanks to PortAudio for their 'sal.h' compatible with MinGW !
 -------------------------------------------------------------------------*/
 
@@ -80,9 +80,9 @@ DEFINE_GUID(CLSID_AudioReverb_Debug, 0xc4f82dd4, 0xcb4e, 0x4ce1, 0x8b, 0xdb, 0xe
 #ifndef GUID_DEFS_ONLY
 
 #ifdef _XBOX
-    #include <xobjbase.h>   // Xbox COM declarations (IUnknown, etc)
+#include <xobjbase.h>   // Xbox COM declarations (IUnknown, etc)
 #else
-    #include <objbase.h>    // Windows COM declarations
+#include <objbase.h>    // Windows COM declarations
 #endif
 #include <math.h>           // For log10()
 
@@ -103,55 +103,55 @@ DEFINE_GUID(CLSID_AudioReverb_Debug, 0xc4f82dd4, 0xcb4e, 0x4ce1, 0x8b, 0xdb, 0xe
 
 // Use default values for some parameters if building C++ code
 #ifdef __cplusplus
-    #define DEFAULT(x) =x
+#define DEFAULT(x) =x
 #else
-    #define DEFAULT(x)
+#define DEFAULT(x)
 #endif
 
 #define XAUDIO2FX_DEBUG 1   // To select the debug version of an effect
 
 #ifdef _XBOX
 
-    STDAPI CreateAudioVolumeMeter(__deref_out IUnknown** ppApo);
-    STDAPI CreateAudioReverb(__deref_out IUnknown** ppApo);
+STDAPI CreateAudioVolumeMeter(__deref_out IUnknown **ppApo);
+STDAPI CreateAudioReverb(__deref_out IUnknown **ppApo);
 
-    __inline HRESULT XAudio2CreateVolumeMeter(__deref_out IUnknown** ppApo, UINT32 /*Flags*/ DEFAULT(0))
-    {
-        return CreateAudioVolumeMeter(ppApo);
-    }
+__inline HRESULT XAudio2CreateVolumeMeter(__deref_out IUnknown **ppApo, UINT32 /*Flags*/ DEFAULT(0))
+{
+    return CreateAudioVolumeMeter(ppApo);
+}
 
-    __inline HRESULT XAudio2CreateReverb(__deref_out IUnknown** ppApo, UINT32 /*Flags*/ DEFAULT(0))
-    {
-        return CreateAudioReverb(ppApo);
-    }
+__inline HRESULT XAudio2CreateReverb(__deref_out IUnknown **ppApo, UINT32 /*Flags*/ DEFAULT(0))
+{
+    return CreateAudioReverb(ppApo);
+}
 
 #else // Windows
 
-    __inline HRESULT XAudio2CreateVolumeMeter(__deref_out IUnknown** ppApo, UINT32 Flags DEFAULT(0))
-    {
-        #ifdef __cplusplus
-            return CoCreateInstance((Flags & XAUDIO2FX_DEBUG) ? CLSID_AudioVolumeMeter_Debug
-                                                              : CLSID_AudioVolumeMeter,
-                                    NULL, CLSCTX_INPROC_SERVER, IID_IUnknown, (void**)ppApo);
-        #else
-            return CoCreateInstance((Flags & XAUDIO2FX_DEBUG) ? &CLSID_AudioVolumeMeter_Debug
-                                                              : &CLSID_AudioVolumeMeter,
-                                    NULL, CLSCTX_INPROC_SERVER, &IID_IUnknown, (void**)ppApo);
-        #endif
-    }
+__inline HRESULT XAudio2CreateVolumeMeter(__deref_out IUnknown **ppApo, UINT32 Flags DEFAULT(0))
+{
+#ifdef __cplusplus
+    return CoCreateInstance((Flags & XAUDIO2FX_DEBUG) ? CLSID_AudioVolumeMeter_Debug
+                            : CLSID_AudioVolumeMeter,
+                            NULL, CLSCTX_INPROC_SERVER, IID_IUnknown, (void **)ppApo);
+#else
+    return CoCreateInstance((Flags & XAUDIO2FX_DEBUG) ? &CLSID_AudioVolumeMeter_Debug
+                            : &CLSID_AudioVolumeMeter,
+                            NULL, CLSCTX_INPROC_SERVER, &IID_IUnknown, (void **)ppApo);
+#endif
+}
 
-    __inline HRESULT XAudio2CreateReverb(__deref_out IUnknown** ppApo, UINT32 Flags DEFAULT(0))
-    {
-        #ifdef __cplusplus
-            return CoCreateInstance((Flags & XAUDIO2FX_DEBUG) ? CLSID_AudioReverb_Debug
-                                                              : CLSID_AudioReverb,
-                                    NULL, CLSCTX_INPROC_SERVER, IID_IUnknown, (void**)ppApo);
-        #else
-            return CoCreateInstance((Flags & XAUDIO2FX_DEBUG) ? &CLSID_AudioReverb_Debug
-                                                              : &CLSID_AudioReverb,
-                                    NULL, CLSCTX_INPROC_SERVER, &IID_IUnknown, (void**)ppApo);
-        #endif
-    }
+__inline HRESULT XAudio2CreateReverb(__deref_out IUnknown **ppApo, UINT32 Flags DEFAULT(0))
+{
+#ifdef __cplusplus
+    return CoCreateInstance((Flags & XAUDIO2FX_DEBUG) ? CLSID_AudioReverb_Debug
+                            : CLSID_AudioReverb,
+                            NULL, CLSCTX_INPROC_SERVER, IID_IUnknown, (void **)ppApo);
+#else
+    return CoCreateInstance((Flags & XAUDIO2FX_DEBUG) ? &CLSID_AudioReverb_Debug
+                            : &CLSID_AudioReverb,
+                            NULL, CLSCTX_INPROC_SERVER, &IID_IUnknown, (void **)ppApo);
+#endif
+}
 
 #endif // #ifdef _XBOX
 
@@ -170,12 +170,12 @@ DEFINE_GUID(CLSID_AudioReverb_Debug, 0xc4f82dd4, 0xcb4e, 0x4ce1, 0x8b, 0xdb, 0xe
 // The volume meter does not support SetEffectParameters().
 typedef struct XAUDIO2FX_VOLUMEMETER_LEVELS
 {
-    float* pPeakLevels;  // Peak levels table: receives maximum absolute level for each channel
-                         // over a processing pass; may be NULL if pRMSLevls != NULL,
-                         // otherwise must have at least ChannelCount elements.
-    float* pRMSLevels;   // Root mean square levels table: receives RMS level for each channel
-                         // over a processing pass; may be NULL if pPeakLevels != NULL,
-                         // otherwise must have at least ChannelCount elements.
+    float *pPeakLevels;  // Peak levels table: receives maximum absolute level for each channel
+    // over a processing pass; may be NULL if pRMSLevls != NULL,
+    // otherwise must have at least ChannelCount elements.
+    float *pRMSLevels;   // Root mean square levels table: receives RMS level for each channel
+    // over a processing pass; may be NULL if pPeakLevels != NULL,
+    // otherwise must have at least ChannelCount elements.
     UINT32 ChannelCount; // Number of channels being processed by the volume meter APO
 } XAUDIO2FX_VOLUMEMETER_LEVELS;
 
@@ -325,8 +325,8 @@ typedef struct XAUDIO2FX_REVERB_I3DL2_PARAMETERS
 
 __inline void ReverbConvertI3DL2ToNative
 (
-    __in const XAUDIO2FX_REVERB_I3DL2_PARAMETERS* pI3DL2,
-    __out XAUDIO2FX_REVERB_PARAMETERS* pNative
+    __in const XAUDIO2FX_REVERB_I3DL2_PARAMETERS *pI3DL2,
+    __out XAUDIO2FX_REVERB_PARAMETERS *pNative
 )
 {
     float reflectionsDelay;

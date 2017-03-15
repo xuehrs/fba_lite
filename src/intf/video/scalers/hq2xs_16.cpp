@@ -14,8 +14,8 @@ typedef unsigned int uint32;
 #define Mask_3	0xF800	// 11111 000000 00000
 #define NUMBITS (16)
 
-static int RGBtoYUV[1<<NUMBITS];
-static uint16 RGBtoBright[1<<NUMBITS];
+static int RGBtoYUV[1 << NUMBITS];
+static uint16 RGBtoBright[1 << NUMBITS];
 
 #define Interp05(c1, c2) \
 	(((c1) == (c2)) ? (c1) : \
@@ -44,39 +44,39 @@ static uint16 RGBtoBright[1<<NUMBITS];
 
 static inline bool Diff(int c1, int c2)
 {
-	int c1y = (c1 & Ymask) - (c2 & Ymask);
-	if (Absolute(c1y) > trY) return true;
-	int c1u = (c1 & Umask) - (c2 & Umask);
-	if (Absolute(c1u) > trU) return true;
-	int c1v = (c1 & Vmask) - (c2 & Vmask);
-	if (Absolute(c1v) > trV) return true;
+    int c1y = (c1 & Ymask) - (c2 & Ymask);
+    if (Absolute(c1y) > trY) return true;
+    int c1u = (c1 & Umask) - (c2 & Umask);
+    if (Absolute(c1u) > trU) return true;
+    int c1v = (c1 & Vmask) - (c2 & Vmask);
+    if (Absolute(c1v) > trV) return true;
 
-	return false;
+    return false;
 }
 
 void InitLUTs(void)
 {
-	int c, r, g, b, y, u, v;
+    int c, r, g, b, y, u, v;
 
-	for (c = 0 ; c < (1<<NUMBITS) ; c++)
-  	{
-		b = (int)((c & 0x1F)) << 3;
-		g = (int)((c & 0x7E0)) >> 3;
-		r = (int)((c & 0xF800)) >> 8;
-		RGBtoBright[c] = r+r+r + g+g+g + b+b;
+    for (c = 0 ; c < (1 << NUMBITS) ; c++)
+    {
+        b = (int)((c & 0x1F)) << 3;
+        g = (int)((c & 0x7E0)) >> 3;
+        r = (int)((c & 0xF800)) >> 8;
+        RGBtoBright[c] = r + r + r + g + g + g + b + b;
 
-		y = (int)( 0.256788f*r + 0.504129f*g + 0.097906f*b + 0.5f) + 16;
-		u = (int)(-0.148223f*r - 0.290993f*g + 0.439216f*b + 0.5f) + 128;
-		v = (int)( 0.439216f*r - 0.367788f*g - 0.071427f*b + 0.5f) + 128;
+        y = (int)( 0.256788f * r + 0.504129f * g + 0.097906f * b + 0.5f) + 16;
+        u = (int)(-0.148223f * r - 0.290993f * g + 0.439216f * b + 0.5f) + 128;
+        v = (int)( 0.439216f * r - 0.367788f * g - 0.071427f * b + 0.5f) + 128;
 
-		RGBtoYUV[c] = (y << 16) + (u << 8) + v;
+        RGBtoYUV[c] = (y << 16) + (u << 8) + v;
 
-//		y = (r + g + b) >> 2;
-//    	u = 128 + ((r - b) >> 2);
-//    	v = 128 + ((-r + 2 * g - b) >> 3);
-//
-//		RGBtoYUVLQ[c] = (y << 16) + (u << 8) + v;
-	}
+        //		y = (r + g + b) >> 2;
+        //    	u = 128 + ((r - b) >> 2);
+        //    	v = 128 + ((-r + 2 * g - b) >> 3);
+        //
+        //		RGBtoYUVLQ[c] = (y << 16) + (u << 8) + v;
+    }
 }
 
 #define Interp02(c1, c2, c3) \
@@ -321,109 +321,113 @@ void InitLUTs(void)
 
 void RenderHQ2XS(unsigned char *src, unsigned int srcpitch, unsigned char *dst, unsigned int dstpitch, int nWidth, int nHeight, int type)
 {
-	uint8 *srcPtr = src;
-	uint8 *dstPtr = dst;
-	uint32 srcPitch = srcpitch;
-	uint32 dstPitch = dstpitch;
-	int width = nWidth;
-	int height = nHeight;
+    uint8 *srcPtr = src;
+    uint8 *dstPtr = dst;
+    uint32 srcPitch = srcpitch;
+    uint32 dstPitch = dstpitch;
+    int width = nWidth;
+    int height = nHeight;
 
-	int	w1, w2, w3, w4, w5, w6, w7, w8, w9;
+    int	w1, w2, w3, w4, w5, w6, w7, w8, w9;
 
-	uint32 src1line = srcPitch >> 1;
-	uint32 dst1line = dstPitch >> 1;
-	uint16 *sp = (uint16 *) srcPtr;
-	uint16 *dp = (uint16 *) dstPtr;
+    uint32 src1line = srcPitch >> 1;
+    uint32 dst1line = dstPitch >> 1;
+    uint16 *sp = (uint16 *) srcPtr;
+    uint16 *dp = (uint16 *) dstPtr;
 
-	const int* RGBtoYUVtable = RGBtoYUV;
+    const int *RGBtoYUVtable = RGBtoYUV;
 
-	uint32 pattern;
-	int l, y;
+    uint32 pattern;
+    int l, y;
 
-	while (height--)
-	{
-		sp--;
+    while (height--)
+    {
+        sp--;
 
-		w1 = *(sp - src1line);
-		w4 = *(sp);
-		w7 = *(sp + src1line);
+        w1 = *(sp - src1line);
+        w4 = *(sp);
+        w7 = *(sp + src1line);
 
-		sp++;
+        sp++;
 
-		w2 = *(sp - src1line);
-		w5 = *(sp);
-		w8 = *(sp + src1line);
+        w2 = *(sp - src1line);
+        w5 = *(sp);
+        w8 = *(sp + src1line);
 
-		for (l = width; l; l--)
-		{
-			sp++;
+        for (l = width; l; l--)
+        {
+            sp++;
 
-			w3 = *(sp - src1line);
-			w6 = *(sp);
-			w9 = *(sp + src1line);
+            w3 = *(sp - src1line);
+            w6 = *(sp);
+            w9 = *(sp + src1line);
 
-			pattern = 0;
+            pattern = 0;
 
-			if (type == 0)	// hq2xs
-			{
-				bool nosame = true;
-				if(w1 == w5 || w3 == w5 || w7 == w5 || w9 == w5)
-					nosame = false;
+            if (type == 0)	// hq2xs
+            {
+                bool nosame = true;
+                if(w1 == w5 || w3 == w5 || w7 == w5 || w9 == w5)
+                    nosame = false;
 
-				if(nosame)
-				{
-					const uint16 avg = (RGBtoBright[w1] + RGBtoBright[w2] + RGBtoBright[w3] + RGBtoBright[w4] + RGBtoBright[w5] + RGBtoBright[w6] + RGBtoBright[w7] + RGBtoBright[w8] + RGBtoBright[w9]) / 9;
-					const bool diff5 = RGBtoBright[w5] > avg;
-					if((RGBtoBright[w1] > avg) != diff5) pattern |= (1 << 0);
-					if((RGBtoBright[w2] > avg) != diff5) pattern |= (1 << 1);
-					if((RGBtoBright[w3] > avg) != diff5) pattern |= (1 << 2);
-					if((RGBtoBright[w4] > avg) != diff5) pattern |= (1 << 3);
-					if((RGBtoBright[w6] > avg) != diff5) pattern |= (1 << 4);
-					if((RGBtoBright[w7] > avg) != diff5) pattern |= (1 << 5);
-					if((RGBtoBright[w8] > avg) != diff5) pattern |= (1 << 6);
-					if((RGBtoBright[w9] > avg) != diff5) pattern |= (1 << 7);
-				}
-				else
-				{
-					y = RGBtoYUV[w5];
-					if ((w1 != w5) && (Diff(y, RGBtoYUV[w1]))) pattern |= (1 << 0);
-					if ((w2 != w5) && (Diff(y, RGBtoYUV[w2]))) pattern |= (1 << 1);
-					if ((w3 != w5) && (Diff(y, RGBtoYUV[w3]))) pattern |= (1 << 2);
-					if ((w4 != w5) && (Diff(y, RGBtoYUV[w4]))) pattern |= (1 << 3);
-					if ((w6 != w5) && (Diff(y, RGBtoYUV[w6]))) pattern |= (1 << 4);
-					if ((w7 != w5) && (Diff(y, RGBtoYUV[w7]))) pattern |= (1 << 5);
-					if ((w8 != w5) && (Diff(y, RGBtoYUV[w8]))) pattern |= (1 << 6);
-					if ((w9 != w5) && (Diff(y, RGBtoYUV[w9]))) pattern |= (1 << 7);
-				}
-			}
-			else if (type == 1)	// hq2xbold
-			{
-				const uint16 avg = (RGBtoBright[w1] + RGBtoBright[w2] + RGBtoBright[w3] + RGBtoBright[w4] + RGBtoBright[w5] + RGBtoBright[w6] + RGBtoBright[w7] + RGBtoBright[w8] + RGBtoBright[w9]) / 9;
-				const bool diff5 = RGBtoBright[w5] > avg;
-				if ((w1 != w5) && ((RGBtoBright[w1] > avg) != diff5)) pattern |= (1 << 0);
-				if ((w2 != w5) && ((RGBtoBright[w2] > avg) != diff5)) pattern |= (1 << 1);
-				if ((w3 != w5) && ((RGBtoBright[w3] > avg) != diff5)) pattern |= (1 << 2);
-				if ((w4 != w5) && ((RGBtoBright[w4] > avg) != diff5)) pattern |= (1 << 3);
-				if ((w6 != w5) && ((RGBtoBright[w6] > avg) != diff5)) pattern |= (1 << 4);
-				if ((w7 != w5) && ((RGBtoBright[w7] > avg) != diff5)) pattern |= (1 << 5);
-				if ((w8 != w5) && ((RGBtoBright[w8] > avg) != diff5)) pattern |= (1 << 6);
-				if ((w9 != w5) && ((RGBtoBright[w9] > avg) != diff5)) pattern |= (1 << 7);
-			}
+                if(nosame)
+                {
+                    const uint16 avg = (RGBtoBright[w1] + RGBtoBright[w2] + RGBtoBright[w3] + RGBtoBright[w4] + RGBtoBright[w5] + RGBtoBright[w6] + RGBtoBright[w7] + RGBtoBright[w8] + RGBtoBright[w9]) / 9;
+                    const bool diff5 = RGBtoBright[w5] > avg;
+                    if((RGBtoBright[w1] > avg) != diff5) pattern |= (1 << 0);
+                    if((RGBtoBright[w2] > avg) != diff5) pattern |= (1 << 1);
+                    if((RGBtoBright[w3] > avg) != diff5) pattern |= (1 << 2);
+                    if((RGBtoBright[w4] > avg) != diff5) pattern |= (1 << 3);
+                    if((RGBtoBright[w6] > avg) != diff5) pattern |= (1 << 4);
+                    if((RGBtoBright[w7] > avg) != diff5) pattern |= (1 << 5);
+                    if((RGBtoBright[w8] > avg) != diff5) pattern |= (1 << 6);
+                    if((RGBtoBright[w9] > avg) != diff5) pattern |= (1 << 7);
+                }
+                else
+                {
+                    y = RGBtoYUV[w5];
+                    if ((w1 != w5) && (Diff(y, RGBtoYUV[w1]))) pattern |= (1 << 0);
+                    if ((w2 != w5) && (Diff(y, RGBtoYUV[w2]))) pattern |= (1 << 1);
+                    if ((w3 != w5) && (Diff(y, RGBtoYUV[w3]))) pattern |= (1 << 2);
+                    if ((w4 != w5) && (Diff(y, RGBtoYUV[w4]))) pattern |= (1 << 3);
+                    if ((w6 != w5) && (Diff(y, RGBtoYUV[w6]))) pattern |= (1 << 4);
+                    if ((w7 != w5) && (Diff(y, RGBtoYUV[w7]))) pattern |= (1 << 5);
+                    if ((w8 != w5) && (Diff(y, RGBtoYUV[w8]))) pattern |= (1 << 6);
+                    if ((w9 != w5) && (Diff(y, RGBtoYUV[w9]))) pattern |= (1 << 7);
+                }
+            }
+            else if (type == 1)	// hq2xbold
+            {
+                const uint16 avg = (RGBtoBright[w1] + RGBtoBright[w2] + RGBtoBright[w3] + RGBtoBright[w4] + RGBtoBright[w5] + RGBtoBright[w6] + RGBtoBright[w7] + RGBtoBright[w8] + RGBtoBright[w9]) / 9;
+                const bool diff5 = RGBtoBright[w5] > avg;
+                if ((w1 != w5) && ((RGBtoBright[w1] > avg) != diff5)) pattern |= (1 << 0);
+                if ((w2 != w5) && ((RGBtoBright[w2] > avg) != diff5)) pattern |= (1 << 1);
+                if ((w3 != w5) && ((RGBtoBright[w3] > avg) != diff5)) pattern |= (1 << 2);
+                if ((w4 != w5) && ((RGBtoBright[w4] > avg) != diff5)) pattern |= (1 << 3);
+                if ((w6 != w5) && ((RGBtoBright[w6] > avg) != diff5)) pattern |= (1 << 4);
+                if ((w7 != w5) && ((RGBtoBright[w7] > avg) != diff5)) pattern |= (1 << 5);
+                if ((w8 != w5) && ((RGBtoBright[w8] > avg) != diff5)) pattern |= (1 << 6);
+                if ((w9 != w5) && ((RGBtoBright[w9] > avg) != diff5)) pattern |= (1 << 7);
+            }
 
-			switch (pattern)
-			{
-				HQ2XCASES
-			}
+            switch (pattern)
+            {
+                HQ2XCASES
+            }
 
-			w1 = w2; w4 = w5; w7 = w8;
-			w2 = w3; w5 = w6; w8 = w9;
+            w1 = w2;
+            w4 = w5;
+            w7 = w8;
+            w2 = w3;
+            w5 = w6;
+            w8 = w9;
 
-			dp += 2;
-		}
+            dp += 2;
+        }
 
-		dp += ((dst1line - width) << 1);
-		sp +=  (src1line - width);
-	}
+        dp += ((dst1line - width) << 1);
+        sp +=  (src1line - width);
+    }
 }
 
 
@@ -658,107 +662,111 @@ void RenderHQ2XS(unsigned char *src, unsigned int srcpitch, unsigned char *dst, 
 
 void RenderHQ3XS(unsigned char *src, unsigned int srcpitch, unsigned char *dst, unsigned int dstpitch, int nWidth, int nHeight, int type)
 {
-	uint8 *srcPtr = src;
-	uint8 *dstPtr = dst;
-	uint32 srcPitch = srcpitch;
-	uint32 dstPitch = dstpitch;
-	int width = nWidth;
-	int height = nHeight;
+    uint8 *srcPtr = src;
+    uint8 *dstPtr = dst;
+    uint32 srcPitch = srcpitch;
+    uint32 dstPitch = dstpitch;
+    int width = nWidth;
+    int height = nHeight;
 
-	int	w1, w2, w3, w4, w5, w6, w7, w8, w9;
+    int	w1, w2, w3, w4, w5, w6, w7, w8, w9;
 
-	uint32 src1line = srcPitch >> 1;
-	uint32 dst1line = dstPitch >> 1;
-	uint16 *sp = (uint16 *) srcPtr;
-	uint16 *dp = (uint16 *) dstPtr;
+    uint32 src1line = srcPitch >> 1;
+    uint32 dst1line = dstPitch >> 1;
+    uint16 *sp = (uint16 *) srcPtr;
+    uint16 *dp = (uint16 *) dstPtr;
 
-	const int* RGBtoYUVtable = RGBtoYUV;
+    const int *RGBtoYUVtable = RGBtoYUV;
 
-	uint32 pattern;
-	int l, y;
+    uint32 pattern;
+    int l, y;
 
-	while (height--)
-	{
-		sp--;
+    while (height--)
+    {
+        sp--;
 
-		w1 = *(sp - src1line);
-		w4 = *(sp);
-		w7 = *(sp + src1line);
+        w1 = *(sp - src1line);
+        w4 = *(sp);
+        w7 = *(sp + src1line);
 
-		sp++;
+        sp++;
 
-		w2 = *(sp - src1line);
-		w5 = *(sp);
-		w8 = *(sp + src1line);
+        w2 = *(sp - src1line);
+        w5 = *(sp);
+        w8 = *(sp + src1line);
 
-		for (l = width; l; l--)
-		{
-			sp++;
+        for (l = width; l; l--)
+        {
+            sp++;
 
-			w3 = *(sp - src1line);
-			w6 = *(sp);
-			w9 = *(sp + src1line);
+            w3 = *(sp - src1line);
+            w6 = *(sp);
+            w9 = *(sp + src1line);
 
-			pattern = 0;
+            pattern = 0;
 
-			if (type == 0)	// hq3xs
-			{
-				bool nosame = true;
-				if(w1 == w5 || w3 == w5 || w7 == w5 || w9 == w5)
-					nosame = false;
+            if (type == 0)	// hq3xs
+            {
+                bool nosame = true;
+                if(w1 == w5 || w3 == w5 || w7 == w5 || w9 == w5)
+                    nosame = false;
 
-				if(nosame)
-				{
-					const uint16 avg = (RGBtoBright[w1] + RGBtoBright[w2] + RGBtoBright[w3] + RGBtoBright[w4] + RGBtoBright[w5] + RGBtoBright[w6] + RGBtoBright[w7] + RGBtoBright[w8] + RGBtoBright[w9]) / 9;
-					const bool diff5 = RGBtoBright[w5] > avg;
-					if((RGBtoBright[w1] > avg) != diff5) pattern |= (1 << 0);
-					if((RGBtoBright[w2] > avg) != diff5) pattern |= (1 << 1);
-					if((RGBtoBright[w3] > avg) != diff5) pattern |= (1 << 2);
-					if((RGBtoBright[w4] > avg) != diff5) pattern |= (1 << 3);
-					if((RGBtoBright[w6] > avg) != diff5) pattern |= (1 << 4);
-					if((RGBtoBright[w7] > avg) != diff5) pattern |= (1 << 5);
-					if((RGBtoBright[w8] > avg) != diff5) pattern |= (1 << 6);
-					if((RGBtoBright[w9] > avg) != diff5) pattern |= (1 << 7);
-				}
-				else
-				{
-					y = RGBtoYUV[w5];
-					if ((w1 != w5) && (Diff(y, RGBtoYUV[w1]))) pattern |= (1 << 0);
-					if ((w2 != w5) && (Diff(y, RGBtoYUV[w2]))) pattern |= (1 << 1);
-					if ((w3 != w5) && (Diff(y, RGBtoYUV[w3]))) pattern |= (1 << 2);
-					if ((w4 != w5) && (Diff(y, RGBtoYUV[w4]))) pattern |= (1 << 3);
-					if ((w6 != w5) && (Diff(y, RGBtoYUV[w6]))) pattern |= (1 << 4);
-					if ((w7 != w5) && (Diff(y, RGBtoYUV[w7]))) pattern |= (1 << 5);
-					if ((w8 != w5) && (Diff(y, RGBtoYUV[w8]))) pattern |= (1 << 6);
-					if ((w9 != w5) && (Diff(y, RGBtoYUV[w9]))) pattern |= (1 << 7);
-				}
-			}
-			else if (type == 1)	// hq3xbold
-			{
-				const uint16 avg = (RGBtoBright[w1] + RGBtoBright[w2] + RGBtoBright[w3] + RGBtoBright[w4] + RGBtoBright[w5] + RGBtoBright[w6] + RGBtoBright[w7] + RGBtoBright[w8] + RGBtoBright[w9]) / 9;
-				const bool diff5 = RGBtoBright[w5] > avg;
-				if ((w1 != w5) && ((RGBtoBright[w1] > avg) != diff5)) pattern |= (1 << 0);
-				if ((w2 != w5) && ((RGBtoBright[w2] > avg) != diff5)) pattern |= (1 << 1);
-				if ((w3 != w5) && ((RGBtoBright[w3] > avg) != diff5)) pattern |= (1 << 2);
-				if ((w4 != w5) && ((RGBtoBright[w4] > avg) != diff5)) pattern |= (1 << 3);
-				if ((w6 != w5) && ((RGBtoBright[w6] > avg) != diff5)) pattern |= (1 << 4);
-				if ((w7 != w5) && ((RGBtoBright[w7] > avg) != diff5)) pattern |= (1 << 5);
-				if ((w8 != w5) && ((RGBtoBright[w8] > avg) != diff5)) pattern |= (1 << 6);
-				if ((w9 != w5) && ((RGBtoBright[w9] > avg) != diff5)) pattern |= (1 << 7);
-			}
+                if(nosame)
+                {
+                    const uint16 avg = (RGBtoBright[w1] + RGBtoBright[w2] + RGBtoBright[w3] + RGBtoBright[w4] + RGBtoBright[w5] + RGBtoBright[w6] + RGBtoBright[w7] + RGBtoBright[w8] + RGBtoBright[w9]) / 9;
+                    const bool diff5 = RGBtoBright[w5] > avg;
+                    if((RGBtoBright[w1] > avg) != diff5) pattern |= (1 << 0);
+                    if((RGBtoBright[w2] > avg) != diff5) pattern |= (1 << 1);
+                    if((RGBtoBright[w3] > avg) != diff5) pattern |= (1 << 2);
+                    if((RGBtoBright[w4] > avg) != diff5) pattern |= (1 << 3);
+                    if((RGBtoBright[w6] > avg) != diff5) pattern |= (1 << 4);
+                    if((RGBtoBright[w7] > avg) != diff5) pattern |= (1 << 5);
+                    if((RGBtoBright[w8] > avg) != diff5) pattern |= (1 << 6);
+                    if((RGBtoBright[w9] > avg) != diff5) pattern |= (1 << 7);
+                }
+                else
+                {
+                    y = RGBtoYUV[w5];
+                    if ((w1 != w5) && (Diff(y, RGBtoYUV[w1]))) pattern |= (1 << 0);
+                    if ((w2 != w5) && (Diff(y, RGBtoYUV[w2]))) pattern |= (1 << 1);
+                    if ((w3 != w5) && (Diff(y, RGBtoYUV[w3]))) pattern |= (1 << 2);
+                    if ((w4 != w5) && (Diff(y, RGBtoYUV[w4]))) pattern |= (1 << 3);
+                    if ((w6 != w5) && (Diff(y, RGBtoYUV[w6]))) pattern |= (1 << 4);
+                    if ((w7 != w5) && (Diff(y, RGBtoYUV[w7]))) pattern |= (1 << 5);
+                    if ((w8 != w5) && (Diff(y, RGBtoYUV[w8]))) pattern |= (1 << 6);
+                    if ((w9 != w5) && (Diff(y, RGBtoYUV[w9]))) pattern |= (1 << 7);
+                }
+            }
+            else if (type == 1)	// hq3xbold
+            {
+                const uint16 avg = (RGBtoBright[w1] + RGBtoBright[w2] + RGBtoBright[w3] + RGBtoBright[w4] + RGBtoBright[w5] + RGBtoBright[w6] + RGBtoBright[w7] + RGBtoBright[w8] + RGBtoBright[w9]) / 9;
+                const bool diff5 = RGBtoBright[w5] > avg;
+                if ((w1 != w5) && ((RGBtoBright[w1] > avg) != diff5)) pattern |= (1 << 0);
+                if ((w2 != w5) && ((RGBtoBright[w2] > avg) != diff5)) pattern |= (1 << 1);
+                if ((w3 != w5) && ((RGBtoBright[w3] > avg) != diff5)) pattern |= (1 << 2);
+                if ((w4 != w5) && ((RGBtoBright[w4] > avg) != diff5)) pattern |= (1 << 3);
+                if ((w6 != w5) && ((RGBtoBright[w6] > avg) != diff5)) pattern |= (1 << 4);
+                if ((w7 != w5) && ((RGBtoBright[w7] > avg) != diff5)) pattern |= (1 << 5);
+                if ((w8 != w5) && ((RGBtoBright[w8] > avg) != diff5)) pattern |= (1 << 6);
+                if ((w9 != w5) && ((RGBtoBright[w9] > avg) != diff5)) pattern |= (1 << 7);
+            }
 
-			switch (pattern)
-			{
-				HQ3XCASES
-			}
+            switch (pattern)
+            {
+                HQ3XCASES
+            }
 
-			w1 = w2; w4 = w5; w7 = w8;
-			w2 = w3; w5 = w6; w8 = w9;
+            w1 = w2;
+            w4 = w5;
+            w7 = w8;
+            w2 = w3;
+            w5 = w6;
+            w8 = w9;
 
-			dp += 3;
-		}
+            dp += 3;
+        }
 
-		dp += ((dst1line - width) * 3);
-		sp +=  (src1line - width);
-	}
+        dp += ((dst1line - width) * 3);
+        sp +=  (src1line - width);
+    }
 }

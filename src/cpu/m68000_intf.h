@@ -1,12 +1,12 @@
 // 68000 (Sixty Eight K) Interface - header file
 #include <stdint.h>
 #ifndef FASTCALL
- #undef __fastcall
- #define __fastcall
+#undef __fastcall
+#define __fastcall
 #endif
 
 #if defined BUILD_A68K
- #define EMU_A68K								// Use A68K Assembler 68000 emulator
+#define EMU_A68K								// Use A68K Assembler 68000 emulator
 #endif
 
 #define EMU_M68K								// Use Musashi 68000 emulator
@@ -14,7 +14,7 @@
 #define SEK_MAX	(4)								// Maximum number of CPUs supported
 
 #if defined EMU_M68K
- #include "m68k/m68k.h"
+#include "m68k/m68k.h"
 #endif
 
 // Number of bits used for each page in the fast memory map
@@ -28,40 +28,41 @@
 #define SEK_MAXHANDLER	(10)						// Max. number of handlers for memory access
 
 #if SEK_MAXHANDLER < 1
- #error At least one set of handlers for memory access must be used.
+#error At least one set of handlers for memory access must be used.
 #endif
 
 #ifdef EMU_A68K
- extern "C" void __cdecl M68000_RUN();
- extern "C" void __cdecl M68000_RESET();
+extern "C" void __cdecl M68000_RUN();
+extern "C" void __cdecl M68000_RESET();
 #endif
 
 #ifdef EMU_A68K
- // The format of the data in a68k.asm (at the _M68000_regs location)
- struct A68KContext {
-	UINT32 d[8], a[8];
-	UINT32 isp, srh, ccr, xc, pc, irq, sr;
-	INT32 (*IrqCallback) (INT32 nIrq);
-	UINT32 ppc;
-	INT32 (*ResetCallback)();
-	INT32 (*RTECallback)();
-	INT32 (*CmpCallback)(UINT32 val, INT32 reg);
-	UINT32 sfc, dfc, usp, vbr;
-	UINT32 nAsmBank, nCpuVersion;
- };
- extern "C" struct A68KContext M68000_regs;
- extern     struct A68KContext* SekRegs[SEK_MAX];
+// The format of the data in a68k.asm (at the _M68000_regs location)
+struct A68KContext
+{
+    UINT32 d[8], a[8];
+    UINT32 isp, srh, ccr, xc, pc, irq, sr;
+    INT32 (*IrqCallback) (INT32 nIrq);
+    UINT32 ppc;
+    INT32 (*ResetCallback)();
+    INT32 (*RTECallback)();
+    INT32 (*CmpCallback)(UINT32 val, INT32 reg);
+    UINT32 sfc, dfc, usp, vbr;
+    UINT32 nAsmBank, nCpuVersion;
+};
+extern "C" struct A68KContext M68000_regs;
+extern     struct A68KContext *SekRegs[SEK_MAX];
 
- extern "C" UINT8* OP_ROM;
- extern "C" UINT8* OP_RAM;
+extern "C" UINT8 *OP_ROM;
+extern "C" UINT8 *OP_RAM;
 
- void __fastcall AsekChangePc(UINT32 pc);
+void __fastcall AsekChangePc(UINT32 pc);
 #endif
 
 #ifdef EMU_M68K
- extern "C" INT32 nSekM68KContextSize[SEK_MAX];
- extern "C" INT8* SekM68KContext[SEK_MAX];
- extern "C" INT32 m68k_ICount;
+extern "C" INT32 nSekM68KContextSize[SEK_MAX];
+extern "C" INT8 *SekM68KContext[SEK_MAX];
+extern "C" INT32 m68k_ICount;
 #endif
 
 typedef UINT8 (__fastcall *pSekReadByteHandler)(UINT32 a);
@@ -82,22 +83,23 @@ extern INT32 nSekCycles[SEK_MAX], nSekCPUType[SEK_MAX];
 // Mapped memory pointers to Rom and Ram areas (Read then Write)
 // These memory areas must be allocated multiples of the page size
 // with a 4 byte over-run area lookup for each page (*3 for read, write and fetch)
-struct SekExt {
-	UINT8* MemMap[SEK_PAGE_COUNT * 3];
+struct SekExt
+{
+    UINT8 *MemMap[SEK_PAGE_COUNT * 3];
 
-	// If MemMap[i] < SEK_MAXHANDLER, use the handler functions
-	pSekReadByteHandler ReadByte[SEK_MAXHANDLER];
-	pSekWriteByteHandler WriteByte[SEK_MAXHANDLER];
-	pSekReadWordHandler ReadWord[SEK_MAXHANDLER];
-	pSekWriteWordHandler WriteWord[SEK_MAXHANDLER];
-	pSekReadLongHandler ReadLong[SEK_MAXHANDLER];
-	pSekWriteLongHandler WriteLong[SEK_MAXHANDLER];
+    // If MemMap[i] < SEK_MAXHANDLER, use the handler functions
+    pSekReadByteHandler ReadByte[SEK_MAXHANDLER];
+    pSekWriteByteHandler WriteByte[SEK_MAXHANDLER];
+    pSekReadWordHandler ReadWord[SEK_MAXHANDLER];
+    pSekWriteWordHandler WriteWord[SEK_MAXHANDLER];
+    pSekReadLongHandler ReadLong[SEK_MAXHANDLER];
+    pSekWriteLongHandler WriteLong[SEK_MAXHANDLER];
 
-	pSekResetCallback ResetCallback;
-	pSekRTECallback RTECallback;
-	pSekIrqCallback IrqCallback;
-	pSekCmpCallback CmpCallback;
-	pSekTASCallback TASCallback;
+    pSekResetCallback ResetCallback;
+    pSekRTECallback RTECallback;
+    pSekIrqCallback IrqCallback;
+    pSekCmpCallback CmpCallback;
+    pSekTASCallback TASCallback;
 };
 
 #define SEK_DEF_READ_WORD(i, a) { UINT16 d; d = (UINT16)(pSekExt->ReadByte[i](a) << 8); d |= (UINT16)(pSekExt->ReadByte[i]((a) + 1)); return d; }
@@ -150,28 +152,28 @@ INT32 SekRun(const INT32 nCycles);
 inline static INT32 SekIdle(INT32 nCycles)
 {
 #if defined FBA_DEBUG
-	extern UINT8 DebugCPU_SekInitted;
-	if (!DebugCPU_SekInitted) bprintf(PRINT_ERROR, (TCHAR*)_T("SekIdle called without init\n"));
-	if (nSekActive == -1) bprintf(PRINT_ERROR, (TCHAR*)_T("SekIdle called when no CPU open\n"));
+    extern UINT8 DebugCPU_SekInitted;
+    if (!DebugCPU_SekInitted) bprintf(PRINT_ERROR, (TCHAR *)_T("SekIdle called without init\n"));
+    if (nSekActive == -1) bprintf(PRINT_ERROR, (TCHAR *)_T("SekIdle called when no CPU open\n"));
 #endif
 
-	nSekCyclesTotal += nCycles;
+    nSekCyclesTotal += nCycles;
 
-	return nCycles;
+    return nCycles;
 }
 
 inline static INT32 SekSegmentCycles()
 {
 #if defined FBA_DEBUG
-	extern UINT8 DebugCPU_SekInitted;
-	if (!DebugCPU_SekInitted) bprintf(PRINT_ERROR, (TCHAR*)_T("SekSegmentCycles called without init\n"));
-	if (nSekActive == -1) bprintf(PRINT_ERROR, (TCHAR*)_T("SekSegmentCycles called when no CPU open\n"));
+    extern UINT8 DebugCPU_SekInitted;
+    if (!DebugCPU_SekInitted) bprintf(PRINT_ERROR, (TCHAR *)_T("SekSegmentCycles called without init\n"));
+    if (nSekActive == -1) bprintf(PRINT_ERROR, (TCHAR *)_T("SekSegmentCycles called when no CPU open\n"));
 #endif
 
 #ifdef EMU_M68K
-	return nSekCyclesDone + nSekCyclesToDo - m68k_ICount;
+    return nSekCyclesDone + nSekCyclesToDo - m68k_ICount;
 #else
-	return nSekCyclesDone + nSekCyclesToDo;
+    return nSekCyclesDone + nSekCyclesToDo;
 #endif
 }
 
@@ -182,32 +184,32 @@ inline static INT32 SekTotalCycles()
 #endif
 {
 #if defined FBA_DEBUG
-	extern UINT8 DebugCPU_SekInitted;
-	if (!DebugCPU_SekInitted) bprintf(PRINT_ERROR, (TCHAR*)_T("SekTotalCycles called without init\n"));
-	if (nSekActive == -1) bprintf(PRINT_ERROR, (TCHAR*)_T("SekTotalCycles called when no CPU open\n"));
+    extern UINT8 DebugCPU_SekInitted;
+    if (!DebugCPU_SekInitted) bprintf(PRINT_ERROR, (TCHAR *)_T("SekTotalCycles called without init\n"));
+    if (nSekActive == -1) bprintf(PRINT_ERROR, (TCHAR *)_T("SekTotalCycles called when no CPU open\n"));
 #endif
 
 #ifdef EMU_M68K
-	return nSekCyclesTotal + nSekCyclesToDo - m68k_ICount;
+    return nSekCyclesTotal + nSekCyclesToDo - m68k_ICount;
 #else
-	return nSekCyclesTotal + nSekCyclesToDo;
+    return nSekCyclesTotal + nSekCyclesToDo;
 #endif
 }
 
 inline static INT32 SekCurrentScanline()
 {
 #if defined FBA_DEBUG
-	extern UINT8 DebugCPU_SekInitted;
-	if (!DebugCPU_SekInitted) bprintf(PRINT_ERROR, (TCHAR*)_T("SekCurrentScanline called without init\n"));
-	if (nSekActive == -1) bprintf(PRINT_ERROR, (TCHAR*)_T("SekCurrentScanline called when no CPU open\n"));
+    extern UINT8 DebugCPU_SekInitted;
+    if (!DebugCPU_SekInitted) bprintf(PRINT_ERROR, (TCHAR *)_T("SekCurrentScanline called without init\n"));
+    if (nSekActive == -1) bprintf(PRINT_ERROR, (TCHAR *)_T("SekCurrentScanline called when no CPU open\n"));
 #endif
 
-	return SekTotalCycles() / nSekCyclesScanline;
+    return SekTotalCycles() / nSekCyclesScanline;
 }
 
 
 // Map areas of memory
-INT32 SekMapMemory(UINT8* pMemory, UINT32 nStart, UINT32 nEnd, INT32 nType);
+INT32 SekMapMemory(UINT8 *pMemory, UINT32 nStart, UINT32 nEnd, INT32 nType);
 INT32 SekMapHandler(uintptr_t nHandler, UINT32 nStart, UINT32 nEnd, INT32 nType);
 
 // Set handlers

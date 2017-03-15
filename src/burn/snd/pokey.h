@@ -78,9 +78,10 @@ extern "C" {
  *	New function pointers for serial input/output and a interrupt callback.
  *****************************************************************************/
 
-struct POKEYinterface {
-	int num;    /* total number of pokeys in the machine */
-	int addtostream; /* 0 = clear stream 1 = mix previous stream w/ pokey_update */
+struct POKEYinterface
+{
+    int num;    /* total number of pokeys in the machine */
+    int addtostream; /* 0 = clear stream 1 = mix previous stream w/ pokey_update */
     int baseclock;
     int mixing_level[MAXPOKEYS];
     int (*pot0_r[MAXPOKEYS])(int offset);
@@ -109,11 +110,11 @@ int pokey3_r (int offset);
 int pokey4_r (int offset);
 int quad_pokey_r (int offset);
 
-void pokey1_w (int offset,int data);
-void pokey2_w (int offset,int data);
-void pokey3_w (int offset,int data);
-void pokey4_w (int offset,int data);
-void quad_pokey_w (int offset,int data);
+void pokey1_w (int offset, int data);
+void pokey2_w (int offset, int data);
+void pokey3_w (int offset, int data);
+void pokey4_w (int offset, int data);
+void quad_pokey_w (int offset, int data);
 
 void pokey1_serin_ready (int after);
 void pokey2_serin_ready (int after);

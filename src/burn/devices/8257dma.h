@@ -9,5 +9,5 @@ void i8257_drq_write(INT32 channel, INT32 state);
 void i8257_do_transfer(INT32 state);		// call after last drq_write
 void i8257Init();
 void i8257Exit();
-void i8257Config(UINT8 (*cpuread)(UINT16), void (*cpuwrite)(UINT16,UINT8), INT32 (*idle)(INT32), ior_in_functs *read_f, ior_out_functs *write_f);
+void i8257Config(UINT8 (*cpuread)(UINT16), void (*cpuwrite)(UINT16, UINT8), INT32 (*idle)(INT32), ior_in_functs *read_f, ior_out_functs *write_f);
 void i8257Scan();

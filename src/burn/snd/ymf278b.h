@@ -5,7 +5,7 @@
 
 #define YMF278B_STD_CLOCK (33868800)						/* standard clock for OPL4 */
 
-void ymf278b_scan(INT32 nAction, INT32* pnMin);
+void ymf278b_scan(INT32 nAction, INT32 *pnMin);
 void ymf278b_pcm_update(int num, INT16 **outputs, int samples);
 int ymf278b_timer_over(int num, int timer);
 int ymf278b_start(int num, UINT8 *rom, void (*irq_cb)(INT32, INT32), void (*timer_cb)(INT32, INT32, double), int clock, int rate);

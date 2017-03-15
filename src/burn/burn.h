@@ -4,15 +4,15 @@
 // Burner emulation library
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #if !defined (_WIN32)
- #define __cdecl
+#define __cdecl
 #endif
 
 #ifndef MAX_PATH
- #define MAX_PATH 	260
+#define MAX_PATH 	260
 #endif
 
 #include <time.h>
@@ -26,38 +26,38 @@ extern TCHAR szAppBlendPath[MAX_PATH];
 
 // Give access to the CPUID function for various compilers
 #if defined (__GNUC__)
- #define CPUID(f,ra,rb,rc,rd) __asm__ __volatile__ ("cpuid"											\
+#define CPUID(f,ra,rb,rc,rd) __asm__ __volatile__ ("cpuid"											\
  													: "=a" (ra), "=b" (rb), "=c" (rc), "=d" (rd)	\
  													: "a"  (f)										\
  												   );
 #elif defined (_MSC_VER)
- #define CPUID(f,ra,rb,rc,rd) __asm { __asm mov		eax, f		\
+#define CPUID(f,ra,rb,rc,rd) __asm { __asm mov		eax, f		\
 									  __asm cpuid				\
 									  __asm mov		ra, eax		\
 									  __asm mov		rb, ebx		\
 									  __asm mov		rc, ecx		\
 									  __asm mov		rd, edx }
 #else
- #define CPUID(f,ra,rb,rc,rd)
+#define CPUID(f,ra,rb,rc,rd)
 #endif
 
 #ifndef BUILD_X86_ASM
- #undef CPUID
- #define CPUID(f,ra,rb,rc,rd)
+#undef CPUID
+#define CPUID(f,ra,rb,rc,rd)
 #endif
 
 #ifdef _UNICODE
- #define SEPERATOR_1 " \u2022 "
- #define SEPERATOR_2 " \u25E6 "
+#define SEPERATOR_1 " \u2022 "
+#define SEPERATOR_2 " \u25E6 "
 #else
- #define SEPERATOR_1 " ~ "
- #define SEPERATOR_2 " ~ "
+#define SEPERATOR_1 " ~ "
+#define SEPERATOR_2 " ~ "
 #endif
 
 #ifdef _UNICODE
- #define WRITE_UNICODE_BOM(file) { UINT16 BOM[] = { 0xFEFF }; fwrite(BOM, 2, 1, file); }
+#define WRITE_UNICODE_BOM(file) { UINT16 BOM[] = { 0xFEFF }; fwrite(BOM, 2, 1, file); }
 #else
- #define WRITE_UNICODE_BOM(file)
+#define WRITE_UNICODE_BOM(file)
 #endif
 
 typedef unsigned char						UINT8;
@@ -87,11 +87,11 @@ enum BurnCartrigeCommand { CART_INIT_START, CART_INIT_END, CART_EXIT };
 // Callbacks
 
 // Application-defined rom loading function
-extern INT32 (__cdecl *BurnExtLoadRom)(UINT8* Dest, INT32* pnWrote, INT32 i);
+extern INT32 (__cdecl *BurnExtLoadRom)(UINT8 *Dest, INT32 *pnWrote, INT32 i);
 
 // Application-defined progress indicator functions
 extern INT32 (__cdecl *BurnExtProgressRangeCallback)(double dProgressRange);
-extern INT32 (__cdecl *BurnExtProgressUpdateCallback)(double dProgress, const TCHAR* pszText, bool bAbs);
+extern INT32 (__cdecl *BurnExtProgressUpdateCallback)(double dProgress, const TCHAR *pszText, bool bAbs);
 
 // Application-defined catridge initialisation function
 extern INT32 (__cdecl *BurnExtCartridgeSetupCallback)(BurnCartrigeCommand nCommand);
@@ -103,12 +103,14 @@ extern UINT32 (__cdecl *BurnHighCol) (INT32 r, INT32 g, INT32 b, INT32 i);
 
 extern UINT32 nCurrentFrame;
 
-inline static INT32 GetCurrentFrame() {
-	return nCurrentFrame;
+inline static INT32 GetCurrentFrame()
+{
+    return nCurrentFrame;
 }
 
-inline static void SetCurrentFrame(const UINT32 n) {
-	nCurrentFrame = n;
+inline static void SetCurrentFrame(const UINT32 n)
+{
+    nCurrentFrame = n;
 }
 
 // ---------------------------------------------------------------------------
@@ -126,16 +128,18 @@ inline static void SetCurrentFrame(const UINT32 n) {
 #define BRF_OPT				(1 << 27)
 #define BRF_NODUMP			(1 << 28)
 
-struct BurnRomInfo {
-	char szName[100];
-	UINT32 nLen;
-	UINT32 nCrc;
-	UINT32 nType;
+struct BurnRomInfo
+{
+    char szName[100];
+    UINT32 nLen;
+    UINT32 nCrc;
+    UINT32 nType;
 };
 
-struct BurnSampleInfo {
-	char szName[100];
-	UINT32 nFlags;
+struct BurnSampleInfo
+{
+    char szName[100];
+    UINT32 nFlags;
 };
 
 // Inputs
@@ -150,29 +154,32 @@ struct BurnSampleInfo {
 #define BIT_CONSTANT		(8)
 #define BIT_DIPSWITCH		(9)
 
-struct BurnInputInfo {
-	char* szName;
-	UINT8 nType;
-	union {
-		UINT8* pVal;					// Most inputs use a char*
-		UINT16* pShortVal;				// All analog inputs use a short*
-	};
-	char* szInfo;
+struct BurnInputInfo
+{
+    char *szName;
+    UINT8 nType;
+    union
+    {
+        UINT8 *pVal;					// Most inputs use a char*
+        UINT16 *pShortVal;				// All analog inputs use a short*
+    };
+    char *szInfo;
 };
 
 // DIPs
 
-struct BurnDIPInfo {
-	INT32 nInput;
-	UINT8 nFlags;
-	UINT8 nMask;
-	UINT8 nSetting;
-	char* szText;
+struct BurnDIPInfo
+{
+    INT32 nInput;
+    UINT8 nFlags;
+    UINT8 nMask;
+    UINT8 nSetting;
+    char *szText;
 };
 
 
 // ---------------------------------------------------------------------------
-// Common CPU definitions 
+// Common CPU definitions
 
 #define CPU_IRQSTATUS_NONE	0
 #define CPU_IRQSTATUS_ACK	1
@@ -231,7 +238,7 @@ extern UINT8 nSpriteEnable;			// Can be used externally to select which Sprites 
 
 extern INT32 nBurnSoundRate;					// Samplerate of sound
 extern INT32 nBurnSoundLen;					// Length in samples per frame
-extern INT16* pBurnSoundOut;				// Pointer to output buffer
+extern INT16 *pBurnSoundOut;				// Pointer to output buffer
 
 extern INT32 nInterpolation;					// Desired interpolation level for ADPCM/PCM sound
 extern INT32 nFMInterpolation;				// Desired interpolation level for FM sound
@@ -244,7 +251,7 @@ extern UINT32 *pBurnDrvPalette;
 #define PRINT_ERROR		(3)
 
 #ifndef bprintf
-extern INT32 (__cdecl *bprintf) (INT32 nStatus, TCHAR* szFormat, ...);
+extern INT32 (__cdecl *bprintf) (INT32 nStatus, TCHAR *szFormat, ...);
 #endif
 
 INT32 BurnLibInit();
@@ -261,7 +268,7 @@ INT32 BurnRecalcPal();
 INT32 BurnDrvGetPaletteEntries();
 
 INT32 BurnSetProgressRange(double dProgressRange);
-INT32 BurnUpdateProgress(double dProgressStep, const TCHAR* pszText, bool bAbs);
+INT32 BurnUpdateProgress(double dProgressStep, const TCHAR *pszText, bool bAbs);
 
 void BurnLocalisationSetName(char *szName, TCHAR *szLongName);
 
@@ -283,18 +290,18 @@ void BurnLocalisationSetName(char *szName, TCHAR *szLongName);
 #define DRV_ASCIIONLY	 (1 << 12)
 #define DRV_UNICODEONLY	 (1 << 13)
 
-TCHAR* BurnDrvGetText(UINT32 i);
-char* BurnDrvGetTextA(UINT32 i);
+TCHAR *BurnDrvGetText(UINT32 i);
+char *BurnDrvGetTextA(UINT32 i);
 
-INT32 BurnDrvGetZipName(char** pszName, UINT32 i);
+INT32 BurnDrvGetZipName(char **pszName, UINT32 i);
 INT32 BurnDrvGetRomInfo(struct BurnRomInfo *pri, UINT32 i);
-INT32 BurnDrvGetRomName(char** pszName, UINT32 i, INT32 nAka);
-INT32 BurnDrvGetInputInfo(struct BurnInputInfo* pii, UINT32 i);
-INT32 BurnDrvGetDIPInfo(struct BurnDIPInfo* pdi, UINT32 i);
-INT32 BurnDrvGetVisibleSize(INT32* pnWidth, INT32* pnHeight);
-INT32 BurnDrvGetVisibleOffs(INT32* pnLeft, INT32* pnTop);
-INT32 BurnDrvGetFullSize(INT32* pnWidth, INT32* pnHeight);
-INT32 BurnDrvGetAspect(INT32* pnXAspect, INT32* pnYAspect);
+INT32 BurnDrvGetRomName(char **pszName, UINT32 i, INT32 nAka);
+INT32 BurnDrvGetInputInfo(struct BurnInputInfo *pii, UINT32 i);
+INT32 BurnDrvGetDIPInfo(struct BurnDIPInfo *pdi, UINT32 i);
+INT32 BurnDrvGetVisibleSize(INT32 *pnWidth, INT32 *pnHeight);
+INT32 BurnDrvGetVisibleOffs(INT32 *pnLeft, INT32 *pnTop);
+INT32 BurnDrvGetFullSize(INT32 *pnWidth, INT32 *pnHeight);
+INT32 BurnDrvGetAspect(INT32 *pnXAspect, INT32 *pnYAspect);
 INT32 BurnDrvGetHardwareCode();
 INT32 BurnDrvGetFlags();
 bool BurnDrvIsWorking();
@@ -304,12 +311,12 @@ INT32 BurnDrvSetAspect(INT32 pnXAspect, INT32 pnYAspect);
 INT32 BurnDrvGetGenreFlags();
 INT32 BurnDrvGetFamilyFlags();
 INT32 BurnDrvGetSampleInfo(struct BurnSampleInfo *pri, UINT32 i);
-INT32 BurnDrvGetSampleName(char** pszName, UINT32 i, INT32 nAka);
+INT32 BurnDrvGetSampleName(char **pszName, UINT32 i, INT32 nAka);
 
 void Reinitialise();
 
 extern bool bDoIpsPatch;
-void IpsApplyPatches(UINT8* base, char* rom_name);
+void IpsApplyPatches(UINT8 *base, char *rom_name);
 
 // ---------------------------------------------------------------------------
 // Flags used with the Burndriver structure
@@ -590,6 +597,6 @@ void IpsApplyPatches(UINT8* base, char* rom_name);
 #define FBF_PWRINST										(1 << 8)
 
 #ifdef __cplusplus
- } // End of extern "C"
+} // End of extern "C"
 #endif
 

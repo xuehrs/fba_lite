@@ -4,30 +4,33 @@
 
 extern bool bCheatsAllowed;
 
-struct CheatAddressInfo {
-	INT32 nCPU;
-	INT32 nAddress;
-	UINT32 nValue;
-	UINT32 nOriginalValue;
+struct CheatAddressInfo
+{
+    INT32 nCPU;
+    INT32 nAddress;
+    UINT32 nValue;
+    UINT32 nOriginalValue;
 };
 
-struct CheatOption {
-	TCHAR szOptionName[CHEAT_MAX_NAME];
-	struct CheatAddressInfo AddressInfo[CHEAT_MAX_ADDRESS + 1];
+struct CheatOption
+{
+    TCHAR szOptionName[CHEAT_MAX_NAME];
+    struct CheatAddressInfo AddressInfo[CHEAT_MAX_ADDRESS + 1];
 };
 
-struct CheatInfo {
-	struct CheatInfo* pNext;
-	struct CheatInfo* pPrevious;
-	INT32 nType;									// Cheat type
-	INT32 nStatus;								// 0 = Inactive
-	INT32 nCurrent;								// Currently selected option
-	INT32 nDefault;								// Default option
-	TCHAR szCheatName[CHEAT_MAX_NAME];
-	struct CheatOption* pOption[CHEAT_MAX_OPTIONS];
+struct CheatInfo
+{
+    struct CheatInfo *pNext;
+    struct CheatInfo *pPrevious;
+    INT32 nType;									// Cheat type
+    INT32 nStatus;								// 0 = Inactive
+    INT32 nCurrent;								// Currently selected option
+    INT32 nDefault;								// Default option
+    TCHAR szCheatName[CHEAT_MAX_NAME];
+    struct CheatOption *pOption[CHEAT_MAX_OPTIONS];
 };
 
-extern CheatInfo* pCheatInfo;
+extern CheatInfo *pCheatInfo;
 
 INT32 CheatUpdate();
 INT32 CheatEnable(INT32 nCheat, INT32 nOption);

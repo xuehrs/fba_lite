@@ -25,11 +25,18 @@
  *
  *****************************************************************************
  * op    temp     cycles             rdmem   opc  wrmem   ********************/
-OP(00) { DECO16_BRK; } /* 7 BRK */
+OP(00)
+{
+    DECO16_BRK;    /* 7 BRK */
+}
 #define deco16_20 m6502_20								/* 6 JSR ABS */
 #define deco16_40 m6502_40								/* 6 RTI */
 #define deco16_60 m6502_60								/* 6 RTS */
-OP(80) { RD_DUM; ILL; }									/* 2 ILL */
+OP(80)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
 #define deco16_a0 m6502_a0								/* 2 LDY IMM */
 #define deco16_c0 m6502_c0								/* 2 CPY IMM */
 #define deco16_e0 m6502_e0								/* 2 CPX IMM */
@@ -61,90 +68,241 @@ OP(80) { RD_DUM; ILL; }									/* 2 ILL */
 #define deco16_d1 m6502_d1								/* 5 CMP IDY; */
 #define deco16_f1 m6502_f1								/* 5 SBC IDY; */
 
-OP(02) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(22) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(42) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(62) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(82) { RD_DUM; ILL; } 								/* 2 ILL */
+OP(02)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(22)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(42)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(62)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(82)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
 #define deco16_a2 m6502_a2								/* 2 LDX IMM */
-OP(c2) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(e2) { RD_DUM; ILL; } 								/* 2 ILL */
-
-OP(12) { RD_DUM; ILL; }									/* 2 ILL / 3 ora zpi ?? */
-OP(32) { RD_DUM; ILL; }									/* 2 ILL / 3 and zpi ?? */
-OP(52) { RD_DUM; ILL; }									/* 2 ILL / 3 eor zpi ?? */
-OP(72) { RD_DUM; ILL; }									/* 2 ILL / 3 adc zpi ?? */
-OP(92) { RD_DUM; ILL; }									/* 2 ILL / 3 sta zpi ?? */
-OP(b2) { RD_DUM; ILL; }									/* 2 ILL / 3 lda zpi ?? */
-OP(d2) { RD_DUM; ILL; }									/* 2 ILL / 3 cmp zpi ?? */
-OP(f2) { RD_DUM; ILL; }									/* 2 ILL / 3 sbc zpi ?? */
-
-OP(03) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(23) {
-	int tmp;
-
-	m6502_ICount -= 1;
-	RD_IMM;
-
-	//if (DECO16_VERBOSE)
-	//	logerror("%04x: OP23 %02x\n",PCW,tmp);
+OP(c2)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
 }
-OP(43) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(63) {
-	int tmp;
-
-	m6502_ICount -= 1;
-	RD_IMM;
-
-	//if (DECO16_VERBOSE)
-	//	logerror("%04x: OP63 %02x\n",PCW,tmp);
+OP(e2)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
 }
-OP(83) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(a3) {
-	int tmp;
 
-	m6502_ICount -= 1;
-	RD_IMM;
-
-	//if (DECO16_VERBOSE)
-	//	logerror("%04x: OPA3 %02x\n",PCW,tmp);
+OP(12)
+{
+    RD_DUM;    /* 2 ILL / 3 ora zpi ?? */
+    ILL;
 }
-OP(c3) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(e3) { RD_DUM; ILL; } 								/* 2 ILL */
+OP(32)
+{
+    RD_DUM;    /* 2 ILL / 3 and zpi ?? */
+    ILL;
+}
+OP(52)
+{
+    RD_DUM;    /* 2 ILL / 3 eor zpi ?? */
+    ILL;
+}
+OP(72)
+{
+    RD_DUM;    /* 2 ILL / 3 adc zpi ?? */
+    ILL;
+}
+OP(92)
+{
+    RD_DUM;    /* 2 ILL / 3 sta zpi ?? */
+    ILL;
+}
+OP(b2)
+{
+    RD_DUM;    /* 2 ILL / 3 lda zpi ?? */
+    ILL;
+}
+OP(d2)
+{
+    RD_DUM;    /* 2 ILL / 3 cmp zpi ?? */
+    ILL;
+}
+OP(f2)
+{
+    RD_DUM;    /* 2 ILL / 3 sbc zpi ?? */
+    ILL;
+}
 
-OP(13) { int tmp; m6502_ICount -= 1; RD_IMM;
+OP(03)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(23)
+{
+    int tmp;
 
-	//if (DECO16_VERBOSE)
-	//	logerror("%04x: OP13 %02x\n",PCW,tmp);
+    m6502_ICount -= 1;
+    RD_IMM;
 
-//bank select control?
+    //if (DECO16_VERBOSE)
+    //	logerror("%04x: OP23 %02x\n",PCW,tmp);
+}
+OP(43)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(63)
+{
+    int tmp;
 
-				} /*  */
-OP(33) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(53) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(73) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(93) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(b3) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(d3) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(f3) { RD_DUM; ILL; } 								/* 2 ILL */
+    m6502_ICount -= 1;
+    RD_IMM;
 
-OP(04) { RD_DUM; ILL; }									/* 2 ILL / 3 tsb zpg ?? */
+    //if (DECO16_VERBOSE)
+    //	logerror("%04x: OP63 %02x\n",PCW,tmp);
+}
+OP(83)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(a3)
+{
+    int tmp;
+
+    m6502_ICount -= 1;
+    RD_IMM;
+
+    //if (DECO16_VERBOSE)
+    //	logerror("%04x: OPA3 %02x\n",PCW,tmp);
+}
+OP(c3)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(e3)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+
+OP(13)
+{
+    int tmp;
+    m6502_ICount -= 1;
+    RD_IMM;
+
+    //if (DECO16_VERBOSE)
+    //	logerror("%04x: OP13 %02x\n",PCW,tmp);
+
+    //bank select control?
+
+} /*  */
+OP(33)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(53)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(73)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(93)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(b3)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(d3)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(f3)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+
+OP(04)
+{
+    RD_DUM;    /* 2 ILL / 3 tsb zpg ?? */
+    ILL;
+}
 #define deco16_24 m6502_24								/* 3 BIT ZPG */
-OP(44) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(64) { RD_DUM; ILL; }									/* 2 ILL / 3 stz zpg ?? */
+OP(44)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(64)
+{
+    RD_DUM;    /* 2 ILL / 3 stz zpg ?? */
+    ILL;
+}
 #define deco16_84 m6502_84								/* 3 STY ZPG */
 #define deco16_a4 m6502_a4								/* 3 LDY ZPG */
 #define deco16_c4 m6502_c4								/* 3 CPY ZPG */
 #define deco16_e4 m6502_e4								/* 3 CPX ZPG */
 
-OP(14) { RD_DUM; ILL; }									/* 2 ILL / 3 trb zpg ?? */
-OP(34) { RD_DUM; ILL; }									/* 2 ILL / 4 bit zpx ?? */
-OP(54) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(74) { RD_DUM; ILL; }									/* 2 ILL / 4 stz zpx ?? */
+OP(14)
+{
+    RD_DUM;    /* 2 ILL / 3 trb zpg ?? */
+    ILL;
+}
+OP(34)
+{
+    RD_DUM;    /* 2 ILL / 4 bit zpx ?? */
+    ILL;
+}
+OP(54)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(74)
+{
+    RD_DUM;    /* 2 ILL / 4 stz zpx ?? */
+    ILL;
+}
 #define deco16_94 m6502_94								/* 4 sty zpx */
 #define deco16_b4 m6502_b4								/* 4 ldy zpx */
-OP(d4) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(f4) { RD_DUM; ILL; }									/* 2 ILL */
+OP(d4)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(f4)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
 
 #define deco16_05 m6502_05								/* 3 ORA ZPG */
 #define deco16_25 m6502_25								/* 3 AND ZPG */
@@ -182,34 +340,95 @@ OP(f4) { RD_DUM; ILL; }									/* 2 ILL */
 #define deco16_d6 m6502_d6								/* 6 DEC ZPX */
 #define deco16_f6 m6502_f6								/* 6 INC ZPX */
 
-OP(07) { RD_DUM; ILL; }									/* 2 ILL / 5 RMB0 ZPG ?? */
-OP(27) { RD_DUM; ILL; }									/* 2 ILL / 5 RMB2 ZPG ?? */
-OP(47) { RD_DUM; ILL; }									/* 2 ILL / 5 RMB4 ZPG ?? */
-OP(67) {
-	RD_IMM_DISCARD;
-	m6502.a=M6502ReadPort(0);
+OP(07)
+{
+    RD_DUM;    /* 2 ILL / 5 RMB0 ZPG ?? */
+    ILL;
+}
+OP(27)
+{
+    RD_DUM;    /* 2 ILL / 5 RMB2 ZPG ?? */
+    ILL;
+}
+OP(47)
+{
+    RD_DUM;    /* 2 ILL / 5 RMB4 ZPG ?? */
+    ILL;
+}
+OP(67)
+{
+    RD_IMM_DISCARD;
+    m6502.a = M6502ReadPort(0);
 
-//  logerror("%04x: VBL (0x67)\n",PCW);
+    //  logerror("%04x: VBL (0x67)\n",PCW);
 
-// really - wait for status?
+    // really - wait for status?
 
 } /*  */
-OP(87) { int tmp; m6502_ICount -= 1; RD_IMM;
-	//logerror("%04x: OP87 %02x\n",PCW,tmp);
+OP(87)
+{
+    int tmp;
+    m6502_ICount -= 1;
+    RD_IMM;
+    //logerror("%04x: OP87 %02x\n",PCW,tmp);
 
 } /*  */
-OP(a7) { RD_DUM; ILL; }									/* 2 ILL / 5 SMB2 ZPG ?? */
-OP(c7) { RD_DUM; ILL; }									/* 2 ILL / 5 SMB4 ZPG ?? */
-OP(e7) { RD_DUM; ILL; }									/* 2 ILL / 5 SMB6 ZPG ?? */
+OP(a7)
+{
+    RD_DUM;    /* 2 ILL / 5 SMB2 ZPG ?? */
+    ILL;
+}
+OP(c7)
+{
+    RD_DUM;    /* 2 ILL / 5 SMB4 ZPG ?? */
+    ILL;
+}
+OP(e7)
+{
+    RD_DUM;    /* 2 ILL / 5 SMB6 ZPG ?? */
+    ILL;
+}
 
-OP(17) { RD_DUM; ILL; }									/* 2 ILL / 5 RMB1 ZPG ?? */
-OP(37) { RD_DUM; ILL; }									/* 2 ILL / 5 RMB3 ZPG ?? */
-OP(57) { RD_DUM; ILL; }									/* 2 ILL / 5 RMB5 ZPG ?? */
-OP(77) { RD_DUM; ILL; }									/* 2 ILL / 5 RMB7 ZPG ?? */
-OP(97) { RD_DUM; ILL; }									/* 2 ILL / 5 SMB1 ZPG ?? */
-OP(b7) { RD_DUM; ILL; }									/* 2 ILL / 5 SMB3 ZPG ?? */
-OP(d7) { RD_DUM; ILL; }									/* 2 ILL / 5 SMB5 ZPG ?? */
-OP(f7) { RD_DUM; ILL; }									/* 2 ILL / 5 SMB7 ZPG ?? */
+OP(17)
+{
+    RD_DUM;    /* 2 ILL / 5 RMB1 ZPG ?? */
+    ILL;
+}
+OP(37)
+{
+    RD_DUM;    /* 2 ILL / 5 RMB3 ZPG ?? */
+    ILL;
+}
+OP(57)
+{
+    RD_DUM;    /* 2 ILL / 5 RMB5 ZPG ?? */
+    ILL;
+}
+OP(77)
+{
+    RD_DUM;    /* 2 ILL / 5 RMB7 ZPG ?? */
+    ILL;
+}
+OP(97)
+{
+    RD_DUM;    /* 2 ILL / 5 SMB1 ZPG ?? */
+    ILL;
+}
+OP(b7)
+{
+    RD_DUM;    /* 2 ILL / 5 SMB3 ZPG ?? */
+    ILL;
+}
+OP(d7)
+{
+    RD_DUM;    /* 2 ILL / 5 SMB5 ZPG ?? */
+    ILL;
+}
+OP(f7)
+{
+    RD_DUM;    /* 2 ILL / 5 SMB7 ZPG ?? */
+    ILL;
+}
 
 #define deco16_08 m6502_08								/* 3 PHP */
 #define deco16_28 m6502_28								/* 4 PLP */
@@ -265,44 +484,104 @@ OP(f7) { RD_DUM; ILL; }									/* 2 ILL / 5 SMB7 ZPG ?? */
 #define deco16_da m65c02_da								/* 3 PHX */
 #define deco16_fa m65c02_fa								/* 4 PLX */
 
-OP(0b) { int tmp; m6502_ICount -= 1; RD_IMM;
-//	logerror("%04x: OP0B %02x\n",PCW,tmp);
+OP(0b)
+{
+    int tmp;
+    m6502_ICount -= 1;
+    RD_IMM;
+    //	logerror("%04x: OP0B %02x\n",PCW,tmp);
 
-				}
-OP(2b) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(4b) { m6502_ICount -= 1; RD_IMM_DISCARD;
-	//logerror("%04x: OP4B %02x\n",PCW,tmp);
-	/* TODO: Maybe it's just read I/O 0 and do a logic AND with bit 1? */
-	m6502.a=M6502ReadPort(1);
-
-//tilt??
-
-//VBL on expr-raider
-//VBL on boomrang (bit 2)
-
-				}
-OP(6b) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(8b) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(ab) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(cb) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(eb) { RD_DUM; ILL; } 								/* 2 ILL */
-
-OP(1b) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(3b) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(5b) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(7b) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(9b) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(bb) {
-	int tmp;
-
-	m6502_ICount -= 1;
-	RD_IMM;
-
-	//if (DECO16_VERBOSE)
-	//	logerror("%04x: OPBB %02x\n",PCW,tmp);
 }
-OP(db) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(fb) { RD_DUM; ILL; } 								/* 2 ILL */
+OP(2b)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(4b)
+{
+    m6502_ICount -= 1;
+    RD_IMM_DISCARD;
+    //logerror("%04x: OP4B %02x\n",PCW,tmp);
+    /* TODO: Maybe it's just read I/O 0 and do a logic AND with bit 1? */
+    m6502.a = M6502ReadPort(1);
+
+    //tilt??
+
+    //VBL on expr-raider
+    //VBL on boomrang (bit 2)
+
+}
+OP(6b)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(8b)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(ab)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(cb)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(eb)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+
+OP(1b)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(3b)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(5b)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(7b)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(9b)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(bb)
+{
+    int tmp;
+
+    m6502_ICount -= 1;
+    RD_IMM;
+
+    //if (DECO16_VERBOSE)
+    //	logerror("%04x: OPBB %02x\n",PCW,tmp);
+}
+OP(db)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(fb)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
 
 #define deco16_0c m65c02_0c								/* 4 TSB ABS */
 #define deco16_2c m6502_2c								/* 4 BIT ABS */
@@ -315,12 +594,24 @@ OP(fb) { RD_DUM; ILL; } 								/* 2 ILL */
 
 #define deco16_1c m65c02_1c								/* 4 TRB ABS */
 #define deco16_3c m65c02_3c								/* 4 BIT ABX */
-OP(5c) { RD_DUM; ILL; } 								/* 2 ILL */
+OP(5c)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
 #define deco16_7c m65c02_7c								/* 6 JMP IAX */
 #define deco16_9c m65c02_9c								/* 4 STZ ABS */
 #define deco16_bc m65c02_bc								/* 4 LDY ABX */
-OP(dc) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(fc) { RD_DUM; ILL; } 								/* 2 ILL */
+OP(dc)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
+OP(fc)
+{
+    RD_DUM;    /* 2 ILL */
+    ILL;
+}
 
 #define deco16_0d m6502_0d								/* 4 ORA ABS */
 #define deco16_2d m6502_2d								/* 4 AND ABS */
@@ -358,70 +649,132 @@ OP(fc) { RD_DUM; ILL; } 								/* 2 ILL */
 #define deco16_de m6502_de								/* 7 DEC ABX */
 #define deco16_fe m6502_fe								/* 7 INC ABX */
 
-OP(0f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR0 ZPG ?? */
-OP(2f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR2 ZPG ?? */
-OP(4f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR4 ZPG ?? */
-OP(6f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR6 ZPG ?? */
-OP(8f) { int tmp; m6502_ICount -= 1; RD_IMM;
-	//if (DECO16_VERBOSE)
-	//	logerror("%04x: BANK (8F) %02x\n",PCW,tmp);
-
-	M6502WritePort(0,tmp);
-
-	//swap bank in/out
-} /*  */
-OP(af) { RD_DUM; ILL; }									/* 2 ILL / 5 BBS2 ZPG ?? */
-OP(cf) { RD_DUM; ILL; }									/* 2 ILL / 5 BBS4 ZPG ?? */
-OP(ef) { RD_DUM; ILL; }									/* 2 ILL / 5 BBS6 ZPG ?? */
-
-OP(1f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR1 ZPG ?? */
-OP(3f) {
-	int tmp;
-
-	m6502_ICount -= 1;
-	RD_IMM;
-
-	//if (DECO16_VERBOSE)
-	//	logerror("%04x: OP3F %02x\n",PCW,tmp);
+OP(0f)
+{
+    RD_DUM;    /* 2 ILL / 5 BBR0 ZPG ?? */
+    ILL;
 }
-OP(5f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR5 ZPG ?? */
-OP(7f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR7 ZPG ?? */
-OP(9f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBS1 ZPG ?? */
-OP(bf) { RD_DUM; ILL; }									/* 2 ILL / 5 BBS3 ZPG ?? */
-OP(df) { RD_DUM; ILL; }									/* 2 ILL / 5 BBS5 ZPG ?? */
-OP(ff) { RD_DUM; ILL; }									/* 2 ILL / 5 BBS7 ZPG ?? */
+OP(2f)
+{
+    RD_DUM;    /* 2 ILL / 5 BBR2 ZPG ?? */
+    ILL;
+}
+OP(4f)
+{
+    RD_DUM;    /* 2 ILL / 5 BBR4 ZPG ?? */
+    ILL;
+}
+OP(6f)
+{
+    RD_DUM;    /* 2 ILL / 5 BBR6 ZPG ?? */
+    ILL;
+}
+OP(8f)
+{
+    int tmp;
+    m6502_ICount -= 1;
+    RD_IMM;
+    //if (DECO16_VERBOSE)
+    //	logerror("%04x: BANK (8F) %02x\n",PCW,tmp);
 
-static void (*const insndeco16[0x100])() = {
-	deco16_00,deco16_01,deco16_02,deco16_03,deco16_04,deco16_05,deco16_06,deco16_07,
-	deco16_08,deco16_09,deco16_0a,deco16_0b,deco16_0c,deco16_0d,deco16_0e,deco16_0f,
-	deco16_10,deco16_11,deco16_12,deco16_13,deco16_14,deco16_15,deco16_16,deco16_17,
-	deco16_18,deco16_19,deco16_1a,deco16_1b,deco16_1c,deco16_1d,deco16_1e,deco16_1f,
-	deco16_20,deco16_21,deco16_22,deco16_23,deco16_24,deco16_25,deco16_26,deco16_27,
-	deco16_28,deco16_29,deco16_2a,deco16_2b,deco16_2c,deco16_2d,deco16_2e,deco16_2f,
-	deco16_30,deco16_31,deco16_32,deco16_33,deco16_34,deco16_35,deco16_36,deco16_37,
-	deco16_38,deco16_39,deco16_3a,deco16_3b,deco16_3c,deco16_3d,deco16_3e,deco16_3f,
-	deco16_40,deco16_41,deco16_42,deco16_43,deco16_44,deco16_45,deco16_46,deco16_47,
-	deco16_48,deco16_49,deco16_4a,deco16_4b,deco16_4c,deco16_4d,deco16_4e,deco16_4f,
-	deco16_50,deco16_51,deco16_52,deco16_53,deco16_54,deco16_55,deco16_56,deco16_57,
-	deco16_58,deco16_59,deco16_5a,deco16_5b,deco16_5c,deco16_5d,deco16_5e,deco16_5f,
-	deco16_60,deco16_61,deco16_62,deco16_63,deco16_64,deco16_65,deco16_66,deco16_67,
-	deco16_68,deco16_69,deco16_6a,deco16_6b,deco16_6c,deco16_6d,deco16_6e,deco16_6f,
-	deco16_70,deco16_71,deco16_72,deco16_73,deco16_74,deco16_75,deco16_76,deco16_77,
-	deco16_78,deco16_79,deco16_7a,deco16_7b,deco16_7c,deco16_7d,deco16_7e,deco16_7f,
-	deco16_80,deco16_81,deco16_82,deco16_83,deco16_84,deco16_85,deco16_86,deco16_87,
-	deco16_88,deco16_89,deco16_8a,deco16_8b,deco16_8c,deco16_8d,deco16_8e,deco16_8f,
-	deco16_90,deco16_91,deco16_92,deco16_93,deco16_94,deco16_95,deco16_96,deco16_97,
-	deco16_98,deco16_99,deco16_9a,deco16_9b,deco16_9c,deco16_9d,deco16_9e,deco16_9f,
-	deco16_a0,deco16_a1,deco16_a2,deco16_a3,deco16_a4,deco16_a5,deco16_a6,deco16_a7,
-	deco16_a8,deco16_a9,deco16_aa,deco16_ab,deco16_ac,deco16_ad,deco16_ae,deco16_af,
-	deco16_b0,deco16_b1,deco16_b2,deco16_b3,deco16_b4,deco16_b5,deco16_b6,deco16_b7,
-	deco16_b8,deco16_b9,deco16_ba,deco16_bb,deco16_bc,deco16_bd,deco16_be,deco16_bf,
-	deco16_c0,deco16_c1,deco16_c2,deco16_c3,deco16_c4,deco16_c5,deco16_c6,deco16_c7,
-	deco16_c8,deco16_c9,deco16_ca,deco16_cb,deco16_cc,deco16_cd,deco16_ce,deco16_cf,
-	deco16_d0,deco16_d1,deco16_d2,deco16_d3,deco16_d4,deco16_d5,deco16_d6,deco16_d7,
-	deco16_d8,deco16_d9,deco16_da,deco16_db,deco16_dc,deco16_dd,deco16_de,deco16_df,
-	deco16_e0,deco16_e1,deco16_e2,deco16_e3,deco16_e4,deco16_e5,deco16_e6,deco16_e7,
-	deco16_e8,deco16_e9,deco16_ea,deco16_eb,deco16_ec,deco16_ed,deco16_ee,deco16_ef,
-	deco16_f0,deco16_f1,deco16_f2,deco16_f3,deco16_f4,deco16_f5,deco16_f6,deco16_f7,
-	deco16_f8,deco16_f9,deco16_fa,deco16_fb,deco16_fc,deco16_fd,deco16_fe,deco16_ff
+    M6502WritePort(0, tmp);
+
+    //swap bank in/out
+} /*  */
+OP(af)
+{
+    RD_DUM;    /* 2 ILL / 5 BBS2 ZPG ?? */
+    ILL;
+}
+OP(cf)
+{
+    RD_DUM;    /* 2 ILL / 5 BBS4 ZPG ?? */
+    ILL;
+}
+OP(ef)
+{
+    RD_DUM;    /* 2 ILL / 5 BBS6 ZPG ?? */
+    ILL;
+}
+
+OP(1f)
+{
+    RD_DUM;    /* 2 ILL / 5 BBR1 ZPG ?? */
+    ILL;
+}
+OP(3f)
+{
+    int tmp;
+
+    m6502_ICount -= 1;
+    RD_IMM;
+
+    //if (DECO16_VERBOSE)
+    //	logerror("%04x: OP3F %02x\n",PCW,tmp);
+}
+OP(5f)
+{
+    RD_DUM;    /* 2 ILL / 5 BBR5 ZPG ?? */
+    ILL;
+}
+OP(7f)
+{
+    RD_DUM;    /* 2 ILL / 5 BBR7 ZPG ?? */
+    ILL;
+}
+OP(9f)
+{
+    RD_DUM;    /* 2 ILL / 5 BBS1 ZPG ?? */
+    ILL;
+}
+OP(bf)
+{
+    RD_DUM;    /* 2 ILL / 5 BBS3 ZPG ?? */
+    ILL;
+}
+OP(df)
+{
+    RD_DUM;    /* 2 ILL / 5 BBS5 ZPG ?? */
+    ILL;
+}
+OP(ff)
+{
+    RD_DUM;    /* 2 ILL / 5 BBS7 ZPG ?? */
+    ILL;
+}
+
+static void (*const insndeco16[0x100])() =
+{
+    deco16_00, deco16_01, deco16_02, deco16_03, deco16_04, deco16_05, deco16_06, deco16_07,
+    deco16_08, deco16_09, deco16_0a, deco16_0b, deco16_0c, deco16_0d, deco16_0e, deco16_0f,
+    deco16_10, deco16_11, deco16_12, deco16_13, deco16_14, deco16_15, deco16_16, deco16_17,
+    deco16_18, deco16_19, deco16_1a, deco16_1b, deco16_1c, deco16_1d, deco16_1e, deco16_1f,
+    deco16_20, deco16_21, deco16_22, deco16_23, deco16_24, deco16_25, deco16_26, deco16_27,
+    deco16_28, deco16_29, deco16_2a, deco16_2b, deco16_2c, deco16_2d, deco16_2e, deco16_2f,
+    deco16_30, deco16_31, deco16_32, deco16_33, deco16_34, deco16_35, deco16_36, deco16_37,
+    deco16_38, deco16_39, deco16_3a, deco16_3b, deco16_3c, deco16_3d, deco16_3e, deco16_3f,
+    deco16_40, deco16_41, deco16_42, deco16_43, deco16_44, deco16_45, deco16_46, deco16_47,
+    deco16_48, deco16_49, deco16_4a, deco16_4b, deco16_4c, deco16_4d, deco16_4e, deco16_4f,
+    deco16_50, deco16_51, deco16_52, deco16_53, deco16_54, deco16_55, deco16_56, deco16_57,
+    deco16_58, deco16_59, deco16_5a, deco16_5b, deco16_5c, deco16_5d, deco16_5e, deco16_5f,
+    deco16_60, deco16_61, deco16_62, deco16_63, deco16_64, deco16_65, deco16_66, deco16_67,
+    deco16_68, deco16_69, deco16_6a, deco16_6b, deco16_6c, deco16_6d, deco16_6e, deco16_6f,
+    deco16_70, deco16_71, deco16_72, deco16_73, deco16_74, deco16_75, deco16_76, deco16_77,
+    deco16_78, deco16_79, deco16_7a, deco16_7b, deco16_7c, deco16_7d, deco16_7e, deco16_7f,
+    deco16_80, deco16_81, deco16_82, deco16_83, deco16_84, deco16_85, deco16_86, deco16_87,
+    deco16_88, deco16_89, deco16_8a, deco16_8b, deco16_8c, deco16_8d, deco16_8e, deco16_8f,
+    deco16_90, deco16_91, deco16_92, deco16_93, deco16_94, deco16_95, deco16_96, deco16_97,
+    deco16_98, deco16_99, deco16_9a, deco16_9b, deco16_9c, deco16_9d, deco16_9e, deco16_9f,
+    deco16_a0, deco16_a1, deco16_a2, deco16_a3, deco16_a4, deco16_a5, deco16_a6, deco16_a7,
+    deco16_a8, deco16_a9, deco16_aa, deco16_ab, deco16_ac, deco16_ad, deco16_ae, deco16_af,
+    deco16_b0, deco16_b1, deco16_b2, deco16_b3, deco16_b4, deco16_b5, deco16_b6, deco16_b7,
+    deco16_b8, deco16_b9, deco16_ba, deco16_bb, deco16_bc, deco16_bd, deco16_be, deco16_bf,
+    deco16_c0, deco16_c1, deco16_c2, deco16_c3, deco16_c4, deco16_c5, deco16_c6, deco16_c7,
+    deco16_c8, deco16_c9, deco16_ca, deco16_cb, deco16_cc, deco16_cd, deco16_ce, deco16_cf,
+    deco16_d0, deco16_d1, deco16_d2, deco16_d3, deco16_d4, deco16_d5, deco16_d6, deco16_d7,
+    deco16_d8, deco16_d9, deco16_da, deco16_db, deco16_dc, deco16_dd, deco16_de, deco16_df,
+    deco16_e0, deco16_e1, deco16_e2, deco16_e3, deco16_e4, deco16_e5, deco16_e6, deco16_e7,
+    deco16_e8, deco16_e9, deco16_ea, deco16_eb, deco16_ec, deco16_ed, deco16_ee, deco16_ef,
+    deco16_f0, deco16_f1, deco16_f2, deco16_f3, deco16_f4, deco16_f5, deco16_f6, deco16_f7,
+    deco16_f8, deco16_f9, deco16_fa, deco16_fb, deco16_fc, deco16_fd, deco16_fe, deco16_ff
 };

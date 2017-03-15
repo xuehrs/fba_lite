@@ -19,7 +19,7 @@ export
 UNICODE = 1
 
 # Build A68K ASM 68000 core
-BUILD_A68K = 1
+#BUILD_A68K = 1
 
 # Include x86 Assembly routines
 BUILD_X86_ASM = 1
@@ -31,16 +31,16 @@ BUILD_X86_ASM = 1
 #BUILD_VS_XP_TARGET = 1
 
 # Include 7-zip support
-INCLUDE_7Z_SUPPORT = 1
+#INCLUDE_7Z_SUPPORT = 1
 
 # Include AVI recording support (uses Video For Windows)
-INCLUDE_AVI_RECORDING = 1
+#INCLUDE_AVI_RECORDING = 0
 
 # Include Toaplan sound sample hacks for games without MCU dumps
-TOAPLAN_SOUND_SAMPLES_HACK = 1
+#TOAPLAN_SOUND_SAMPLES_HACK = 1
 
 # Include Files that require C++11 (Killer Instinct, Midway Mortal Kombat style drivers, and associated files) - requires C++11 support
-INCLUDE_CPLUSPLUS11_FILES = 1
+#INCLUDE_CPLUSPLUS11_FILES = 1
 
 # Include symbols and other debug information in the executable
 #SYMBOL = 1
@@ -52,7 +52,7 @@ INCLUDE_CPLUSPLUS11_FILES = 1
 #ROM_VERIFY = 1
 
 # Force recompilation of files that need it (i.e. use __TIME__, __DATE__, SPECIALBUILD).
-FORCE_UPDATE = 1
+#FORCE_UPDATE = 1
 
 # Use the __fastcall calling convention when interfacing with A68K/Musashi/Doze
 FASTCALL = 1
@@ -96,3 +96,8 @@ vc: FORCE
 	@$(MAKE) -s -f makefile.vc
 
 FORCE:
+
+clean:
+	@rm -rf obj
+	@rm -rf src/dep/generated
+	@echo clean done.

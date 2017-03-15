@@ -10,15 +10,15 @@
 /* 6809 Registers */
 typedef struct
 {
-	PAIR	pc; 		/* Program counter */
-	PAIR	ppc;		/* Previous program counter */
-	PAIR	d;			/* Accumulator a and b */
-	PAIR	dp; 		/* Direct Page register (page in MSB) */
-	PAIR	u, s;		/* Stack pointers */
-	PAIR	x, y;		/* Index registers */
+    PAIR	pc; 		/* Program counter */
+    PAIR	ppc;		/* Previous program counter */
+    PAIR	d;			/* Accumulator a and b */
+    PAIR	dp; 		/* Direct Page register (page in MSB) */
+    PAIR	u, s;		/* Stack pointers */
+    PAIR	x, y;		/* Index registers */
     UINT8   cc;
-	UINT8	ireg;		/* First opcode */
-	UINT8	irq_state[2];
+    UINT8	ireg;		/* First opcode */
+    UINT8	irq_state[2];
     int     extra_cycles; /* cycles used up by interrupts */
     int     (*irq_callback)(int irqline);
     UINT8   int_state;  /* SYNC and CWAI flags */
@@ -27,8 +27,8 @@ typedef struct
 
 enum
 {
-	M6809_PC=1, M6809_S, M6809_CC ,M6809_A, M6809_B, M6809_U, M6809_X, M6809_Y,
-	M6809_DP
+    M6809_PC = 1, M6809_S, M6809_CC , M6809_A, M6809_B, M6809_U, M6809_X, M6809_Y,
+    M6809_DP
 };
 
 #define M6809_IRQ_LINE	0	/* IRQ line number */

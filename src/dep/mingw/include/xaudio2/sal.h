@@ -244,9 +244,9 @@
 #define __data_entrypoint(category)
 
 #ifndef __fallthrough
-    #define __fallthrough __inner_fallthrough
+#define __fallthrough __inner_fallthrough
 #endif
 
 #ifndef __analysis_assume
-    #define __analysis_assume(expr)
+#define __analysis_assume(expr)
 #endif

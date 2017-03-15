@@ -6,8 +6,8 @@ void nesapuReset();
 
 INT32 nesapuScan(INT32 nAction);
 
-void nesapuWrite(INT32 chip,INT32 address, UINT8 value);
-UINT8 nesapuRead(INT32 chip,INT32 address);
+void nesapuWrite(INT32 chip, INT32 address, UINT8 value);
+UINT8 nesapuRead(INT32 chip, INT32 address);
 
 #define BURN_SND_NESAPU_ROUTE_1		0
 #define BURN_SND_NESAPU_ROUTE_2		1
