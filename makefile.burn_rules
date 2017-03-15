@@ -1,32 +1,24 @@
-alldir	= 	burn burn/devices burn/snd burn/drv burn/drv/capcom burn/drv/cave burn/drv/coleco burn/drv/cps3 burn/drv/dataeast \
-			burn/drv/galaxian burn/drv/irem burn/drv/konami burn/drv/megadrive burn/drv/midway burn/drv/pce burn/drv/pst90s burn/drv/pre90s \
-			burn/drv/neogeo burn/drv/pgm burn/drv/psikyo burn/drv/sega burn/drv/sg1000 burn/drv/sms burn/drv/snes burn/drv/taito \
-			burn/drv/toaplan cpu cpu/a68k cpu/arm cpu/arm7 cpu/h6280 cpu/hd6309 cpu/i8039 cpu/konami cpu/m68k cpu/m6502 cpu/m6800 \
-			cpu/m6805 cpu/m6809 cpu/nec cpu/pic16c5x cpu/s2650 cpu/tlcs90 cpu/sh2 cpu/z80 
+alldir	= 	burn burn/devices burn/snd\
+                burn/drv burn/drv/capcom burn/drv/cps3 burn/drv/dataeast burn/drv/neogeo burn/drv/pgm\
+		cpu cpu/arm cpu/arm7 cpu/m68k cpu/sh2 cpu/z80\
+		
 
 drvobj	= 	d_cps1.o d_cps2.o d_cps3.o d_neogeo.o d_pgm.o
 			
-ifdef	INCLUDE_CPLUSPLUS11_FILES
-	drvobj += d_kinst.o d_wunit.o
-endif
 
 depobj	:= 	$(drvobj) \
 			\
-			burn.o burn_gun.o burn_led.o burn_memory.o burn_sound.o burn_sound_c.o cheat.o debug_track.o hiscore.o load.o \
+			burn.o burn_gun.o burn_led.o burn_memory.o burn_sound.o burn_sound_c.o cheat.o debug_track.o load.o \
 			tiles_generic.o timer.o vector.o \
 			\
 			eeprom.o timekpr.o v3021.o \
 			\
 			ay8910.o  burn_ym2151.o burn_ym2203.o  burn_ym2610.o \
-			fm.o fmopl.o ics2115.o \
-			msm5205.o msm6295.o \
-			ym2151.o ymdeltat.o \
+			fm.o fmopl.o ics2115.o msm5205.o msm6295.o ym2151.o ymdeltat.o \
 			\
-			arm7_intf.o arm_intf.o  \
-			m68000_intf.o z80_intf.o  \
+			arm7_intf.o arm_intf.o m68000_intf.o z80_intf.o \
 			\
-			arm.o arm7.o sh2.o \
-			z80.o z80daisy.o \
+			arm.o arm7.o sh2.o z80.o z80daisy.o \
 			\
 			cps2_crpt.o cps.o cps_config.o cps_draw.o cps_mem.o cps_obj.o cps_pal.o cps_run.o cps_rw.o cps_scr.o cpsr.o cpsrd.o \
 			cpst.o ctv.o fcrash_snd.o kabuki.o ps.o ps_m.o ps_z.o qs.o qs_c.o qs_z.o sf2mdt_snd.o \
@@ -47,12 +39,3 @@ ifdef	BUILD_X86_ASM
 	autobj += burn_sound_a.o
 endif
 
-
-ifdef	INCLUDE_CPLUSPLUS11_FILES
-	alldir += cpu/mips3 cpu/tms34010 cpu/adsp2100
-	depobj += ide.o cop0.o cop1.o mips3.o mips3_intf.o dcs2k.o midwayic.o midwunit.o tms34010.o tms34010_optable.o tms34010_intf.o adsp2100.o adsp2100_intf.o
-ifdef	BUILD_X64_EXE
-	alldir += cpu/mips3/x64
-	depobj += mips3_x64.o
-endif
-endif

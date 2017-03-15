@@ -29,7 +29,6 @@
 #include <mmsystem.h>
 #include <shellapi.h>
 #include <shlwapi.h>
-#include "dwmapi_core.h"
 
 INT32 DSCore_Init();
 INT32 DICore_Init();
@@ -180,12 +179,6 @@ int FBAPopupDestroyText();
 LONG CALLBACK ExceptionFilter(_EXCEPTION_POINTERS *pExceptionInfo);
 int SystemInfoCreate();
 
-// splash.cpp
-int SplashCreate();
-void SplashDestroy(bool bForce);
-
-extern int nSplashTime;
-
 // about.cpp
 int AboutCreate();
 int FirstUsageCreate();
@@ -308,17 +301,6 @@ extern bool bIconsLoaded;
 extern int nIconsSize, nIconsSizeXY, nIconsYDiff;
 extern bool bGameInfoOpen;
 
-// neocdsel.cpp
-extern int NeoCDList_Init();
-extern bool bNeoCDListScanSub;
-extern bool bNeoCDListScanOnlyISO;
-extern TCHAR szNeoCDCoverDir[MAX_PATH];
-extern TCHAR szNeoCDGamesDir[MAX_PATH];
-
-HBITMAP ImageToBitmap(HWND hwnd, IMAGE *img);
-HBITMAP PNGLoadBitmap(HWND hWnd, FILE *fp, int nWidth, int nHeight, int nPreset);
-HBITMAP LoadBitmap(HWND hWnd, FILE *fp, int nWidth, int nHeight, int nPreset);
-
 // cona.cpp
 extern int nIniVersion;
 
@@ -405,24 +387,12 @@ int CreateROMInfo(HWND hParentWND);
 void FreeROMInfo();
 int WriteGameAvb();
 
-// support_paths.cpp
-int SupportDirCreate(HWND hParentWND);
-int SupportDirCreateTab(int nTab, HWND hParentWND);
-
 // res.cpp
 int ResCreate(int);
 
 // fba_kaillera.cpp
 int KailleraInitInput();
 int KailleraGetInput();
-
-// replay.cpp
-extern int nReplayStatus;
-int RecordInput();
-int ReplayInput();
-int StartRecord();
-int StartReplay(const TCHAR *szFileName = NULL);
-void StopReplay();
 
 // memcard.cpp
 extern int nMemoryCardStatus;						// & 1 = file selected, & 2 = inserted
@@ -438,9 +408,6 @@ int ProgressUpdateBurner(double dProgress, const TCHAR *pszText, bool bAbs);
 int ProgressCreate();
 int ProgressDestroy();
 
-// gameinfo.cpp
-int GameInfoDialogCreate(HWND hParentWND, int nDrvSel);
-
 // ---------------------------------------------------------------------------
 // Debugger
 
@@ -453,17 +420,6 @@ int DebugCreate();
 // paletteviewer.cpp
 int PaletteViewerDialogCreate(HWND hParentWND);
 
-// ips_manager.cpp
-extern int nIpsSelectedLanguage;
-int GetIpsNumPatches();
-void LoadIpsActivePatches();
-int GetIpsNumActivePatches();
-int IpsManagerCreate(HWND hParentWND);
-void IpsPatchExit();
-
-// localise_download.cpp
-int LocaliseDownloadCreate(HWND hParentWND);
-
 // Misc
 #define _TtoA(a)	TCHARToANSI(a, NULL, 0)
 #define _AtoT(a)	ANSIToTCHAR(a, NULL, 0)
@@ -473,14 +429,3 @@ TCHAR *FormatCommasNumber(__int64);
 #define _uInt64ToCommaFormattedTCHAR(szOUT, nIN)	\
 	_stprintf(szOUT, _T("%s"), FormatCommasNumber(nIN));
 
-#ifdef INCLUDE_AVI_RECORDING
-// ----------------------------------------------------------------------------
-// AVI recording
-
-// avi.cpp
-INT32 AviStart();
-INT32 AviRecordFrame(INT32 bDraw);
-void AviStop();
-extern INT32 nAviStatus;
-extern INT32 nAvi3x;
-#endif

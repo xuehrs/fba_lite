@@ -16,67 +16,22 @@
 #define MAKE_STRING_2(s) #s
 #define MAKE_STRING(s) MAKE_STRING_2(s)
 
-#define BZIP_MAX (20)								// Maximum zip files to search through
-#if defined (BUILD_QT)
+#define BZIP_MAX (40)								// Maximum zip files to search through
 #define DIRS_MAX (4)								// Maximum number of directories to search
-#else
-#define DIRS_MAX (20)								// Maximum number of directories to search
-#endif
 
 #include "title.h"
 #include "burn.h"
 
 // ---------------------------------------------------------------------------
 // OS dependent functionality
-typedef struct tagIMAGE
-{
-    unsigned int	width;
-    unsigned int	height;
-    unsigned int	rowbytes;
-    unsigned int	imgbytes;
-    unsigned char	**rowptr;
-    unsigned char	*bmpbits;
-    unsigned int	flags;
-} IMAGE;
-
-#if defined (BUILD_WIN32)
 #include "burner_win32.h"
-#elif defined (BUILD_SDL)
-#include "burner_sdl.h"
-#elif defined (_XBOX) && !defined(__LIBRETRO__)
-#include "burner_xbox.h"
-#elif defined(__LIBRETRO__)
-#include "burner_libretro.h"
-#elif defined(BUILD_QT)
-#include "burner_qt.h"
-#endif
-
-#if defined (INCLUDE_LIB_PNGH)
-#include "png.h"
-#endif
-
-// ---------------------------------------------------------------------------
-// OS independent functionality
-
-#ifndef __LIBRETRO__
 #include "interface.h"
-#endif
-
 #define IMG_FREE		(1 << 0)
 
 // Macros for parsing text
 #define SKIP_WS(s) while (_istspace(*s)) { s++; }			// Skip whitespace
 #define FIND_WS(s) while (*s && !_istspace(*s)) { s++; }	// Find whitespace
 #define FIND_QT(s) while (*s && *s != _T('\"')) { s++; }	// Find quote
-
-// image.cpp
-extern int bPngImageOrientation;
-void img_free(IMAGE *img);
-INT32 img_alloc(IMAGE *img);
-
-bool PNGIsImage(FILE *fp);
-INT32 PNGLoad(IMAGE *img, FILE *fp, INT32 nPreset);
-INT32 PNGGetInfo(IMAGE *img, FILE *fp);
 
 // gami.cpp
 extern struct GameInp *GameInp;
@@ -175,9 +130,6 @@ void ComputeGammaLUT();
 INT32 write_datfile(INT32 bType, FILE *fDat);
 INT32 create_datfile(TCHAR *szFilename, INT32 bType);
 
-// sshot.cpp
-INT32 MakeScreenShot();
-
 // state.cpp
 INT32 BurnStateLoadEmbed(FILE *fp, INT32 nOffset, INT32 bAll, INT32 (*pLoadGame)());
 INT32 BurnStateLoad(TCHAR *szName, INT32 bAll, INT32 (*pLoadGame)());
@@ -215,21 +167,3 @@ INT32 BzipInit();
 INT32 BzipExit();
 INT32 BzipStatus();
 
-// support_paths.cpp
-extern TCHAR szAppPreviewsPath[MAX_PATH];
-extern TCHAR szAppTitlesPath[MAX_PATH];
-extern TCHAR szAppCheatsPath[MAX_PATH];
-extern TCHAR szAppIpsPath[MAX_PATH];
-extern TCHAR szAppIconsPath[MAX_PATH];
-extern TCHAR szAppSelectPath[MAX_PATH];
-extern TCHAR szAppVersusPath[MAX_PATH];
-extern TCHAR szAppHowtoPath[MAX_PATH];
-extern TCHAR szAppScoresPath[MAX_PATH];
-extern TCHAR szAppBossesPath[MAX_PATH];
-extern TCHAR szAppGameoverPath[MAX_PATH];
-extern TCHAR szAppFlyersPath[MAX_PATH];
-extern TCHAR szAppMarqueesPath[MAX_PATH];
-extern TCHAR szAppControlsPath[MAX_PATH];
-extern TCHAR szAppCabinetsPath[MAX_PATH];
-extern TCHAR szAppPCBsPath[MAX_PATH];
-extern TCHAR szAppHistoryPath[MAX_PATH];

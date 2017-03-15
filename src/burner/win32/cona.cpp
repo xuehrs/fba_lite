@@ -124,7 +124,6 @@ int ConfigAppLoad()
 
         VAR(bVidTripleBuffer);
         VAR(bVidVSync);
-        VAR(bVidDWMCore);
 
         VAR(bVidScanlines);
         VAR(nVidScanIntensity);
@@ -187,19 +186,12 @@ int ConfigAppLoad()
 
         VAR(bModelessMenu);
 
-        VAR(nSplashTime);
-
         VAR(bDrvSaveAll);
         VAR(nAppThreadPriority);
         VAR(bAlwaysProcessKeyboardInput);
         VAR(bAutoPause);
         VAR(bSaveInputs);
 
-        VAR(nCDEmuSelect);
-        PAT(CDEmuImage);
-
-        VAR(nSelDlgWidth);
-        VAR(nSelDlgHeight);
         VAR(nLoadMenuShowX);
         VAR(nLoadMenuBoardTypeFilter);
         VAR(nLoadMenuGenreFilter);
@@ -209,62 +201,13 @@ int ConfigAppLoad()
         STR(szAppRomPaths[1]);
         STR(szAppRomPaths[2]);
         STR(szAppRomPaths[3]);
-        STR(szAppRomPaths[4]);
-        STR(szAppRomPaths[5]);
-        STR(szAppRomPaths[6]);
-        STR(szAppRomPaths[7]);
-        STR(szAppRomPaths[8]);
-        STR(szAppRomPaths[9]);
-        STR(szAppRomPaths[10]);
-        STR(szAppRomPaths[11]);
-        STR(szAppRomPaths[12]);
-        STR(szAppRomPaths[13]);
-        STR(szAppRomPaths[14]);
-        STR(szAppRomPaths[15]);
-        STR(szAppRomPaths[16]);
-        STR(szAppRomPaths[17]);
-        STR(szAppRomPaths[18]);
-        STR(szAppRomPaths[19]);
 
-        STR(szNeoCDGamesDir);
 
-        STR(szAppPreviewsPath);
-        STR(szAppTitlesPath);
-        STR(szAppCheatsPath);
-        STR(szAppHiscorePath);
-        STR(szAppSamplesPath);
-        STR(szAppIpsPath);
-        STR(szAppIconsPath);
-        STR(szNeoCDCoverDir);
-        STR(szAppBlendPath);
-        STR(szAppSelectPath);
-        STR(szAppVersusPath);
-        STR(szAppScoresPath);
-        STR(szAppBossesPath);
-        STR(szAppGameoverPath);
-        STR(szAppFlyersPath);
-        STR(szAppMarqueesPath);
-        STR(szAppControlsPath);
-        STR(szAppCabinetsPath);
-        STR(szAppPCBsPath);
-        STR(szAppHistoryPath);
 
         VAR(bNoChangeNumLock);
-        VAR(bAlwaysCreateSupportFolders);
-
         VAR(nAutoFireRate);
 
-        VAR(EnableHiscores);
-        VAR(bBurnUseBlend);
-
-#ifdef INCLUDE_AVI_RECORDING
-        VAR(nAvi3x);
-#endif
-
-        VAR(nIpsSelectedLanguage);
-
-        VAR(bEnableIcons);
-        VAR(nIconsSize);
+        //VAR(nIpsSelectedLanguage);
 
         STR(szPrevGames[0]);
         STR(szPrevGames[1]);
@@ -284,9 +227,6 @@ int ConfigAppLoad()
         DRV(nBurnDrvSelect[3]);
         DRV(nBurnDrvSelect[4]);
         DRV(nBurnDrvSelect[5]);
-
-        VAR(bNeoCDListScanSub);
-        VAR(bNeoCDListScanOnlyISO);
 
         // Default Controls
         VAR(nPlayerDefaultControls[0]);
@@ -421,8 +361,6 @@ int ConfigAppSave()
     VAR(bVidTripleBuffer);
     _ftprintf(h, _T("\n// If non-zero, try to synchronise blits with the display\n"));
     VAR(bVidVSync);
-    _ftprintf(h, _T("\n// If non-zero, try to enable custom DWM parameters on Windows 7, this fixes frame stuttering problems.\n"));
-    VAR(bVidDWMCore);
     _ftprintf(h, _T("\n// Transfer method:  0 = blit from system memory / use driver/DirectX texture management;\n"));
     _ftprintf(h, _T("//                   1 = copy to a video memory surface, then use bltfast();\n"));
     _ftprintf(h, _T("//                  -1 = autodetect for DirectDraw, equals 1 for Direct3D\n"));
@@ -534,9 +472,6 @@ int ConfigAppSave()
     _ftprintf(h, _T("\n// Make the menu modeless\n"));
     VAR(bModelessMenu);
 
-    _ftprintf(h, _T("\n// Minimum length of time to display the splash screen (in milliseconds)\n"));
-    VAR(nSplashTime);
-
     _ftprintf(h, _T("\n// If non-zero, load and save all ram (the state)\n"));
     VAR(bDrvSaveAll);
     _ftprintf(h, _T("\n// The thread priority for the application. Do *NOT* edit this manually\n"));
@@ -548,19 +483,9 @@ int ConfigAppSave()
     _ftprintf(h, _T("\n// If non-zero, save the inputs for each game\n"));
     VAR(bSaveInputs);
 
-    _ftprintf(h, _T("\n\n\n"));
-    _ftprintf(h, _T("// --- CD emulation -----------------------------------------------------------\n"));
-    _ftprintf(h, _T("\n // The selected CD emulation module\n"));
-    VAR(nCDEmuSelect);
-    _ftprintf(h, _T("\n // The path to the CD image to use (.cue or .iso)\n"));
-    STR(CDEmuImage);
 
     _ftprintf(h, _T("\n\n\n"));
     _ftprintf(h, _T("// --- Load Game Dialogs ------------------------------------------------------\n"));
-    _ftprintf(h, _T("\n// Load game dialog dimensions (in win32 client co-ordinates)\n"));
-    VAR(nSelDlgWidth);
-    VAR(nSelDlgHeight);
-
     _ftprintf(h, _T("\n// Load game dialog options\n"));
     VAR(nLoadMenuShowX);
 
@@ -578,47 +503,6 @@ int ConfigAppSave()
     STR(szAppRomPaths[1]);
     STR(szAppRomPaths[2]);
     STR(szAppRomPaths[3]);
-    STR(szAppRomPaths[4]);
-    STR(szAppRomPaths[5]);
-    STR(szAppRomPaths[6]);
-    STR(szAppRomPaths[7]);
-    STR(szAppRomPaths[8]);
-    STR(szAppRomPaths[9]);
-    STR(szAppRomPaths[10]);
-    STR(szAppRomPaths[11]);
-    STR(szAppRomPaths[12]);
-    STR(szAppRomPaths[13]);
-    STR(szAppRomPaths[14]);
-    STR(szAppRomPaths[15]);
-    STR(szAppRomPaths[16]);
-    STR(szAppRomPaths[17]);
-    STR(szAppRomPaths[18]);
-    STR(szAppRomPaths[19]);
-
-    _ftprintf(h, _T("\n// The path to search for Neo Geo CDZ isos\n"));
-    STR(szNeoCDGamesDir);
-
-    _ftprintf(h, _T("\n// The paths to search for support files (include trailing backslash)\n"));
-    STR(szAppPreviewsPath);
-    STR(szAppTitlesPath);
-    STR(szAppCheatsPath);
-    STR(szAppHiscorePath);
-    STR(szAppSamplesPath);
-    STR(szAppIpsPath);
-    STR(szAppIconsPath);
-    STR(szNeoCDCoverDir);
-    STR(szAppBlendPath);
-    STR(szAppSelectPath);
-    STR(szAppVersusPath);
-    STR(szAppScoresPath);
-    STR(szAppBossesPath);
-    STR(szAppGameoverPath);
-    STR(szAppFlyersPath);
-    STR(szAppMarqueesPath);
-    STR(szAppControlsPath);
-    STR(szAppCabinetsPath);
-    STR(szAppPCBsPath);
-    STR(szAppHistoryPath);
 
     _ftprintf(h, _T("\n// The cartridges to use for emulation of an MVS system\n"));
     DRV(nBurnDrvSelect[0]);
@@ -627,10 +511,6 @@ int ConfigAppSave()
     DRV(nBurnDrvSelect[3]);
     DRV(nBurnDrvSelect[4]);
     DRV(nBurnDrvSelect[5]);
-
-    _ftprintf(h, _T("\n// Neo Geo CD Load Game Dialog options\n"));
-    VAR(bNeoCDListScanSub);
-    VAR(bNeoCDListScanOnlyISO);
 
     _ftprintf(h, _T("\n\n\n"));
     _ftprintf(h, _T("// --- miscellaneous ---------------------------------------------------------\n"));
@@ -643,26 +523,6 @@ int ConfigAppSave()
 
     _ftprintf(h, _T("\n// Auto-Fire Rate, non-linear - use the GUI to change this setting!\n"));
     VAR(nAutoFireRate);
-
-    _ftprintf(h, _T("\n// If non-zero, enable high score saving support.\n"));
-    VAR(EnableHiscores);
-
-    _ftprintf(h, _T("\n// If non-zero, enable alpha blending support.\n"));
-    VAR(bBurnUseBlend);
-
-#ifdef INCLUDE_AVI_RECORDING
-    _ftprintf(h, _T("\n// If non-zero, enable 3x pixel output for the AVI writer.\n"));
-    VAR(nAvi3x);
-#endif
-
-    _ftprintf(h, _T("\n// The language index to use for the IPS Patch Manager dialog.\n"));
-    VAR(nIpsSelectedLanguage);
-
-    _ftprintf(h, _T("\n// If non-zero, display drivers icons.\n"));
-    VAR(bEnableIcons);
-
-    _ftprintf(h, _T("\n// Specify icons display size, 0 = 16x16 , 1 = 24x24, 2 = 32x32.\n"));
-    VAR(nIconsSize);
 
     _ftprintf(h, _T("\n// Previous games list.\n"));
     STR(szPrevGames[0]);

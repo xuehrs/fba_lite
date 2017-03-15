@@ -290,17 +290,6 @@ int InpCheatCreate()
     }
 
     bOK = false;
-
-    //	DestroyWindow(hInpCheatDlg);							// Make sure exitted
-
-    //	hInpCheatDlg = FBACreateDialog(hAppInst, MAKEINTRESOURCE(IDD_INPCHEAT), hScrnWnd, DialogProc);
-    //	if (hInpCheatDlg == NULL) {
-    //		return 1;
-    //	}
-
-    //	WndInMid(hInpCheatDlg, hScrnWnd);
-    //	ShowWindow(hInpCheatDlg, SW_NORMAL);
-
     FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_INPCHEAT), hScrnWnd, (DLGPROC)DialogProc);
 
     return 0;

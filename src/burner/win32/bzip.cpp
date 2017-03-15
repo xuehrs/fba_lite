@@ -1,5 +1,6 @@
 // Burner Zip module
 #include "burner.h"
+#include "shlwapi.h"
 
 int nBzipError = 0;												// non-zero if there is a problem with the opened romset
 
@@ -472,12 +473,9 @@ int BzipOpen(bool bootApp)
         {
             TCHAR szFullName[MAX_PATH];
 
-            _stprintf(szFullName, _T("%s%hs"), szAppRomPaths[d], szName);
-
-            if (ZipOpen(TCHARToANSI(szFullName, NULL, 0)) == 0)  		// Open the rom zip file
+            _stprintf(szFullName, _T("%s%hs.zip"), szAppRomPaths[d], szName);
+            if(PathFileExists(szFullName))
             {
-                ZipClose();
-
                 bFound = true;
 
                 szBzipName[z] = (TCHAR *)malloc(MAX_PATH * sizeof(TCHAR));

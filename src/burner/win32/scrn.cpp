@@ -57,13 +57,7 @@ static void OnExitSizeMove(HWND);
 static void OnEnterIdle(HWND, UINT, HWND);
 static void OnEnterMenuLoop(HWND, BOOL);
 static void OnExitMenuLoop(HWND, BOOL);
-//static int OnMouseMove(HWND, int, int, UINT);
-//static int OnLButtonUp(HWND, int, int, UINT);
-//static int OnLButtonDown(HWND, BOOL, int, int, UINT);
 static int OnLButtonDblClk(HWND, BOOL, int, int, UINT);
-static int OnRButtonUp(HWND, int, int, UINT);
-static int OnRButtonDown(HWND, BOOL, int, int, UINT);
-
 static int OnDisplayChange(HWND, UINT, UINT, UINT);
 
 int OnNotify(HWND, int, NMHDR *lpnmhdr);
@@ -415,15 +409,7 @@ static LRESULT CALLBACK ScrnProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPar
     HANDLE_MSG(hWnd, WM_EXITSIZEMOVE,	OnExitSizeMove);
     HANDLE_MSG(hWnd, WM_ENTERIDLE,		OnEnterIdle);
 
-        //HANDLE_MSG(hWnd, WM_MOUSEMOVE,		OnMouseMove);
-        //HANDLE_MSG(hWnd, WM_LBUTTONUP,		OnLButtonUp);
-        //HANDLE_MSG(hWnd, WM_LBUTTONDOWN,	OnLButtonDown);
-
     HANDLE_MSG(hWnd, WM_LBUTTONDBLCLK,	OnLButtonDblClk);
-
-    HANDLE_MSG(hWnd, WM_RBUTTONUP,		OnRButtonUp);
-    HANDLE_MSG(hWnd, WM_RBUTTONDBLCLK,	OnRButtonDown);
-    HANDLE_MSG(hWnd, WM_RBUTTONDOWN,	OnRButtonDown);
 
     HANDLE_MSG(hWnd, WM_NOTIFY,			OnNotify);
     HANDLE_MSG(hWnd, WM_MENUSELECT,		OnMenuSelect);
@@ -448,124 +434,6 @@ static int OnDisplayChange(HWND, UINT, UINT, UINT)
 
     return 0;
 }
-
-/******************************************************************************/
-/*	Fixed right click mouse events, now they work properly without interfering
-	with other applications in the background [CaptainCPS-X]				  */
-//----------------------------------------------------------------------------//
-bool bRDblClick = false;
-
-static int OnRButtonDown(HWND hwnd, BOOL bDouble, int, int, UINT)
-{
-    if (hwnd != hScrnWnd && !nVidFullscreen) return 1;
-
-    if (bDouble)
-    {
-        // Right double-click at fullcreen happened, turn this flag 'true' so
-        // when right double-click ends (OnRButtonUp) it doesn't do anything else.
-        bRDblClick = true;
-    }
-    return 1;
-}
-
-static int OnRButtonUp(HWND hwnd, int, int, UINT)
-{
-    // If fullscreen and right double-click
-    if (hwnd == hScrnWnd && nVidFullscreen && bRDblClick)
-    {
-        // game running
-        if (bDrvOkay)
-        {
-            // toggle fullscreen
-            nVidFullscreen = !nVidFullscreen;
-            bRDblClick = false;
-            POST_INITIALISE_MESSAGE;
-            return 0;
-        }
-    }
-    return 1;
-}
-/*************************************************************************/
-
-/*static int OnMouseMove(HWND hwnd, int x, int y, UINT keyIndicators)
-{
-	//if(hwnd != hScrnWnd) {
-	//	return 1;
-	//}
-
-	if (bDrag && keyIndicators == MK_LBUTTON && !nVidFullscreen && !bMenuEnabled) {
-		RECT clientRect;
-
-		GetWindowRect(hScrnWnd, &clientRect);
-
-		if ((nLeftButtonX - (clientRect.left + x)) < nDragX && (nLeftButtonX - (clientRect.left + x)) > -nDragX && (nLeftButtonY - (clientRect.top + y)) < nDragY && (nLeftButtonY - (clientRect.top + y)) > -nDragY) {
-			SetWindowPos(hScrnWnd, NULL, nOldWindowX, nOldWindowY, 0, 0, SWP_NOREPOSITION | SWP_NOSIZE);
-		} else {
-			nWindowPosX = nOldWindowX - (nLeftButtonX - (clientRect.left + x));
-			nWindowPosY = nOldWindowY - (nLeftButtonY - (clientRect.top + y));
-
-			SetWindowPos(hScrnWnd, NULL, nWindowPosX, nWindowPosY, 0, 0, SWP_NOREPOSITION | SWP_NOSIZE);
-		}
-
-		return 0;
-	}
-
-	return 1;
-}
-
-static int OnLButtonDown(HWND hwnd, BOOL, int x, int y, UINT)
-{
-	//if(hwnd != hScrnWnd) {
-	//	return 1;
-	//}
-
-	if (!nVidFullscreen && !bMenuEnabled) {
-		RECT clientRect;
-
-		GetWindowRect(hScrnWnd, &clientRect);
-
-		nOldWindowX = clientRect.left;
-		nOldWindowY = clientRect.top;
-
-		nLeftButtonX = clientRect.left + x;
-		nLeftButtonY = clientRect.top + y;
-
-		bDrag = true;
-
-		return 0;
-	}
-
-	return 1;
-}
-
-static int OnLButtonUp(HWND hwnd, int x, int y, UINT)
-{
-	//if (hwnd != hScrnWnd) {
-	//	return 1;
-	//}
-
-	bDrag = false;
-
-	if (UseDialogs()) {
-		RECT clientRect;
-		GetWindowRect(hScrnWnd, &clientRect);
-
-		TrackPopupMenuEx(hMenuPopup, TPM_LEFTALIGN | TPM_TOPALIGN, clientRect.left + x, clientRect.top + y, hScrnWnd, NULL);
-		return 0;
-	}
-
-	if (!bMenuEnabled) {
-		RECT clientRect;
-		GetWindowRect(hScrnWnd, &clientRect);
-
-		if ((nLeftButtonX - (clientRect.left + x)) < nDragX && (nLeftButtonX - (clientRect.left + x)) > -nDragX && (nLeftButtonY - (clientRect.top + y)) < nDragY && (nLeftButtonY - (clientRect.top + y)) > -nDragY) {
-			TrackPopupMenuEx(hMenuPopup, TPM_LEFTALIGN | TPM_TOPALIGN, clientRect.left + x, clientRect.top + y, hScrnWnd, NULL);
-			return 0;
-		}
-	}
-
-	return 1;
-}*/
 
 static int OnLButtonDblClk(HWND hwnd, BOOL, int, int, UINT)
 {
@@ -657,9 +525,6 @@ static void OnPaint(HWND hWnd)
 
 static void OnClose(HWND)
 {
-#ifdef INCLUDE_AVI_RECORDING
-    AviStop();
-#endif
     PostQuitMessage(0);					// Quit the program if the window is closed
 }
 
@@ -805,9 +670,6 @@ int BurnerLoadDriver(TCHAR *szDriverName)
         {
             nBurnDrvActive = nOldDrvSelect;
             nDialogSelect = j;
-            SplashDestroy(1);
-            StopReplay();
-
             DrvExit();
             DrvInit(j, true);	// Init the game driver
             MenuEnableItems();
@@ -874,12 +736,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
             break;
         }
 
-        SplashDestroy(1);
-        StopReplay();
-
-#ifdef INCLUDE_AVI_RECORDING
-        AviStop();
-#endif
 
         InputSetCooperativeLevel(false, bAlwaysProcessKeyboardInput);
 
@@ -943,43 +799,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         BurnerLoadDriver(_T("neocdz"));
         break;
     }
-
-    case MENU_LOAD_NEOCD:
-    {
-        AudBlankSound();
-        if (UseDialogs())
-        {
-            NeoCDList_Init();
-        }
-        break;
-    }
-
-    case MENU_CDIMAGE:
-    {
-        nCDEmuSelect = 0;
-        TCHAR szFilter[100];
-        _stprintf(szFilter, _T("%s"), FBALoadStringEx(hAppInst, IDS_CD_SELECT_FILTER, true));
-        memcpy(szFilter + _tcslen(szFilter), _T(" (*.iso,*.cue)\0*.iso;*.cue\0\0"), 28 * sizeof(TCHAR));
-        TCHAR szTitle[100];
-        _stprintf(szTitle, _T("%s"), FBALoadStringEx(hAppInst, IDS_CD_SELECT_IMAGE_TITLE, true));
-        if (UseDialogs() && !bDrvOkay)
-        {
-            memset(&ofn, 0, sizeof(ofn));
-            ofn.lStructSize = sizeof(ofn);
-            ofn.hwndOwner = hScrnWnd;
-            ofn.lpstrFile = CDEmuImage;
-            ofn.nMaxFile = MAX_PATH;
-            ofn.lpstrTitle = szTitle;
-            ofn.lpstrFilter = szFilter;
-            ofn.lpstrInitialDir = _T(".");
-            ofn.Flags = OFN_NOCHANGEDIR | OFN_HIDEREADONLY;
-            ofn.lpstrDefExt = _T("cue");
-
-            GetOpenFileName(&ofn);
-        }
-        break;
-    }
-
     case MENU_STARTNET:
         if (Init_Network())
         {
@@ -996,61 +815,12 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         {
             InputSetCooperativeLevel(false, bAlwaysProcessKeyboardInput);
             AudBlankSound();
-            SplashDestroy(1);
-            StopReplay();
-#ifdef INCLUDE_AVI_RECORDING
-            AviStop();
-#endif
             DrvExit();
             DoNetGame();
             MenuEnableItems();
             InputSetCooperativeLevel(false, bAlwaysProcessKeyboardInput);
         }
         break;
-
-    case MENU_STARTREPLAY:
-        if (UseDialogs())
-        {
-            InputSetCooperativeLevel(false, bAlwaysProcessKeyboardInput);
-            AudSoundStop();
-            SplashDestroy(1);
-            StopReplay();
-            StartReplay();
-            GameInpCheckMouse();
-            AudSoundPlay();
-        }
-        break;
-    case MENU_STARTRECORD:
-        if (UseDialogs() && nReplayStatus != 1)
-        {
-            InputSetCooperativeLevel(false, bAlwaysProcessKeyboardInput);
-            AudBlankSound();
-            StopReplay();
-            StartRecord();
-            GameInpCheckMouse();
-        }
-        break;
-    case MENU_STOPREPLAY:
-        StopReplay();
-        break;
-
-#ifdef INCLUDE_AVI_RECORDING
-    case MENU_AVISTART:
-        if (AviStart())
-        {
-            AviStop();
-        }
-        else
-        {
-            VidSNewShortMsg(FBALoadStringEx(hAppInst, IDS_REC_AVI, true), 0x0000FF);
-        }
-        break;
-    case MENU_AVISTOP:
-        AviStop();
-        VidSNewShortMsg(FBALoadStringEx(hAppInst, IDS_STOP_AVI, true), 0xFF3F3F);
-        break;
-#endif
-
     case MENU_QUIT:
         AudBlankSound();
         if (nVidFullscreen)
@@ -1060,10 +830,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         }
         if (bDrvOkay)
         {
-            StopReplay();
-#ifdef INCLUDE_AVI_RECORDING
-            AviStop();
-#endif
             DrvExit();
             if (kNetGame)
             {
@@ -1086,10 +852,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         break;
 
     case MENU_EXIT:
-        StopReplay();
-#ifdef INCLUDE_AVI_RECORDING
-        AviStop();
-#endif
         if (kNetGame)
         {
             kNetGame = 0;
@@ -1187,7 +949,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         {
             InputSetCooperativeLevel(false, bAlwaysProcessKeyboardInput);
             AudSoundStop();
-            SplashDestroy(1);
             StatedLoad(0);
             GameInpCheckMouse();
             AudSoundPlay();
@@ -1295,12 +1056,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         bVidTripleBuffer = !bVidTripleBuffer;
         POST_INITIALISE_MESSAGE;
         break;
-
-    case MENU_DWMFIX:
-        bVidDWMCore = !bVidDWMCore;
-        POST_INITIALISE_MESSAGE;
-        break;
-
     case MENU_BLITTER_1:
         VidSelect(0);
         POST_INITIALISE_MESSAGE;
@@ -2013,26 +1768,8 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         bAlwaysCreateSupportFolders = !bAlwaysCreateSupportFolders;
         break;
 
-    case MENU_SAVEHISCORES:
-        EnableHiscores = !EnableHiscores;
-        break;
-
-    case MENU_USEBLEND:
-        bBurnUseBlend = !bBurnUseBlend;
-        break;
-
-#ifdef INCLUDE_AVI_RECORDING
-    case MENU_AVI3X:
-        nAvi3x = !nAvi3x;
-        break;
-#endif
-
     case MENU_ROMDIRS:
         RomsDirCreate(hScrnWnd);
-        break;
-
-    case MENU_SUPPORTDIRS:
-        SupportDirCreate(hScrnWnd);
         break;
 
     case MENU_LANGUAGE_SELECT:
@@ -2053,12 +1790,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         FBALocaliseInit(szLocalisationTemplate);
         POST_INITIALISE_MESSAGE;
         break;
-    case MENU_LANGUAGE_DOWNLOAD:
-        if (UseDialogs())
-        {
-            LocaliseDownloadCreate(hScrnWnd);
-        }
-        break;
 
     case MENU_LANGUAGE_GL_SELECT:
         if (UseDialogs())
@@ -2076,88 +1807,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         szGamelistLocalisationTemplate[0] = _T('\0');
         nGamelistLocalisationActive = false;
         break;
-
-    case MENU_ENABLEICONS:
-    {
-        bEnableIcons = !bEnableIcons;
-        if(!bEnableIcons && bIconsLoaded)
-        {
-            // unload icons
-            UnloadDrvIcons();
-            bIconsLoaded = 0;
-        }
-        if(bEnableIcons && !bIconsLoaded)
-        {
-            // load icons
-            LoadDrvIcons();
-            bIconsLoaded = 1;
-        }
-        break;
-    }
-
-    case MENU_ICONS_SIZE_16:
-    {
-        nIconsSize = ICON_16x16;
-        if(bEnableIcons && bIconsLoaded)
-        {
-            // unload icons
-            UnloadDrvIcons();
-            bIconsLoaded = 0;
-            // load icons
-            LoadDrvIcons();
-            bIconsLoaded = 1;
-        }
-        if(bEnableIcons && !bIconsLoaded)
-        {
-            // load icons
-            LoadDrvIcons();
-            bIconsLoaded = 1;
-        }
-        break;
-    }
-
-    case MENU_ICONS_SIZE_24:
-    {
-        nIconsSize = ICON_24x24;
-        if(bEnableIcons && bIconsLoaded)
-        {
-            // unload icons
-            UnloadDrvIcons();
-            bIconsLoaded = 0;
-            // load icons
-            LoadDrvIcons();
-            bIconsLoaded = 1;
-        }
-        if(bEnableIcons && !bIconsLoaded)
-        {
-            // load icons
-            LoadDrvIcons();
-            bIconsLoaded = 1;
-        }
-        break;
-    }
-
-    case MENU_ICONS_SIZE_32:
-    {
-        nIconsSize = ICON_32x32;
-        if(bEnableIcons && bIconsLoaded)
-        {
-            // unload icons
-            UnloadDrvIcons();
-            bIconsLoaded = 0;
-            // load icons
-            LoadDrvIcons();
-            bIconsLoaded = 1;
-        }
-        if(bEnableIcons && !bIconsLoaded)
-        {
-            // load icons
-            LoadDrvIcons();
-            bIconsLoaded = 1;
-        }
-        break;
-    }
-
     case MENU_INPUT_AUTOFIRE_RATE_1:
         nAutoFireRate = 22;
         break;
@@ -2283,35 +1932,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
 
     case MENU_ASSEMBLYCORE:
         bBurnUseASMCPUEmulation = !bBurnUseASMCPUEmulation;
-        break;
-
-    case MENU_SAVESNAP:
-    {
-        if (bDrvOkay)
-        {
-            int status = MakeScreenShot();
-
-            if (!status)
-            {
-                VidSNewShortMsg(FBALoadStringEx(hAppInst, IDS_SSHOT_SAVED, true));
-            }
-            else
-            {
-                TCHAR tmpmsg[256];
-
-                _sntprintf(tmpmsg, 256, FBALoadStringEx(hAppInst, IDS_SSHOT_ERROR, true), status);
-                VidSNewShortMsg(tmpmsg, 0xFF3F3F);
-            }
-        }
-        break;
-    }
-
-    case MENU_SNAPFACT:
-        if (UseDialogs())
-        {
-            InputSetCooperativeLevel(false, bAlwaysProcessKeyboardInput);
-            SFactdCreate();
-        }
         break;
 
     case MENU_CHEATSEARCH_START:
@@ -3476,8 +3096,6 @@ int ScrnSize()
     return 0;
 }
 
-#include "neocdlist.h"
-
 int ScrnTitle()
 {
     TCHAR szText[1024] = _T("");
@@ -3488,7 +3106,7 @@ int ScrnTitle()
         TCHAR *pszPosition = szText;
         TCHAR *pszName = BurnDrvGetText(DRV_FULLNAME);
 
-        pszPosition += _sntprintf(szText, 1024, _T(APP_TITLE) _T( " v%.20s") _T(SEPERATOR_1) _T("%s"), szAppBurnVer, pszName);
+        pszPosition += _sntprintf(szText, 1024, _T("%s"), pszName);
         while ((pszName = BurnDrvGetText(DRV_NEXTNAME | DRV_FULLNAME)) != NULL)
         {
             if (pszPosition + _tcslen(pszName) - 1024 > szText)
@@ -3497,16 +3115,10 @@ int ScrnTitle()
             }
             pszPosition += _stprintf(pszPosition, _T(SEPERATOR_2) _T("%s"), pszName);
         }
-
-        if(NeoCDInfo_Init())
-        {
-            return 0;
-        }
-
     }
     else
     {
-        _stprintf(szText, _T(APP_TITLE) _T( " v%.20s") _T(SEPERATOR_1) _T("[%s]"), szAppBurnVer, FBALoadStringEx(hAppInst, IDS_SCRN_NOGAME, true));
+        _stprintf(szText, _T(APP_TITLE) _T( " V%.20s"), szAppBurnVer);
     }
 
     SetWindowText(hScrnWnd, szText);

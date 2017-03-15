@@ -2,7 +2,7 @@
 #ifdef FBA_DEBUG
 #define APP_TITLE "FB Alpha [DEBUG]"
 #else
-#define APP_TITLE "FB Alpha"
+#define APP_TITLE "FB Alpha Lite"
 #endif
 
 #define APP_DESCRIPTION "Emulator for arcade games"

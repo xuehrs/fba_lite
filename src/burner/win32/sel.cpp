@@ -862,10 +862,6 @@ static void RefreshPanel()
         nTimer = 0;
     }
 
-
-    hPrevBmp = PNGLoadBitmap(hSelDlg, NULL, 213, 160, 2);
-    hTitleBmp = PNGLoadBitmap(hSelDlg, NULL, 213, 160, 2);
-
     SendDlgItemMessage(hSelDlg, IDC_SCREENSHOT_H, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hPrevBmp);
     SendDlgItemMessage(hSelDlg, IDC_SCREENSHOT_V, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)NULL);
 
@@ -885,222 +881,6 @@ static void RefreshPanel()
 
     CheckDlgButton(hSelDlg, IDC_SEL_SHORTNAME, nLoadMenuShowX & SHOWSHORT ? BST_CHECKED : BST_UNCHECKED);
     CheckDlgButton(hSelDlg, IDC_SEL_ASCIIONLY, nLoadMenuShowX & ASCIIONLY ? BST_CHECKED : BST_UNCHECKED);
-}
-
-FILE *OpenPreview(int nIndex, TCHAR *szPath)
-{
-    static bool bTryParent;
-
-    TCHAR szBaseName[MAX_PATH];
-    TCHAR szFileName[MAX_PATH];
-
-    FILE *fp = NULL;
-
-    // Try to load a .PNG preview image
-    _sntprintf(szBaseName, sizeof(szBaseName), _T("%s%s"), szPath, BurnDrvGetText(DRV_NAME));
-    if (nIndex <= 1)
-    {
-        _stprintf(szFileName, _T("%s.png"), szBaseName);
-        fp = _tfopen(szFileName, _T("rb"));
-    }
-    if (!fp)
-    {
-        _stprintf(szFileName, _T("%s [%02i].png"), szBaseName, nIndex);
-        fp = _tfopen(szFileName, _T("rb"));
-    }
-
-    if (nIndex <= 1)
-    {
-        bTryParent = fp ? false : true;
-    }
-
-    if (!fp && BurnDrvGetText(DRV_PARENT) && bTryParent)  						// Try the parent
-    {
-        _sntprintf(szBaseName, sizeof(szBaseName), _T("%s%s"), szPath, BurnDrvGetText(DRV_PARENT));
-        if (nIndex <= 1)
-        {
-            _stprintf(szFileName, _T("%s.png"), szBaseName);
-            fp = _tfopen(szFileName, _T("rb"));
-        }
-        if (!fp)
-        {
-            _stprintf(szFileName, _T("%s [%02i].png"), szBaseName, nIndex);
-            fp = _tfopen(szFileName, _T("rb"));
-        }
-    }
-
-    return fp;
-}
-
-static VOID CALLBACK PreviewTimerProc(HWND, UINT, UINT_PTR, DWORD)
-{
-    UpdatePreview(false, szAppPreviewsPath, IDC_SCREENSHOT_H, IDC_SCREENSHOT_V);
-}
-
-static VOID CALLBACK InitPreviewTimerProc(HWND, UINT, UINT_PTR, DWORD)
-{
-    UpdatePreview(true, szAppPreviewsPath, IDC_SCREENSHOT_H, IDC_SCREENSHOT_V);
-
-    if (GetIpsNumPatches())
-    {
-        if (!nShowMVSCartsOnly) EnableWindow(GetDlgItem(hSelDlg, IDC_SEL_IPSMANAGER), TRUE);
-    }
-    else
-    {
-        EnableWindow(GetDlgItem(hSelDlg, IDC_SEL_IPSMANAGER), FALSE);
-    }
-
-    LoadIpsActivePatches();
-    if (GetIpsNumActivePatches())
-    {
-        if (!nShowMVSCartsOnly) EnableWindow(GetDlgItem(hSelDlg, IDC_SEL_APPLYIPS), TRUE);
-    }
-    else
-    {
-        EnableWindow(GetDlgItem(hSelDlg, IDC_SEL_APPLYIPS), FALSE);
-    }
-
-    KillTimer(hSelDlg, nInitPreviewTimer);
-    nInitPreviewTimer = 0;
-}
-
-static int UpdatePreview(bool bReset, TCHAR *szPath, int HorCtrl, int VerCtrl)
-{
-    static int nIndex;
-    int nOldIndex = 0;
-
-    FILE *fp = NULL;
-    HBITMAP hNewImage = NULL;
-
-    if (HorCtrl == IDC_SCREENSHOT_H)
-    {
-        nOldIndex = nIndex;
-        nIndex++;
-        if (bReset)
-        {
-            nIndex = 1;
-            nOldIndex = -1;
-            if (nTimer)
-            {
-                KillTimer(hSelDlg, 1);
-                nTimer = 0;
-            }
-        }
-    }
-
-    nBurnDrvActive = nDialogSelect;
-
-    if ((nIndex != nOldIndex) || (HorCtrl == IDC_SCREENSHOT2_H))
-    {
-        int x, y, ax, ay;
-
-        BurnDrvGetAspect(&ax, &ay);
-
-        //if (BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL) {
-        if (ay > ax)
-        {
-            bImageOrientation = TRUE;
-
-            y = 160;
-            x = y * ax / ay;
-        }
-        else
-        {
-            bImageOrientation = FALSE;
-
-            x = 213;
-            y = x * ay / ax;
-        }
-
-        if (HorCtrl == IDC_SCREENSHOT_H)
-        {
-            fp = OpenPreview(nIndex, szPath);
-        }
-        else
-        {
-            fp = OpenPreview(0, szPath);
-        }
-        if (!fp && nIndex > 1 && HorCtrl == IDC_SCREENSHOT_H)
-        {
-            if (nIndex == 2)
-            {
-
-                // There's only a single preview image, stop timer
-
-                if (nTimer)
-                {
-                    KillTimer(hSelDlg, 1);
-                    nTimer = 0;
-                }
-
-                return 0;
-            }
-
-            nIndex = 1;
-            fp = OpenPreview(nIndex, szPath);
-        }
-        if (fp)
-        {
-            hNewImage = PNGLoadBitmap(hSelDlg, fp, x, y, 3);
-        }
-    }
-
-    if (fp)
-    {
-        fclose(fp);
-
-        if (HorCtrl == IDC_SCREENSHOT_H) nTimer = SetTimer(hSelDlg, 1, 2500, PreviewTimerProc);
-    }
-    else
-    {
-
-        // We couldn't load a new image for this game, so kill the timer (it will be restarted when a new game is selected)
-
-        if (HorCtrl == IDC_SCREENSHOT_H)
-        {
-            if (nTimer)
-            {
-                KillTimer(hSelDlg, 1);
-                nTimer = 0;
-            }
-        }
-
-        bImageOrientation = FALSE;
-        hNewImage = PNGLoadBitmap(hSelDlg, NULL, 213, 160, 2);
-    }
-
-    if (hPrevBmp && (HorCtrl == IDC_SCREENSHOT_H || VerCtrl == IDC_SCREENSHOT_V))
-    {
-        DeleteObject((HGDIOBJ)hPrevBmp);
-        * &hPrevBmp = NULL;
-        hPrevBmp = hNewImage;
-    }
-
-    if (hTitleBmp && (HorCtrl == IDC_SCREENSHOT2_H || VerCtrl == IDC_SCREENSHOT2_V))
-    {
-        DeleteObject((HGDIOBJ)hTitleBmp);
-        * &hTitleBmp = NULL;
-        hTitleBmp = hNewImage;
-    }
-
-    if (bImageOrientation == 0)
-    {
-        SendDlgItemMessage(hSelDlg, HorCtrl, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hNewImage);
-        SendDlgItemMessage(hSelDlg, VerCtrl, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)NULL);
-        ShowWindow(GetDlgItem(hSelDlg, HorCtrl), SW_SHOW);
-        ShowWindow(GetDlgItem(hSelDlg, VerCtrl), SW_HIDE);
-    }
-    else
-    {
-        SendDlgItemMessage(hSelDlg, HorCtrl, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)NULL);
-        SendDlgItemMessage(hSelDlg, VerCtrl, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hNewImage);
-        ShowWindow(GetDlgItem(hSelDlg, HorCtrl), SW_HIDE);
-        ShowWindow(GetDlgItem(hSelDlg, VerCtrl), SW_SHOW);
-    }
-
-    UpdateWindow(hSelDlg);
-
-    return 0;
 }
 
 static void RebuildEverything()
@@ -1248,25 +1028,6 @@ void LoadDrvIcons()
         nIconsSizeXY	= 32;
         nIconsYDiff		= 12;
     }
-
-    unsigned int nOldDrvSel = nBurnDrvActive;
-
-    for(unsigned int nDrvIndex = 0; nDrvIndex < nBurnDrvCount; nDrvIndex++)
-    {
-        nBurnDrvActive = nDrvIndex;
-        TCHAR szIcon[MAX_PATH];
-
-        _stprintf(szIcon, _T("%s%s.ico"), szAppIconsPath, BurnDrvGetText(DRV_NAME));
-        hDrvIcon[nDrvIndex] = (HICON)LoadImage(hAppInst, szIcon, IMAGE_ICON, nIconsSizeXY, nIconsSizeXY, LR_LOADFROMFILE);
-
-        if(!hDrvIcon[nDrvIndex] && BurnDrvGetText(DRV_PARENT))
-        {
-            _stprintf(szIcon, _T("%s%s.ico"), szAppIconsPath, BurnDrvGetText(DRV_PARENT));
-            hDrvIcon[nDrvIndex] = (HICON)LoadImage(hAppInst, szIcon, IMAGE_ICON, nIconsSizeXY, nIconsSizeXY, LR_LOADFROMFILE);
-        }
-    }
-
-    nBurnDrvActive = nOldDrvSel;
 }
 
 void UnloadDrvIcons()
@@ -1299,12 +1060,6 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
         InitCommonControls();
 
         hSelDlg = hDlg;
-
-        SendDlgItemMessage(hDlg, IDC_SCREENSHOT_H, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)NULL);
-        SendDlgItemMessage(hDlg, IDC_SCREENSHOT_V, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)NULL);
-
-        SendDlgItemMessage(hDlg, IDC_SCREENSHOT2_H, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)NULL);
-        SendDlgItemMessage(hDlg, IDC_SCREENSHOT2_V, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)NULL);
 
         hWhiteBGBrush	= CreateSolidBrush(RGB(0xFF, 0xFF, 0xFF));
 
@@ -1356,7 +1111,7 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
         }
 
         // Icons size related -----------------------------------------
-        SHORT cyItem = nIconsSizeXY + 4;								// height (in pixels) of each item on the TreeView list
+        SHORT cyItem = nIconsSizeXY;								// height (in pixels) of each item on the TreeView list
         TreeView_SetItemHeight(hSelList, cyItem);
 
         SetFocus(hSelList);
@@ -1378,9 +1133,6 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
                     break;
                 }
             }
-
-            // hack to load the preview image after a delay
-            nInitPreviewTimer = SetTimer(hSelDlg, 1, 20, InitPreviewTimerProc);
         }
 
         LONG_PTR Style;
@@ -1389,11 +1141,6 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
         SetWindowLongPtr (GetDlgItem(hSelDlg, IDC_TREE2), GWL_STYLE, Style);
 
         CreateFilters();
-
-        EnableWindow(GetDlgItem(hDlg, IDC_SEL_APPLYIPS), FALSE);
-        EnableWindow(GetDlgItem(hDlg, IDC_SEL_IPSMANAGER), FALSE);
-        bDoIpsPatch = FALSE;
-        IpsPatchExit();
 
         WndInMid(hDlg, hParent);
 
@@ -1733,40 +1480,6 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
                 nLoadMenuShowX ^= ASCIIONLY;
                 RebuildEverything();
                 break;
-            case IDGAMEINFO:
-                if (bDrvSelected)
-                {
-                    GameInfoDialogCreate(hSelDlg, nBurnDrvActive);
-                    SetFocus(hSelList); // Update list for Rescan Romset button
-                }
-                else
-                {
-                    MessageBox(hSelDlg, FBALoadStringEx(hAppInst, IDS_ERR_NO_DRIVER_SELECTED, true), FBALoadStringEx(hAppInst, IDS_ERR_ERROR, true), MB_OK);
-                }
-                break;
-            case IDC_SEL_IPSMANAGER:
-                if (bDrvSelected)
-                {
-                    IpsManagerCreate(hSelDlg);
-                    LoadIpsActivePatches();
-                    if (GetIpsNumActivePatches())
-                    {
-                        EnableWindow(GetDlgItem(hDlg, IDC_SEL_APPLYIPS), TRUE);
-                    }
-                    else
-                    {
-                        EnableWindow(GetDlgItem(hDlg, IDC_SEL_APPLYIPS), FALSE);
-                    }
-                    SetFocus(hSelList);
-                }
-                else
-                {
-                    MessageBox(hSelDlg, FBALoadStringEx(hAppInst, IDS_ERR_NO_DRIVER_SELECTED, true), FBALoadStringEx(hAppInst, IDS_ERR_ERROR, true), MB_OK);
-                }
-                break;
-            case IDC_SEL_APPLYIPS:
-                bDoIpsPatch = !bDoIpsPatch;
-                break;
             }
         }
     }
@@ -1865,11 +1578,6 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
 
         return 0;
     }
-
-    //	if (Msg == WM_TIMER) {
-    //		UpdatePreview(false, szAppPreviewsPath, IDC_SCREENSHOT_H, IDC_SCREENSHOT_V);
-    //		return 0;
-    //	}
 
     if (Msg == WM_CTLCOLORSTATIC)
     {
@@ -2153,31 +1861,10 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
                     nBurnDrvActive	= nBurnDrv[i].nBurnDrvNo;
                     nDialogSelect	= nBurnDrvActive;
                     bDrvSelected	= true;
-                    UpdatePreview(true, szAppPreviewsPath, IDC_SCREENSHOT_H, IDC_SCREENSHOT_V);
-                    UpdatePreview(false, szAppTitlesPath, IDC_SCREENSHOT2_H, IDC_SCREENSHOT2_V);
                     break;
                 }
             }
-
-            if (GetIpsNumPatches())
-            {
-                if (!nShowMVSCartsOnly) EnableWindow(GetDlgItem(hDlg, IDC_SEL_IPSMANAGER), TRUE);
-            }
-            else
-            {
-                EnableWindow(GetDlgItem(hDlg, IDC_SEL_IPSMANAGER), FALSE);
-            }
-
-            LoadIpsActivePatches();
-            if (GetIpsNumActivePatches())
-            {
-                if (!nShowMVSCartsOnly) EnableWindow(GetDlgItem(hDlg, IDC_SEL_APPLYIPS), TRUE);
-            }
-            else
-            {
-                EnableWindow(GetDlgItem(hDlg, IDC_SEL_APPLYIPS), FALSE);
-            }
-
+			
             // Get the text from the drivers via BurnDrvGetText()
             for (int i = 0; i < 6; i++)
             {
@@ -2540,18 +2227,6 @@ static int MVSpreviewUpdateSlot(int nSlot, HWND hDlg)
         nBurnDrvActive = nBurnDrvSelect[nSlot];
         if (nBurnDrvActive < nBurnDrvCount)
         {
-
-            FILE *fp = OpenPreview(0, szAppTitlesPath);
-            if (fp)
-            {
-                hMVSpreview[nSlot] = PNGLoadBitmap(hDlg, fp, 72, 54, 5);
-                fclose(fp);
-            }
-            else
-            {
-                hMVSpreview[nSlot] = PNGLoadBitmap(hDlg, NULL, 72, 54, 4);
-            }
-
             UpdateInfoROMInfo();
             UpdateInfoRelease();
             UpdateInfoGameInfo();
@@ -2560,7 +2235,6 @@ static int MVSpreviewUpdateSlot(int nSlot, HWND hDlg)
         }
         else
         {
-            hMVSpreview[nSlot] = PNGLoadBitmap(hDlg, NULL, 72, 54, 4);
             SendMessage(hInfoText[0], WM_SETTEXT, (WPARAM)0, (LPARAM)FBALoadStringEx(hAppInst, IDS_EMPTY, true));
         }
 

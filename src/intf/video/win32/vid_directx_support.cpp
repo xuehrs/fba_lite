@@ -1370,14 +1370,6 @@ static void VidSDisplayStatus(IDirectDrawSurface7 *pSurf, RECT *pRect)
     {
         nStatus |= 2;
     }
-    if (nReplayStatus == 1)
-    {
-        nStatus |= 4;
-    }
-    if (nReplayStatus == 2)
-    {
-        nStatus |= 8;
-    }
 
     if (nStatus != nPrevStatus)
     {

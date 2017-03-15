@@ -82,9 +82,6 @@ static INT32 DrvReset()
     {
         CpsRunResetCallbackFunction();
     }
-
-    HiscoreReset();
-
     return 0;
 }
 

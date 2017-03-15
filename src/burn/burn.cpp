@@ -37,7 +37,6 @@ UINT32 nCurrentFrame;			// Framecount for emulated game
 UINT32 nFramesEmulated;		// Counters for FPS	display
 UINT32 nFramesRendered;		//
 bool bForce60Hz = false;
-bool bBurnUseBlend = true;
 INT32 nBurnFPS = 6000;
 INT32 nBurnCPUSpeedAdjust = 0x0100;	// CPU speed adjustment (clock * nBurnCPUSpeedAdjust / 0x0100)
 
@@ -669,7 +668,6 @@ extern "C" INT32 BurnDrvInit()
     BurnSetRefreshRate(60.0);
 
     CheatInit();
-    HiscoreInit();
     BurnStateInit();
     BurnInitMemoryManager();
 
@@ -714,7 +712,6 @@ extern "C" INT32 BurnDrvExit()
 
     CheatExit();
     CheatSearchExit();
-    HiscoreExit();
     BurnStateExit();
 
     nBurnCPUSpeedAdjust = 0x0100;
@@ -773,7 +770,6 @@ INT32 BurnDrvCartridgeSetup(BurnCartrigeCommand nCommand)
 extern "C" INT32 BurnDrvFrame()
 {
     CheatApply();									// Apply cheats (if any)
-    HiscoreApply();
     return pDriver[nBurnDrvActive]->Frame();		// Forward to drivers function
 }
 

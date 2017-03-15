@@ -383,16 +383,10 @@ int FBAPopupDestroyText()
 int FBAPopupDisplay(int nFlags)
 {
     HMODULE hRiched = NULL;
-
-#if defined (_UNICODE)
-    hRiched = LoadLibrary(L"RICHED20.DLL");
-#else
-    hRiched = LoadLibrary("RICHED20.DLL");
-#endif
+	
+    hRiched = LoadLibrary(_T("RICHED20.DLL"));
 
     nPopupFlags = nFlags;
-
-    SplashDestroy(true);
 
     FBAPopupLog();
 

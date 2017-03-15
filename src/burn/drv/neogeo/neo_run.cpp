@@ -103,7 +103,6 @@ struct NeoMediaInfo {
 #include "cd_interface.h"
 #include "burn_ym2610.h"
 #include "bitswap.h"
-#include "neocdlist.h"
 
 // #undef USE_SPEEDHACKS
 
@@ -4862,10 +4861,6 @@ INT32 NeoExit()
     recursing = false;
 
     bDisableNeoWatchdog = false;
-
-    // release the NeoGeo CD information object if needed
-    NeoCDInfo_Exit();
-
     return 0;
 }
 

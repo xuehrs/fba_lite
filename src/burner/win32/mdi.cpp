@@ -47,7 +47,6 @@ bool				GetThemeStatus		();
 // Window message handling stuff
 static bool bDrag = false;
 static int nOldWindowX, nOldWindowY;
-static bool bRDblClick = false;
 static float nDownX, nDownY, nMoveX, nMoveY;
 HBITMAP hbitmap = NULL;
 void StretchBmForClient(HDC, HWND, HBITMAP);
@@ -60,8 +59,6 @@ static int OnMouseMove		(HWND, int, int, UINT);
 static int OnLButtonDown	(HWND, BOOL, int, int, UINT);
 static int OnLButtonUp		(HWND, int, int, UINT);
 static int OnLButtonDblClk	(HWND, BOOL, int, int, UINT);
-static int OnRButtonUp		(HWND, int, int, UINT);
-static int OnRButtonDown	(HWND, BOOL, int, int, UINT);
 static int OnSysCommand		(HWND, UINT, int, int);
 
 int InitBurnerMDI (HWND hParentWnd)
@@ -93,9 +90,6 @@ LRESULT CALLBACK VideoWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         HANDLE_MSG(hWnd, WM_LBUTTONUP,		OnLButtonUp);
         HANDLE_MSG(hWnd, WM_LBUTTONDOWN,	OnLButtonDown);
         HANDLE_MSG(hWnd, WM_LBUTTONDBLCLK,	OnLButtonDblClk);
-        HANDLE_MSG(hWnd, WM_RBUTTONUP,		OnRButtonUp);
-        HANDLE_MSG(hWnd, WM_RBUTTONDBLCLK,	OnRButtonDown);
-        HANDLE_MSG(hWnd, WM_RBUTTONDOWN,	OnRButtonDown);
 
     // We can't use the macro from windowsx.h macro for this one
     case WM_SYSCOMMAND:
@@ -281,7 +275,7 @@ static int OnMouseMove(HWND /*hwnd*/, int /*x*/, int /*y*/, UINT keyIndicators)
         AudSoundStop();
 
         // If UxThemes are active (Windows XP+) or DWM Composition is active
-        if(GetThemeStatus() || IsCompositeOn())
+        if(GetThemeStatus())
         {
             // Redraw everything on the MDI frame to get accurate calculatations
             RedrawWindow(hWndChildFrame, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW | RDW_ALLCHILDREN);
@@ -375,25 +369,6 @@ static int OnLButtonDblClk(HWND /*hwnd*/, BOOL, int, int, UINT)
     if (bDrvOkay)
     {
         nVidFullscreen = !nVidFullscreen;
-        POST_INITIALISE_MESSAGE;
-        return 0;
-    }
-    return 1;
-}
-
-// MOUSE RIGHT BUTTON (DOWN)
-static int OnRButtonDown(HWND hwnd, BOOL /*bDouble*/, int, int, UINT)
-{
-    return (hwnd == hVideoWindow && !nVidFullscreen) ? 0 : 1;
-}
-
-// MOUSE RIGHT BUTTON (UP)
-static int OnRButtonUp(HWND /*hwnd*/, int, int, UINT)
-{
-    // If not fullscreen and this event is not related to 'toggle fullscreen' right double-click event
-    if (!nVidFullscreen && !bRDblClick)
-    {
-        bMenuEnabled = !bMenuEnabled;
         POST_INITIALISE_MESSAGE;
         return 0;
     }

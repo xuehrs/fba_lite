@@ -4,8 +4,6 @@
 //#define DUMP_SPRITE_BITMAPS
 //#define DRAW_SPRITE_NUMBER
 
-static INT32 enable_blending = 0;
-
 static INT32   nTileMask = 0;
 static UINT8   sprmsktab[0x100];
 static UINT8  *SpritePrio;		// sprite priorities
@@ -14,7 +12,6 @@ static UINT16 *pTempDraw;		// pre-zoomed sprites
 static UINT8  *tiletrans;		// tile transparency table
 static UINT8  *texttrans;		// text transparency table
 static UINT32 *pTempDraw32;		// 32 bit temporary bitmap (blending!)
-static UINT8  *pSpriteBlendTable;	// if blending is available, allocate this.
 
 static inline UINT32 alpha_blend(UINT32 d, UINT32 s, UINT32 p)
 {
@@ -60,32 +57,6 @@ static void draw_font(INT32 sx, INT32 sy, UINT32 code)
         enable1 = 1;
 
         UINT8 *gfx = font_pixels[chr];
-
-        if (enable_blending)
-        {
-            for (INT32 y = 0; y < 7; y++)
-            {
-                if ((sy + y) < 0 || (sy + y) >= nScreenHeight) continue; // clip
-
-                UINT32 *dst = pTempDraw32 + (sy + y) * nScreenWidth;
-
-                for (INT32 x = 0; x < 5; x++)
-                {
-                    if ((sx + x) < 0 || (sx + x) >= nScreenWidth) continue; // clip
-
-                    INT32 pxl = gfx[(y * 5) + x];
-                    if (pxl)
-                    {
-                        dst[(sx + x)] = 0xffffff;
-                    }
-                    else
-                    {
-                        dst[(sx + x)] = 0x000000;
-                    }
-                }
-            }
-        }
-        else
         {
             for (INT32 y = 0; y < 7; y++)
             {
@@ -146,8 +117,6 @@ inline static UINT32 CalcCol(UINT16 nColour)
     g |= g >> 5;
     b = (nColour & 0x001F) << 3;	// Blue
     b |= b >> 5;
-
-    if (enable_blending) return (r << 16) | (g << 8) | (b << 0);
 
     return BurnHighCol(r, g, b, 0);
 }
@@ -690,11 +659,6 @@ static void pgm_drawsprites()
         if (xpos > 0x3ff) xpos -= 0x800;
         if (ypos > 0x1ff) ypos -= 0x400;
 
-        if (enable_blending)
-        {
-            palt |= pSpriteBlendTable[boff] << 7;
-        }
-
         draw_sprite_new_zoomed(wide, high, xpos, ypos, palt, boff * 2, flip, xzoom, xgrow, yzoom, ygrow, prio);
 
         source += 5;
@@ -706,35 +670,12 @@ static void copy_sprite_priority(INT32 prio)
     UINT16 *src = pTempScreen;
     UINT8 *pri = SpritePrio;
 
-    if (enable_blending)
+    UINT16 *dest = pTransDraw;
+    for (INT32 i = 0; i < nScreenWidth * nScreenHeight; i++)
     {
-        UINT32 *dest = pTempDraw32;
-        INT32 blend_levels[16] = { 0x00, 0x1f, 0x2f, 0x3f, 0x4f, 0x5f, 0x6f, 0x7f, 0x8f, 0x9f, 0xaf, 0xbf, 0xcf, 0xdf, 0xef, 0xff };
-
-        for (INT32 i = 0; i < nScreenWidth * nScreenHeight; i++)
+        if (pri[i] == prio)
         {
-            if (pri[i] == prio)
-            {
-                if (src[i] & 0xf000)
-                {
-                    dest[i] = alpha_blend(dest[i], RamCurPal[src[i] & 0xfff], blend_levels[src[i] / 0x1000]);
-                }
-                else
-                {
-                    dest[i] = RamCurPal[src[i]];
-                }
-            }
-        }
-    }
-    else
-    {
-        UINT16 *dest = pTransDraw;
-        for (INT32 i = 0; i < nScreenWidth * nScreenHeight; i++)
-        {
-            if (pri[i] == prio)
-            {
-                dest[i] = src[i];
-            }
+            dest[i] = src[i];
         }
     }
 }
@@ -766,33 +707,6 @@ static void draw_text()
         INT32 flipx =  (attr & 0x40);
         INT32 flipy =  (attr & 0x80);
 
-        if (enable_blending)
-        {
-            UINT8 *gfx = PGMTileROM + (code * 0x40);
-            INT32 flip = (flipx ? 0x07 : 0) | (flipy ? 0x38 : 0);
-            UINT32 *pal = RamCurPal + color * 0x10;
-            UINT32 *dst = pTempDraw32 + (sy * nScreenWidth) + sx;
-
-            for (INT32 y = 0; y < 8; y++, dst += nScreenWidth)
-            {
-                if ((sy + y) >= 0 && (sy + y) < nScreenHeight)
-                {
-                    for (INT32 x = 0; x < 8; x++)
-                    {
-                        INT32 pxl = gfx[((y * 8) + x)^flip];
-
-                        if (pxl != 0xf)
-                        {
-                            if ((sx + x) >= 0 && (sx + x) < nScreenWidth)
-                            {
-                                dst[x] = pal[pxl];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else
         {
             if (sx < 0 || sy < 0 || sx >= nScreenWidth - 8 || sy >= nScreenHeight - 8)
             {
@@ -951,33 +865,6 @@ static void draw_background()
             INT32 flipy = BURN_ENDIAN_SWAP_INT16(vram[offs * 2 + 1]) & 0x80;
             INT32 flipx = BURN_ENDIAN_SWAP_INT16(vram[offs * 2 + 1]) & 0x40;
 
-            if (enable_blending)
-            {
-                UINT8 *gfx = PGMTileROMExp + (code * 0x400);
-                INT32 flip = (flipx ? 0x1f : 0) | (flipy ? 0x3e0 : 0);
-                UINT32 *pal = RamCurPal + color * 0x20;
-                UINT32 *dst = pTempDraw32 + (sy * nScreenWidth) + sx;
-
-                for (INT32 y = 0; y < 32; y++, dst += nScreenWidth)
-                {
-                    if ((sy + y) >= 0 && (sy + y) < nScreenHeight)
-                    {
-                        for (INT32 x = 0; x < 32; x++)
-                        {
-                            INT32 pxl = gfx[((y * 32) + x)^flip];
-
-                            if (pxl != 0x1f)
-                            {
-                                if ((sx + x) >= 0 && (sx + x) < nScreenWidth)
-                                {
-                                    dst[x] = pal[pxl];
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            else
             {
                 if (sx < 0 || sy < 0 || sx >= nScreenWidth - 32 || sy >= nScreenHeight - 32)
                 {
@@ -1114,41 +1001,6 @@ static void draw_background()
             INT32 flipy = ((attr & 0x80) >> 7) * 0x1f;
 
             UINT8 *src = PGMTileROMExp + (code * 1024) + (((scrolly ^ flipy) & 0x1f) << 5);
-
-            if (enable_blending)
-            {
-                UINT32 *dst = pTempDraw32 + (y * nScreenWidth);
-                UINT32 *pal = RamCurPal + color;
-
-                if (sx >= 0 && sx <= 415)
-                {
-                    for (INT32 xx = 0; xx < 32; xx++, sx++)
-                    {
-                        INT32 pxl = src[xx ^ flipx];
-
-                        if (pxl != 0x1f)
-                        {
-                            dst[sx] = pal[pxl];
-                        }
-                    }
-                }
-                else
-                {
-                    for (INT32 xx = 0; xx < 32; xx++, sx++)
-                    {
-                        if (sx < 0) continue;
-                        if (sx >= nScreenWidth) break;
-
-                        INT32 pxl = src[xx ^ flipx];
-
-                        if (pxl != 0x1f)
-                        {
-                            dst[sx] = pal[pxl];
-                        }
-                    }
-                }
-            }
-            else
             {
                 UINT16 *dst = pTransDraw + (y * nScreenWidth);
 
@@ -1184,22 +1036,8 @@ static void draw_background()
     }
 }
 
-static void pgmBlendCopy()
-{
-    pBurnDrvPalette = RamCurPal;
-
-    UINT32 *bmp = pTempDraw32;
-
-    for (INT32 i = 0; i < nScreenWidth * nScreenHeight; i++)
-    {
-        PutPix(pBurnDraw + (i * nBurnBpp), BurnHighCol(bmp[i] >> 16, (bmp[i] >> 8) & 0xff, bmp[i] & 0xff, 0));
-    }
-}
-
 INT32 pgmDraw()
 {
-    if (enable_blending) nPgmPalRecalc = 1; // force recalc.
-
     if (nPgmPalRecalc)
     {
         for (INT32 i = 0; i < 0x1200 / 2; i++)
@@ -1240,96 +1078,9 @@ INT32 pgmDraw()
 #endif
     if (nBurnLayer & 2) draw_text();
 
-    if (enable_blending)
-    {
-        pgmBlendCopy();
-    }
-    else
-    {
-        BurnTransferCopy(RamCurPal);
-    }
+    BurnTransferCopy(RamCurPal);
 
     return 0;
-}
-
-static void pgmBlendInit()
-{
-    enable_blending = 0;
-
-    TCHAR filename[MAX_PATH];
-
-    _stprintf(filename, _T("%s%s.bld"), szAppBlendPath, BurnDrvGetText(DRV_NAME));
-
-    FILE *fa = _tfopen(filename, _T("rt"));
-
-    if (fa == NULL)
-    {
-        bprintf (0, _T("can't find: %s\n"), filename);
-        _stprintf(filename, _T("%s%s.bld"), szAppBlendPath, BurnDrvGetText(DRV_PARENT));
-
-        fa = _tfopen(filename, _T("rt"));
-
-        if (fa == NULL)
-        {
-            bprintf (0, _T("can't find: %s\n"), filename);
-            return;
-        }
-    }
-
-    if (pSpriteBlendTable == NULL)
-    {
-        pSpriteBlendTable = (UINT8 *)BurnMalloc(0x800000);
-        if (pSpriteBlendTable == NULL)
-        {
-            bprintf (0, _T("can't allocate blend table\n"));
-            return;
-        }
-    }
-
-    bprintf (PRINT_IMPORTANT, _T("Using sprite blending (.bld) table!\n"));
-
-    char szLine[64];
-
-    while (1)
-    {
-        if (fgets (szLine, 64, fa) == NULL) break;
-
-        if (strncmp ("Game", szLine, 4) == 0) continue; 	// don't care
-        if (strncmp ("Name", szLine, 4) == 0) continue; 	// don't care
-        if (szLine[0] == ';') continue;				// comment (also don't care)
-
-        INT32 single_entry = -1;
-        UINT32 type, min, max, k;
-
-        for (k = 0; k < strlen(szLine); k++)
-        {
-            if (szLine[k] == '-')
-            {
-                single_entry = k + 1;
-                break;
-            }
-        }
-
-        if (single_entry < 0)
-        {
-            sscanf(szLine, "%x %x", &max, &type);
-            min = max;
-        }
-        else
-        {
-            sscanf(szLine, "%x", &min);
-            sscanf(szLine + single_entry, "%x %x", &max, &type);
-        }
-
-        for (k = min; k <= max && k < 0x800000; k++)
-        {
-            pSpriteBlendTable[k] = type & 0xf;
-        }
-    }
-
-    fclose (fa);
-
-    enable_blending = 1;
 }
 
 void pgmInitDraw() // preprocess some things...
@@ -1340,8 +1091,6 @@ void pgmInitDraw() // preprocess some things...
     pTempDraw = (UINT16 *)BurnMalloc(0x400 * 0x200 * sizeof(INT16));
     SpritePrio = (UINT8 *)BurnMalloc(nScreenWidth * nScreenHeight);
     pTempScreen = (UINT16 *)BurnMalloc(nScreenWidth * nScreenHeight * sizeof(INT16));
-
-    if (bBurnUseBlend) pgmBlendInit();
 
     // Find transparent tiles so we can skip them
     {
@@ -1411,13 +1160,6 @@ void pgmExitDraw()
     BurnFree (texttrans);
     BurnFree (pTempScreen);
     BurnFree (SpritePrio);
-
-    if (pSpriteBlendTable)
-    {
-        BurnFree(pSpriteBlendTable);
-    }
-
-    enable_blending = 0;
 
     GenericTilesExit();
 }

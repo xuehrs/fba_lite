@@ -554,9 +554,7 @@ static int AppInit()
     if (nIniVersion < nBurnVer)
     {
         ScrnInit();
-        //SplashDestroy(1);
         FirstUsageCreate();
-
         ConfigAppSave();								// Create initial config file
     }
 #endif
@@ -630,7 +628,6 @@ static int AppExit()
 
 void AppCleanup()
 {
-    StopReplay();
     WaveLogStop();
 
     AppExit();

@@ -200,12 +200,7 @@ static INT_PTR CALLBACK AboutProc(HWND hDlg , UINT Msg, WPARAM wParam, LPARAM lP
 int AboutCreate()
 {
     HMODULE hRiched = NULL;
-
-#if defined (_UNICODE)
-    hRiched = LoadLibrary(L"RICHED20.DLL");
-#else
-    hRiched = LoadLibrary("RICHED20.DLL");
-#endif
+	hRiched = LoadLibrary(_T("RICHED20.DLL"));
     if (hRiched)
     {
         FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_ABOUT), hScrnWnd, (DLGPROC)AboutProc);
@@ -246,9 +241,6 @@ static INT_PTR CALLBACK FirstProc(HWND hDlg , UINT Msg, WPARAM wParam, LPARAM lP
 
         SetForegroundWindow(hDlg);
         WndInMid(hDlg, NULL);
-
-        SplashDestroy(1);
-
         return TRUE;
     }
 

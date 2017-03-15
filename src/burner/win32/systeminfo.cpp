@@ -1265,8 +1265,7 @@ LONG CALLBACK ExceptionFilter(_EXCEPTION_POINTERS *pExceptionInfo)
         return EXCEPTION_EXECUTE_HANDLER;
 #endif
     }
-
-    SplashDestroy(1);
+	
     AudSoundStop();
 
     pExceptionPointers = pExceptionInfo;

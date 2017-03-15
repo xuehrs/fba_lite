@@ -23,7 +23,7 @@ static int nCurrentItem;
 static int nCurrentItemFlags;
 
 int nMenuHeight = 0;
-int nWindowSize = 0;
+int nWindowSize = 1;
 int nScreenSize = 0;
 int nScreenSizeHor = 0;
 int nScreenSizeVer = 0;
@@ -707,31 +707,6 @@ static void CreateStateslotItems()
     menuItem.cch = _tcslen(szItemText);
     SetMenuItemInfo(hMenu, MENU_STATE_SAVE_SLOT, 0, &menuItem);
 }
-#if 0
-// Update CD menu items
-static void CreateCDItems()
-{
-    TCHAR szItemText[256];
-    MENUITEMINFO menuItem = { sizeof(MENUITEMINFO), MIIM_TYPE, MFT_STRING, 0, 0, NULL, NULL, NULL, 0, szItemText, 0, NULL };
-
-    _sntprintf(szItemText, 256, FBALoadStringEx(hAppInst, IDS_CD_SELECT_IMAGE, true));
-    if (nCDEmuSelect == 0)
-    {
-        TCHAR szImage[32];
-        int length = _tcslen(szItemText);
-
-        _sntprintf(szImage, 13, _T("\t%s"), CDEmuImage);
-        if (_tcslen(szImage) > 13)
-        {
-            _sntprintf(szImage + 13, 8, _T("..."));
-        }
-
-        _sntprintf(szItemText + length - 1, 256 - length, szImage);
-    }
-    menuItem.cch = _tcslen(szItemText);
-    SetMenuItemInfo(hMenu, MENU_CDIMAGE, 0, &menuItem);
-}
-#endif
 // Update bullets, checkmarks, and item text
 void MenuUpdate()
 {
@@ -769,10 +744,7 @@ void MenuUpdate()
     }
     CheckMenuRadioItem(hMenu, MENU_NOSTRETCH, MENU_ASPECT, var, MF_BYCOMMAND);
     CheckMenuItem(hMenu, MENU_STRETCH, bVidFullStretch ? MF_CHECKED : MF_UNCHECKED);
-
     CheckMenuItem(hMenu, MENU_TRIPLE, bVidTripleBuffer ? MF_CHECKED : MF_UNCHECKED);
-
-    CheckMenuItem(hMenu, MENU_DWMFIX, bVidDWMCore ? MF_CHECKED : MF_UNCHECKED);
 
     var = nVidSelect + MENU_BLITTER_1;
     CheckMenuRadioItem(hMenu, MENU_BLITTER_1, MENU_BLITTER_8, var, MF_BYCOMMAND);
@@ -1205,12 +1177,6 @@ void MenuUpdate()
     CheckMenuItem(hMenu, MENU_MODELESS, bModelessMenu ? MF_CHECKED : MF_UNCHECKED);
     CheckMenuItem(hMenu, MENU_NOCHANGENUMLOCK, bNoChangeNumLock ? MF_CHECKED : MF_UNCHECKED);
     CheckMenuItem(hMenu, MENU_CREATEDIRS, bAlwaysCreateSupportFolders ? MF_CHECKED : MF_UNCHECKED);
-    CheckMenuItem(hMenu, MENU_SAVEHISCORES, EnableHiscores ? MF_CHECKED : MF_UNCHECKED);
-    CheckMenuItem(hMenu, MENU_USEBLEND, bBurnUseBlend ? MF_CHECKED : MF_UNCHECKED);
-
-#ifdef INCLUDE_AVI_RECORDING
-    CheckMenuItem(hMenu, MENU_AVI3X, nAvi3x ? MF_CHECKED : MF_UNCHECKED);
-#endif
 
     if (nAppThreadPriority == THREAD_PRIORITY_TIME_CRITICAL)
     {
@@ -1629,18 +1595,6 @@ void MenuEnableItems()
             EnableMenuItem(hMenu, MENU_WLOGSTART,	MF_ENABLED | MF_BYCOMMAND);
         }
 
-        if (nReplayStatus)
-        {
-            EnableMenuItem(hMenu, MENU_STOPREPLAY,				MF_ENABLED | MF_BYCOMMAND);
-            EnableMenuItem(hMenu, MENU_STARTRECORD,				MF_GRAYED  | MF_BYCOMMAND);
-            EnableMenuItem(hMenu, MENU_STARTREPLAY,				MF_GRAYED  | MF_BYCOMMAND);
-            EnableMenuItem(hMenu, MENU_STATE_LOAD_SLOT,			MF_GRAYED  | MF_BYCOMMAND);
-            EnableMenuItem(hMenu, MENU_STATE_LOAD_DIALOG,		MF_GRAYED  | MF_BYCOMMAND);
-        }
-        else
-        {
-            EnableMenuItem(hMenu, MENU_STOPREPLAY,				MF_GRAYED  | MF_BYCOMMAND);
-
             if (kNetGame)
             {
                 EnableMenuItem(hMenu, MENU_STARTRECORD,			MF_ENABLED | MF_BYCOMMAND);
@@ -1659,21 +1613,6 @@ void MenuEnableItems()
                 EnableMenuItem(hMenu, MENU_STATE_LOAD_SLOT,		MF_ENABLED | MF_BYCOMMAND);
                 EnableMenuItem(hMenu, MENU_STATE_LOAD_DIALOG,	MF_ENABLED | MF_BYCOMMAND);
             }
-        }
-#ifdef INCLUDE_AVI_RECORDING
-        if (nAviStatus)
-        {
-            EnableMenuItem(hMenu, MENU_AVISTART,	        MF_GRAYED | MF_BYCOMMAND);
-            EnableMenuItem(hMenu, MENU_AVISTOP,		        MF_ENABLED | MF_BYCOMMAND);
-            EnableMenuItem(hMenu, MENU_AVI3X,		        MF_GRAYED | MF_BYCOMMAND);
-        }
-        else
-        {
-            EnableMenuItem(hMenu, MENU_AVISTART,	        MF_ENABLED | MF_BYCOMMAND);
-            EnableMenuItem(hMenu, MENU_AVISTOP,		        MF_GRAYED | MF_BYCOMMAND);
-            EnableMenuItem(hMenu, MENU_AVI3X,		        MF_ENABLED | MF_BYCOMMAND);
-        }
-#endif
     }
     else
     {
@@ -1726,10 +1665,6 @@ void MenuEnableItems()
         EnableMenuItem(hMenu, MENU_SNAPFACT,			MF_GRAYED  | MF_BYCOMMAND);
         EnableMenuItem(hMenu, MENU_PALETTEVIEWER,		MF_GRAYED | MF_BYCOMMAND);
         EnableMenuItem(hMenu, MENU_SAVEGAMEINPUTNOW,		MF_GRAYED  | MF_BYCOMMAND);
-#ifdef INCLUDE_AVI_RECORDING
-        EnableMenuItem(hMenu, MENU_AVISTART,	        MF_GRAYED | MF_BYCOMMAND);
-        EnableMenuItem(hMenu, MENU_AVISTOP,		        MF_GRAYED | MF_BYCOMMAND);
-#endif
         EnableMenuItem(hMenu, MENU_CDIMAGE,				MF_ENABLED | MF_BYCOMMAND);
 
         EnableMenuItem(hMenu, MENU_AUD_PLUGIN_1, 		MF_ENABLED  | MF_BYCOMMAND);

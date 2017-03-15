@@ -67,7 +67,7 @@ PERL = 1
 LSB_FIRST = 1
 
 # Include png.h from burner.h
-INCLUDE_LIB_PNGH = 1
+#INCLUDE_LIB_PNGH = 1
 
 
 #

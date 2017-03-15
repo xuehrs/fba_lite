@@ -2,8 +2,6 @@
 #include <shlobj.h>
 #include <process.h>
 
-static HWND hTabControl = NULL;
-
 HWND hRomsDlg = NULL;
 static HWND hParent = NULL;
 
@@ -37,74 +35,15 @@ static INT_PTR CALLBACK DefInpProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
         chOk = false;
 
         // Setup edit controls values (ROMs Paths)
-        for(int x = 0; x < 20; x++)
+        for(int x = 0; x < DIRS_MAX; x++)
         {
             SetDlgItemText(hDlg, IDC_ROMSDIR_EDIT1 + x, szAppRomPaths[x]);
         }
-
-        // Setup the tabs
-        hTabControl = GetDlgItem(hDlg, IDC_ROMPATH_TAB);
-
-        TC_ITEM tcItem;
-        tcItem.mask = TCIF_TEXT;
-
-        UINT idsString[20] = { IDS_ROMPATH_1, IDS_ROMPATH_2, IDS_ROMPATH_3, IDS_ROMPATH_4, IDS_ROMPATH_5, IDS_ROMPATH_6, IDS_ROMPATH_7, IDS_ROMPATH_8, IDS_ROMPATH_9, IDS_ROMPATH_10, IDS_ROMPATH_11, IDS_ROMPATH_12, IDS_ROMPATH_13, IDS_ROMPATH_14, IDS_ROMPATH_15, IDS_ROMPATH_16, IDS_ROMPATH_17, IDS_ROMPATH_18, IDS_ROMPATH_19, IDS_ROMPATH_20 };
-
-        for(int nIndex = 0; nIndex < 20; nIndex++)
-        {
-            tcItem.pszText = FBALoadStringEx(hAppInst, idsString[nIndex], true);
-            TabCtrl_InsertItem(hTabControl, nIndex, &tcItem);
-        }
-
-        int TabPage = TabCtrl_GetCurSel(hTabControl);
-
-        // hide all controls excluding the selected controls
-        for(int x = 0; x < 20; x++)
-        {
-            if(x != TabPage)
-            {
-                ShowWindow(GetDlgItem(hDlg, IDC_ROMSDIR_BR1 + x), SW_HIDE);		// browse buttons
-                ShowWindow(GetDlgItem(hDlg, IDC_ROMSDIR_EDIT1 + x), SW_HIDE);	// edit controls
-            }
-        }
-
-        // Show the proper controls
-        ShowWindow(GetDlgItem(hDlg, IDC_ROMSDIR_BR1 + TabPage), SW_SHOW);		// browse buttons
-        ShowWindow(GetDlgItem(hDlg, IDC_ROMSDIR_EDIT1 + TabPage), SW_SHOW);		// edit controls
 
         UpdateWindow(hDlg);
 
         WndInMid(hDlg, hParent);
         SetFocus(hDlg);											// Enable Esc=close
-        break;
-    }
-    case WM_NOTIFY:
-    {
-        NMHDR *pNmHdr = (NMHDR *)lParam;
-
-        if (pNmHdr->code == TCN_SELCHANGE)
-        {
-
-            int TabPage = TabCtrl_GetCurSel(hTabControl);
-
-            // hide all controls excluding the selected controls
-            for(int x = 0; x < 20; x++)
-            {
-                if(x != TabPage)
-                {
-                    ShowWindow(GetDlgItem(hDlg, IDC_ROMSDIR_BR1 + x), SW_HIDE);		// browse buttons
-                    ShowWindow(GetDlgItem(hDlg, IDC_ROMSDIR_EDIT1 + x), SW_HIDE);	// edit controls
-                }
-            }
-
-            // Show the proper controls
-            ShowWindow(GetDlgItem(hDlg, IDC_ROMSDIR_BR1 + TabPage), SW_SHOW);		// browse buttons
-            ShowWindow(GetDlgItem(hDlg, IDC_ROMSDIR_EDIT1 + TabPage), SW_SHOW);		// edit controls
-
-            UpdateWindow(hDlg);
-
-            return FALSE;
-        }
         break;
     }
     case WM_COMMAND:
@@ -117,15 +56,12 @@ static INT_PTR CALLBACK DefInpProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
         if (LOWORD(wParam) == IDOK)
         {
 
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < DIRS_MAX; i++)
             {
-                //					if (GetDlgItemText(hDlg, IDC_ROMSDIR_EDIT1 + i, buffer, sizeof(buffer)) && lstrcmp(szAppRomPaths[i], buffer)) {
                 GetDlgItemText(hDlg, IDC_ROMSDIR_EDIT1 + i, buffer, sizeof(buffer));
                 if (lstrcmp(szAppRomPaths[i], buffer)) chOk = true;
                 lstrcpy(szAppRomPaths[i], buffer);
-                //					}
             }
-
             SendMessage(hDlg, WM_CLOSE, 0, 0);
             break;
         }
@@ -151,7 +87,7 @@ static INT_PTR CALLBACK DefInpProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
         bInfo.hwndOwner = hDlg;
         bInfo.pszDisplayName = buffer;
         bInfo.lpszTitle = FBALoadStringEx(hAppInst, IDS_ROMS_SELECT_DIR, true);
-        bInfo.ulFlags = BIF_EDITBOX | BIF_RETURNONLYFSDIRS;
+        bInfo.ulFlags = BIF_USENEWUI;
 
         pItemIDList = SHBrowseForFolder(&bInfo);
 
