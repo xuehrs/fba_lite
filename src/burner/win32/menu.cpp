@@ -1,5 +1,4 @@
 // Menu handling
-
 #include "burner.h"
 
 #ifdef _MSC_VER
@@ -712,17 +711,10 @@ void MenuUpdate()
 {
     int var;
 
-    //	if (!bMenuEnabled) {
-    //		return;
-    //	}
-
     CreateStateslotItems();
 
     CheckMenuItem(hMenu, MENU_PAUSE, bAltPause ? MF_CHECKED : MF_UNCHECKED);
     CheckMenuItem(hMenu, MENU_ALLRAM, bDrvSaveAll ? MF_CHECKED : MF_UNCHECKED);
-
-    //	CreateCDItems();
-    //	CheckMenuRadioItem(hMenu, MENU_CDIMAGE, MENU_CDIMAGE, MENU_CDIMAGE + nCDEmuSelect, MF_BYCOMMAND);
 
     CheckMenuItem(hMenu, MENU_SETCPUCLOCK, nBurnCPUSpeedAdjust != 0x0100 ? MF_CHECKED : MF_UNCHECKED);
     CreateCPUSpeedItem(nBurnCPUSpeedAdjust != 0x0100);
@@ -1230,22 +1222,6 @@ void MenuUpdate()
     CheckMenuItem(hMenu, MENU_ASSEMBLYCORE, MF_UNCHECKED);
     EnableMenuItem(hMenu, MENU_ASSEMBLYCORE, MF_GRAYED  | MF_BYCOMMAND);
 #endif
-
-    var = MENU_ICONS_SIZE_16;
-    switch (nIconsSize)
-    {
-    case ICON_16x16:
-        var = MENU_ICONS_SIZE_16;
-        break;
-    case ICON_24x24:
-        var = MENU_ICONS_SIZE_24;
-        break;
-    case ICON_32x32:
-        var = MENU_ICONS_SIZE_32;
-        break;
-    }
-    CheckMenuRadioItem(hMenu, MENU_ICONS_SIZE_16, MENU_ICONS_SIZE_32, var, MF_BYCOMMAND);
-    CheckMenuItem(hMenu, MENU_ENABLEICONS, bEnableIcons ? MF_CHECKED : MF_UNCHECKED);
 
     // Previous games list
     for (int i = 0; i < SHOW_PREV_GAMES; i++)

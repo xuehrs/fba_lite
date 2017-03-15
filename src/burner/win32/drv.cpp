@@ -136,30 +136,6 @@ int DrvInit(int nDrvNum, bool bRestore)
 
     nBurnDrvActive = nDrvNum;		// Set the driver number
 
-    if ((BurnDrvGetHardwareCode() & HARDWARE_PUBLIC_MASK) == HARDWARE_SNK_MVS)
-    {
-
-        BurnExtCartridgeSetupCallback = DrvCartridgeAccess;
-
-        if (SelMVSDialog())
-        {
-            POST_INITIALISE_MESSAGE;
-            return 0;
-        }
-    }
-
-    if ((BurnDrvGetHardwareCode() & HARDWARE_PUBLIC_MASK) == HARDWARE_SNK_NEOCD)
-    {
-        if (CDEmuInit())
-        {
-            FBAPopupAddText(PUF_TEXT_DEFAULT, MAKEINTRESOURCE(IDS_ERR_CDEMU_INI_FAIL));
-            FBAPopupDisplay(PUF_TYPE_ERROR);
-
-            POST_INITIALISE_MESSAGE;
-            return 0;
-        }
-    }
-
     MediaInit();
 
     // Define nMaxPlayers early; GameInpInit() needs it (normally defined in DoLibInit()).
@@ -289,8 +265,6 @@ int DrvExit()
         // Write silence into the sound buffer on exit, and for drivers which don't use pBurnSoundOut
         memset(nAudNextSound, 0, nAudSegLen << 2);
     }
-
-    CDEmuExit();
 
     BurnExtCartridgeSetupCallback = NULL;
 

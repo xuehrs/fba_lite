@@ -6,18 +6,11 @@
 // don't reduce for these as we display them in the list (neogeo, neocdz)
 #define REDUCE_TOTAL_SETS_BIOS		7
 
-UINT_PTR nTimer					= 0;
 UINT_PTR nInitPreviewTimer		= 0;
 int nDialogSelect				= -1;										// The driver which this dialog selected
 int nOldDlgSelected				= -1;
 bool bDialogCancel				= false;
-
 bool bDrvSelected				= false;
-
-static int nShowMVSCartsOnly	= 0;
-
-HBITMAP hPrevBmp				= NULL;
-HBITMAP hTitleBmp				= NULL;
 
 HWND hSelDlg					= NULL;
 static HWND hSelList			= NULL;
@@ -29,20 +22,9 @@ static HBRUSH hWhiteBGBrush;
 static HICON hExpand, hCollapse;
 static HICON hNotWorking, hNotFoundEss, hNotFoundNonEss;
 
-static HICON hDrvIconMiss;
 
 static char TreeBuilding		= 0;										// if 1, ignore TVN_SELCHANGED messages
 
-static int bImageOrientation;
-static int UpdatePreview(bool bReset, TCHAR *szPath, int HorCtrl, int VerCrtl);
-
-int	nIconsSize					= ICON_16x16;
-int	nIconsSizeXY				= 16;
-bool bEnableIcons				= 0;
-bool bIconsLoaded				= 0;
-int nIconsXDiff;
-int nIconsYDiff;
-static HICON hDrvIcon[9999];
 bool bGameInfoOpen				= false;
 
 // Dialog Sizing
@@ -369,55 +351,16 @@ static bool CheckWorkingStatus(int nDriver)
     return bStatus;
 }
 
+//???
 static TCHAR *MangleGamename(const TCHAR *szOldName, bool /*bRemoveArticle*/)
 {
     static TCHAR szNewName[256] = _T("");
-
-#if 0
-    TCHAR *pszName = szNewName;
-
-    if (_tcsnicmp(szOldName, _T("the "), 4) == 0)
-    {
-        int x = 0, y = 0;
-        while (szOldName[x] && szOldName[x] != _T('(') && szOldName[x] != _T('-'))
-        {
-            x++;
-        }
-        y = x;
-        while (y && szOldName[y - 1] == _T(' '))
-        {
-            y--;
-        }
-        _tcsncpy(pszName, szOldName + 4, y - 4);
-        pszName[y - 4] = _T('\0');
-        pszName += y - 4;
-
-        if (!bRemoveArticle)
-        {
-            pszName += _stprintf(pszName, _T(", the"));
-        }
-        if (szOldName[x])
-        {
-            _stprintf(pszName, _T(" %s"), szOldName + x);
-        }
-    }
-    else
-    {
-        _tcscpy(pszName, szOldName);
-    }
-#endif
-
-#if 1
     _tcscpy(szNewName, szOldName);
-#endif
-
     return szNewName;
 }
 
 static int DoExtraFilters()
 {
-    if (nShowMVSCartsOnly && ((BurnDrvGetHardwareCode() & HARDWARE_PREFIX_CARTRIDGE) != HARDWARE_PREFIX_CARTRIDGE)) return 1;
-
     if ((nLoadMenuBoardTypeFilter & BDF_BOOTLEG)			&& (BurnDrvGetFlags() & BDF_BOOTLEG))				return 1;
     if ((nLoadMenuBoardTypeFilter & BDF_DEMO)				&& (BurnDrvGetFlags() & BDF_DEMO))					return 1;
     if ((nLoadMenuBoardTypeFilter & BDF_HACK)				&& (BurnDrvGetFlags() & BDF_HACK))					return 1;
@@ -566,7 +509,7 @@ static int SelListMake()
         memset(&TvItem, 0, sizeof(TvItem));
         TvItem.item.mask = TVIF_TEXT | TVIF_PARAM;
         TvItem.hInsertAfter = TVI_SORT;
-        TvItem.item.pszText = (nLoadMenuShowX & SHOWSHORT) ? BurnDrvGetText(DRV_NAME) : MangleGamename(BurnDrvGetText(DRV_ASCIIONLY | DRV_FULLNAME), true);
+        TvItem.item.pszText = (nLoadMenuShowX & SHOWSHORT) ? BurnDrvGetText(DRV_NAME) : BurnDrvGetText(DRV_ASCIIONLY | DRV_FULLNAME);
         TvItem.item.lParam = (LPARAM)&nBurnDrv[nTmpDrvCount];
         nBurnDrv[nTmpDrvCount].hTreeHandle = (HTREEITEM)SendMessage(hSelList, TVM_INSERTITEM, 0, (LPARAM)&TvItem);
         nBurnDrv[nTmpDrvCount].nBurnDrvNo = i;
@@ -731,77 +674,6 @@ static int SelListMake()
     return 0;
 }
 
-static void MyEndDialog()
-{
-    if (nTimer)
-    {
-        KillTimer(hSelDlg, nTimer);
-        nTimer = 0;
-    }
-
-    if (nInitPreviewTimer)
-    {
-        KillTimer(hSelDlg, nInitPreviewTimer);
-        nInitPreviewTimer = 0;
-    }
-
-    SendDlgItemMessage(hSelDlg, IDC_SCREENSHOT_H, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)NULL);
-    SendDlgItemMessage(hSelDlg, IDC_SCREENSHOT_V, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)NULL);
-
-    SendDlgItemMessage(hSelDlg, IDC_SCREENSHOT2_H, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)NULL);
-    SendDlgItemMessage(hSelDlg, IDC_SCREENSHOT2_V, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)NULL);
-
-    if (hPrevBmp)
-    {
-        DeleteObject((HGDIOBJ)hPrevBmp);
-        hPrevBmp = NULL;
-    }
-    if(hTitleBmp)
-    {
-        DeleteObject((HGDIOBJ)hTitleBmp);
-        hTitleBmp = NULL;
-    }
-
-    if (hExpand)
-    {
-        DestroyIcon(hExpand);
-        hExpand = NULL;
-    }
-    if (hCollapse)
-    {
-        DestroyIcon(hCollapse);
-        hCollapse = NULL;
-    }
-    if (hNotWorking)
-    {
-        DestroyIcon(hNotWorking);
-        hNotWorking = NULL;
-    }
-    if (hNotFoundEss)
-    {
-        DestroyIcon(hNotFoundEss);
-        hNotFoundEss = NULL;
-    }
-    if (hNotFoundNonEss)
-    {
-        DestroyIcon(hNotFoundNonEss);
-        hNotFoundNonEss = NULL;
-    }
-    if(hDrvIconMiss)
-    {
-        DestroyIcon(hDrvIconMiss);
-        hDrvIconMiss = NULL;
-    }
-
-    RECT rect;
-
-    GetClientRect(hSelDlg, &rect);
-    nSelDlgWidth = rect.right;
-    nSelDlgHeight = rect.bottom;
-
-    EndDialog(hSelDlg, 0);
-}
-
 // User clicked ok for a driver in the list
 static void SelOkay()
 {
@@ -840,34 +712,11 @@ static void SelOkay()
     nDialogSelect = nSelect;
 
     bDialogCancel = false;
-    MyEndDialog();
+	EndDialog(hSelDlg, 0);
 }
 
 static void RefreshPanel()
 {
-    // clear preview shot
-    if (hPrevBmp)
-    {
-        DeleteObject((HGDIOBJ)hPrevBmp);
-        hPrevBmp = NULL;
-    }
-    if (hTitleBmp)
-    {
-        DeleteObject((HGDIOBJ)hTitleBmp);
-        hTitleBmp = NULL;
-    }
-    if (nTimer)
-    {
-        KillTimer(hSelDlg, nTimer);
-        nTimer = 0;
-    }
-
-    SendDlgItemMessage(hSelDlg, IDC_SCREENSHOT_H, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hPrevBmp);
-    SendDlgItemMessage(hSelDlg, IDC_SCREENSHOT_V, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)NULL);
-
-    SendDlgItemMessage(hSelDlg, IDC_SCREENSHOT2_H, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hTitleBmp);
-    SendDlgItemMessage(hSelDlg, IDC_SCREENSHOT2_V, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)NULL);
-
     // Clear the things in our Info-box
     for (int i = 0; i < 6; i++)
     {
@@ -1011,38 +860,6 @@ static void CreateFilters()
     SendMessage(hFilterList	, TVM_EXPAND, TVE_EXPAND, (LPARAM)hHardware);
 }
 
-void LoadDrvIcons()
-{
-    if(nIconsSize == ICON_16x16)
-    {
-        nIconsSizeXY	= 16;
-        nIconsYDiff		= 4;
-    }
-    if(nIconsSize == ICON_24x24)
-    {
-        nIconsSizeXY	= 24;
-        nIconsYDiff		= 8;
-    }
-    if(nIconsSize == ICON_32x32)
-    {
-        nIconsSizeXY	= 32;
-        nIconsYDiff		= 12;
-    }
-}
-
-void UnloadDrvIcons()
-{
-
-    nIconsSizeXY	= 16;
-    nIconsYDiff		= 4;
-
-    for(unsigned int nDrvIndex = 0; nDrvIndex < nBurnDrvCount; nDrvIndex++)
-    {
-        DestroyIcon(hDrvIcon[nDrvIndex]);
-        hDrvIcon[nDrvIndex] = NULL;
-    }
-}
-
 #define UM_CHECKSTATECHANGE (WM_USER + 100)
 #define UM_CLOSE			(WM_USER + 101)
 
@@ -1056,21 +873,11 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
 {
     if (Msg == WM_INITDIALOG)
     {
-
-        InitCommonControls();
-
         hSelDlg = hDlg;
 
         hWhiteBGBrush	= CreateSolidBrush(RGB(0xFF, 0xFF, 0xFF));
-
         hExpand			= (HICON)LoadImage(hAppInst, MAKEINTRESOURCE(IDI_TV_PLUS),			IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
         hCollapse		= (HICON)LoadImage(hAppInst, MAKEINTRESOURCE(IDI_TV_MINUS),			IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
-
-        hNotWorking		= (HICON)LoadImage(hAppInst, MAKEINTRESOURCE(IDI_TV_NOTWORKING),	IMAGE_ICON, nIconsSizeXY, nIconsSizeXY, LR_DEFAULTCOLOR);
-        hNotFoundEss	= (HICON)LoadImage(hAppInst, MAKEINTRESOURCE(IDI_TV_NOTFOUND_ESS),	IMAGE_ICON, nIconsSizeXY, nIconsSizeXY, LR_DEFAULTCOLOR);
-        hNotFoundNonEss = (HICON)LoadImage(hAppInst, MAKEINTRESOURCE(IDI_TV_NOTFOUND_NON),	IMAGE_ICON, nIconsSizeXY, nIconsSizeXY, LR_DEFAULTCOLOR);
-
-        hDrvIconMiss	= (HICON)LoadImage(hAppInst, MAKEINTRESOURCE(IDI_APP),	IMAGE_ICON, nIconsSizeXY, nIconsSizeXY, LR_DEFAULTCOLOR);
 
         TCHAR szOldTitle[1024] = _T(""), szNewTitle[1024] = _T("");
         GetWindowText(hSelDlg, szOldTitle, 1024);
@@ -1092,10 +899,6 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
         hInfoText[4]	= GetDlgItem(hSelDlg, IDC_TEXTNOTES);
         hInfoText[5]	= GetDlgItem(hSelDlg, IDC_TEXTGENRE);
 
-#if !defined _UNICODE
-        EnableWindow(GetDlgItem(hDlg, IDC_SEL_ASCIIONLY), FALSE);
-#endif
-
         bool bFoundROMs = false;
         for (unsigned int i = 0; i < nBurnDrvCount; i++)
         {
@@ -1111,7 +914,7 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
         }
 
         // Icons size related -----------------------------------------
-        SHORT cyItem = nIconsSizeXY;								// height (in pixels) of each item on the TreeView list
+        SHORT cyItem = 16;								// height (in pixels) of each item on the TreeView list
         TreeView_SetItemHeight(hSelList, cyItem);
 
         SetFocus(hSelList);
@@ -1487,7 +1290,7 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
     if (Msg == UM_CLOSE)
     {
         nDialogSelect = nOldDlgSelected;
-        MyEndDialog();
+		EndDialog(hSelDlg, 0);
         DeleteObject(hWhiteBGBrush);
         return 0;
     }
@@ -1496,104 +1299,10 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
     {
         bDialogCancel = true;
         nDialogSelect = nOldDlgSelected;
-        MyEndDialog();
+        EndDialog(hSelDlg, 0);
         DeleteObject(hWhiteBGBrush);
         return 0;
     }
-
-    if (Msg == WM_GETMINMAXINFO)
-    {
-        MINMAXINFO *info = (MINMAXINFO *)lParam;
-
-        info->ptMinTrackSize.x = nDlgInitialWidth;
-        info->ptMinTrackSize.y = nDlgInitialHeight;
-
-        return 0;
-    }
-
-    if (Msg == WM_WINDOWPOSCHANGED)
-    {
-        RECT rc;
-        int xDelta;
-        int yDelta;
-        int xScrollBarDelta;
-
-        if (nDlgInitialWidth == 0 || nDlgInitialHeight == 0) return 0;
-
-        GetClientRect(hDlg, &rc);
-
-        xDelta = nDlgInitialWidth - rc.right;
-        yDelta = nDlgInitialHeight - rc.bottom;
-
-        if (xDelta == 0 && yDelta == 0) return 0;
-
-        SetControlPosAlignTopRight(IDC_STATIC_OPT, nDlgOptionsGrpInitialPos);
-        SetControlPosAlignTopRight(IDC_CHECKAVAILABLE, nDlgAvailableChbInitialPos);
-        SetControlPosAlignTopRight(IDC_CHECKUNAVAILABLE, nDlgUnavailableChbInitialPos);
-        SetControlPosAlignTopRight(IDC_CHECKAUTOEXPAND, nDlgAlwaysClonesChbInitialPos);
-        SetControlPosAlignTopRight(IDC_SEL_SHORTNAME, nDlgZipnamesChbInitialPos);
-        SetControlPosAlignTopRight(IDC_SEL_ASCIIONLY, nDlgLatinTextChbInitialPos);
-        SetControlPosAlignTopRight(IDROM, nDlgRomDirsBtnInitialPos);
-        SetControlPosAlignTopRight(IDRESCAN, nDlgScanRomsBtnInitialPos);
-
-        SetControlPosAlignTopRightResizeVert(IDC_STATIC_SYS, nDlgFilterGrpInitialPos);
-        SetControlPosAlignTopRightResizeVert(IDC_TREE2, nDlgFilterTreeInitialPos);
-
-        SetControlPosAlignBottomRight(IDC_SEL_IPSGROUP, nDlgIpsGrpInitialPos);
-        SetControlPosAlignBottomRight(IDC_SEL_APPLYIPS, nDlgApplyIpsChbInitialPos);
-        SetControlPosAlignBottomRight(IDC_SEL_IPSMANAGER, nDlgIpsManBtnInitialPos);
-        SetControlPosAlignBottomRight(IDC_SEL_SEARCHGROUP, nDlgSearchGrpInitialPos);
-        SetControlPosAlignBottomRight(IDC_SEL_SEARCH, nDlgSearchTxtInitialPos);
-        SetControlPosAlignBottomRight(IDCANCEL, nDlgCancelBtnInitialPos);
-        SetControlPosAlignBottomRight(IDOK, nDlgPlayBtnInitialPos);
-
-        SetControlPosAlignTopLeft(IDC_STATIC2, nDlgPreviewGrpInitialPos);
-        SetControlPosAlignTopLeft(IDC_SCREENSHOT_H, nDlgPreviewImgHInitialPos);
-        SetControlPosAlignTopLeft(IDC_SCREENSHOT_V, nDlgPreviewImgVInitialPos);
-        SetControlPosAlignTopLeft(IDC_STATIC3, nDlgTitleGrpInitialPos);
-        SetControlPosAlignTopLeft(IDC_SCREENSHOT2_H, nDlgTitleImgHInitialPos);
-        SetControlPosAlignTopLeft(IDC_SCREENSHOT2_V, nDlgTitleImgVInitialPos);
-
-        SetControlPosAlignBottomLeftResizeHor(IDC_STATIC_INFOBOX, nDlgWhiteBoxInitialPos);
-        SetControlPosAlignBottomLeftResizeHor(IDC_LABELCOMMENT, nDlgGameInfoLblInitialPos);
-        SetControlPosAlignBottomLeftResizeHor(IDC_LABELROMNAME, nDlgRomNameLblInitialPos);
-        SetControlPosAlignBottomLeftResizeHor(IDC_LABELROMINFO, nDlgRomInfoLblInitialPos);
-        SetControlPosAlignBottomLeftResizeHor(IDC_LABELSYSTEM, nDlgReleasedByLblInitialPos);
-        SetControlPosAlignBottomLeftResizeHor(IDC_LABELGENRE, nDlgGenreLblInitialPos);
-        SetControlPosAlignBottomLeftResizeHor(IDC_LABELNOTES, nDlgNotesLblInitialPos);
-        SetControlPosAlignBottomLeftResizeHor(IDC_TEXTCOMMENT, nDlgGameInfoTxtInitialPos);
-        SetControlPosAlignBottomLeftResizeHor(IDC_TEXTROMNAME, nDlgRomNameTxtInitialPos);
-        SetControlPosAlignBottomLeftResizeHor(IDC_TEXTROMINFO, nDlgRomInfoTxtInitialPos);
-        SetControlPosAlignBottomLeftResizeHor(IDC_TEXTSYSTEM, nDlgReleasedByTxtInitialPos);
-        SetControlPosAlignBottomLeftResizeHor(IDC_TEXTGENRE, nDlgGenreTxtInitialPos);
-        SetControlPosAlignBottomLeftResizeHor(IDC_TEXTNOTES, nDlgNotesTxtInitialPos);
-        SetControlPosAlignBottomLeftResizeHor(IDC_DRVCOUNT, nDlgDrvCountTxtInitialPos);
-        SetControlPosAlignBottomRight(IDGAMEINFO, nDlgDrvRomInfoBtnInitialPos);
-
-        SetControlPosAlignTopLeftResizeHorVert(IDC_STATIC1, nDlgSelectGameGrpInitialPos);
-        SetControlPosAlignTopLeftResizeHorVert(IDC_TREE1, nDlgSelectGameLstInitialPos);
-
-        InvalidateRect(hSelDlg, NULL, true);
-        UpdateWindow(hSelDlg);
-
-        return 0;
-    }
-
-    if (Msg == WM_CTLCOLORSTATIC)
-    {
-        for (int i = 0; i < 6; i++)
-        {
-            if ((HWND)lParam == hInfoLabel[i])
-            {
-                return (INT_PTR)hWhiteBGBrush;
-            }
-            if ((HWND)lParam == hInfoText[i])
-            {
-                return (INT_PTR)hWhiteBGBrush;
-            }
-        }
-    }
-
     NMHDR *pNmHdr = (NMHDR *)lParam;
     if (Msg == WM_NOTIFY)
     {
@@ -1723,13 +1432,13 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
                     {
                         if (TvItem.state & TVIS_EXPANDED)
                         {
-                            DrawIconEx(lplvcd->nmcd.hdc, rect.left + 4, rect.top + nIconsYDiff, hCollapse, 16, 16, 0, NULL, DI_NORMAL);
+                            //DrawIconEx(lplvcd->nmcd.hdc, rect.left + 4, rect.top + nIconsYDiff, hCollapse, 16, 16, 0, NULL, DI_NORMAL);
                         }
                         else
                         {
                             if (TvItem.cChildren)
                             {
-                                DrawIconEx(lplvcd->nmcd.hdc, rect.left + 4, rect.top + nIconsYDiff, hExpand, 16, 16, 0, NULL, DI_NORMAL);
+                               // DrawIconEx(lplvcd->nmcd.hdc, rect.left + 4, rect.top + nIconsYDiff, hExpand, 16, 16, 0, NULL, DI_NORMAL);
                             }
                         }
                     }
@@ -1754,46 +1463,6 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
                     {
                         DrawText(lplvcd->nmcd.hdc, BurnDrvGetText(DRV_NAME), -1, &rect, DT_NOPREFIX | DT_SINGLELINE | DT_LEFT | DT_VCENTER);
                         rect.left += 16 + 40 + 20 + 10;
-                    }
-
-                    {
-                        // Draw icons if needed
-                        if (!CheckWorkingStatus(((NODEINFO *)TvItem.lParam)->nBurnDrvNo))
-                        {
-                            DrawIconEx(lplvcd->nmcd.hdc, rect.left, rect.top, hNotWorking, nIconsSizeXY, nIconsSizeXY, 0, NULL, DI_NORMAL);
-                            rect.left += nIconsSizeXY + 4;
-                        }
-                        else
-                        {
-                            if (!(gameAv[((NODEINFO *)TvItem.lParam)->nBurnDrvNo]))
-                            {
-                                DrawIconEx(lplvcd->nmcd.hdc, rect.left, rect.top, hNotFoundEss, nIconsSizeXY, nIconsSizeXY, 0, NULL, DI_NORMAL);
-                                rect.left += nIconsSizeXY + 4;
-                            }
-                            else
-                            {
-                                if (!(nLoadMenuShowX & AVAILABLE) && !(gameAv[((NODEINFO *)TvItem.lParam)->nBurnDrvNo] & 2))
-                                {
-                                    DrawIconEx(lplvcd->nmcd.hdc, rect.left, rect.top, hNotFoundNonEss, nIconsSizeXY, nIconsSizeXY, 0, NULL, DI_NORMAL);
-                                    rect.left += nIconsSizeXY + 4;
-                                }
-                            }
-                        }
-                    }
-
-                    // Driver Icon drawing code...
-                    if(bEnableIcons && bIconsLoaded)
-                    {
-                        if(hDrvIcon[nBurnDrvActive])
-                        {
-                            DrawIconEx(lplvcd->nmcd.hdc, rect.left, rect.top, hDrvIcon[nBurnDrvActive], nIconsSizeXY, nIconsSizeXY, 0, NULL, DI_NORMAL);
-                        }
-
-                        if(!hDrvIcon[nBurnDrvActive])
-                        {
-                            DrawIconEx(lplvcd->nmcd.hdc, rect.left, rect.top, hDrvIconMiss, nIconsSizeXY, nIconsSizeXY, 0, NULL, DI_NORMAL);
-                        }
-                        rect.left += nIconsSizeXY + 4;
                     }
 
                     _tcsncpy(szText, MangleGamename(BurnDrvGetText(nGetTextFlags | DRV_FULLNAME), false), 1024);
@@ -2041,11 +1710,7 @@ int SelDialog(int nMVSCartsOnly, HWND hParentWND)
     {
         nOldDlgSelected = nBurnDrvActive;
     }
-
     hParent = hParentWND;
-    nShowMVSCartsOnly = nMVSCartsOnly;
-
-    InitCommonControls();
 
     FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_SELNEW), hParent, (DLGPROC)DialogProc);
 
@@ -2057,291 +1722,8 @@ int SelDialog(int nMVSCartsOnly, HWND hParentWND)
         free(nBurnDrv);
         nBurnDrv = NULL;
     }
-
     nBurnDrvActive = nOldSelect;
 
     return nDialogSelect;
 }
 
-// -----------------------------------------------------------------------------
-
-static HBITMAP hMVSpreview[6];
-static unsigned int nPrevDrvSelect[6];
-
-static void UpdateInfoROMInfo()
-{
-    //	int nGetTextFlags = nLoadMenuShowX & ASCIIONLY ? DRV_ASCIIONLY : 0;
-    TCHAR szItemText[256] = _T("");
-    bool bBracket = false;
-
-    _stprintf(szItemText, _T("%s"), BurnDrvGetText(DRV_NAME));
-    if ((BurnDrvGetFlags() & BDF_CLONE) && BurnDrvGetTextA(DRV_PARENT))
-    {
-        int nOldDrvSelect = nBurnDrvActive;
-        TCHAR *pszName = BurnDrvGetText(DRV_PARENT);
-
-        _stprintf(szItemText + _tcslen(szItemText), FBALoadStringEx(hAppInst, IDS_CLONE_OF, true), BurnDrvGetText(DRV_PARENT));
-
-        for (nBurnDrvActive = 0; nBurnDrvActive < nBurnDrvCount; nBurnDrvActive++)
-        {
-            if (!_tcsicmp(pszName, BurnDrvGetText(DRV_NAME)))
-            {
-                break;
-            }
-        }
-        if (nBurnDrvActive < nBurnDrvCount)
-        {
-            if (BurnDrvGetText(DRV_PARENT))
-            {
-                _stprintf(szItemText + _tcslen(szItemText), FBALoadStringEx(hAppInst, IDS_ROMS_FROM_1, true), BurnDrvGetText(DRV_PARENT));
-            }
-        }
-        nBurnDrvActive = nOldDrvSelect;
-        bBracket = true;
-    }
-    else
-    {
-        if (BurnDrvGetTextA(DRV_PARENT))
-        {
-            _stprintf(szItemText + _tcslen(szItemText), FBALoadStringEx(hAppInst, IDS_ROMS_FROM_2, true), bBracket ? _T(", ") : _T(" ("), BurnDrvGetText(DRV_PARENT));
-            bBracket = true;
-        }
-    }
-    if (BurnDrvGetText(DRV_BOARDROM))
-    {
-        _stprintf(szItemText + _tcslen(szItemText), FBALoadStringEx(hAppInst, IDS_BOARD_ROMS_FROM, true), bBracket ? _T(", ") : _T(" ("), BurnDrvGetText(DRV_BOARDROM));
-        bBracket = true;
-    }
-    if (bBracket)
-    {
-        _stprintf(szItemText + _tcslen(szItemText), _T(")"));
-    }
-
-    if (hInfoText[0])
-    {
-        SendMessage(hInfoText[0], WM_SETTEXT, (WPARAM)0, (LPARAM)szItemText);
-    }
-    if (hInfoLabel[0])
-    {
-        EnableWindow(hInfoLabel[0], TRUE);
-    }
-
-    return;
-}
-
-static void UpdateInfoRelease()
-{
-    int nGetTextFlags = nLoadMenuShowX & ASCIIONLY ? DRV_ASCIIONLY : 0;
-    TCHAR szItemText[256] = _T("");
-
-    TCHAR szUnknown[100];
-    TCHAR szCartridge[100];
-    TCHAR szHardware[100];
-    _stprintf(szUnknown, FBALoadStringEx(hAppInst, IDS_ERR_UNKNOWN, true));
-    _stprintf(szCartridge, FBALoadStringEx(hAppInst, IDS_CARTRIDGE, true));
-    _stprintf(szHardware, FBALoadStringEx(hAppInst, IDS_HARDWARE, true));
-    _stprintf(szItemText, _T("%s (%s, %s %s)"), BurnDrvGetTextA(DRV_MANUFACTURER) ? BurnDrvGetText(nGetTextFlags | DRV_MANUFACTURER) : szUnknown, BurnDrvGetText(DRV_DATE),
-              BurnDrvGetText(nGetTextFlags | DRV_SYSTEM), (BurnDrvGetHardwareCode() & HARDWARE_PREFIX_CARTRIDGE) ? szCartridge : szHardware);
-
-    if (hInfoText[2])
-    {
-        SendMessage(hInfoText[2], WM_SETTEXT, (WPARAM)0, (LPARAM)szItemText);
-    }
-    if (hInfoLabel[2])
-    {
-        EnableWindow(hInfoLabel[2], TRUE);
-    }
-
-    return;
-}
-
-static void UpdateInfoGameInfo()
-{
-    int nGetTextFlags = nLoadMenuShowX & ASCIIONLY ? DRV_ASCIIONLY : 0;
-    TCHAR szText[1024] = _T("");
-    TCHAR *pszPosition = szText;
-    TCHAR *pszName = BurnDrvGetText(nGetTextFlags | DRV_FULLNAME);
-
-    pszPosition += _sntprintf(szText, 1024, pszName);
-
-    pszName = BurnDrvGetText(nGetTextFlags | DRV_FULLNAME);
-    while ((pszName = BurnDrvGetText(nGetTextFlags | DRV_NEXTNAME | DRV_FULLNAME)) != NULL)
-    {
-        if (pszPosition + _tcslen(pszName) - 1024 > szText)
-        {
-            break;
-        }
-        pszPosition += _stprintf(pszPosition, _T(SEPERATOR_2) _T("%s"), pszName);
-    }
-    if (BurnDrvGetText(nGetTextFlags | DRV_COMMENT))
-    {
-        pszPosition += _sntprintf(pszPosition, szText + 1024 - pszPosition, _T(SEPERATOR_1) _T("%s"), BurnDrvGetText(nGetTextFlags | DRV_COMMENT));
-    }
-
-    if (hInfoText[3])
-    {
-        SendMessage(hInfoText[3], WM_SETTEXT, (WPARAM)0, (LPARAM)szText);
-    }
-    if (hInfoLabel[3])
-    {
-        if (szText[0])
-        {
-            EnableWindow(hInfoLabel[3], TRUE);
-        }
-        else
-        {
-            EnableWindow(hInfoLabel[3], FALSE);
-        }
-    }
-
-    return;
-}
-
-static int MVSpreviewUpdateSlot(int nSlot, HWND hDlg)
-{
-    int nOldSelect = nBurnDrvActive;
-
-    if (nSlot >= 0 && nSlot <= 6)
-    {
-        hInfoLabel[0] = 0;
-        hInfoLabel[1] = 0;
-        hInfoLabel[2] = 0;
-        hInfoLabel[3] = 0;
-        hInfoText[0] = GetDlgItem(hDlg, IDC_MVS_TEXTROMNAME1 + nSlot);
-        hInfoText[1] = 0;
-        hInfoText[2] = GetDlgItem(hDlg, IDC_MVS_TEXTSYSTEM1 + nSlot);
-        hInfoText[3] = GetDlgItem(hDlg, IDC_MVS_TEXTCOMMENT1 + nSlot);
-
-        for (int j = 0; j < 4; j++)
-        {
-            if (hInfoText[j])
-            {
-                SendMessage(hInfoText[j], WM_SETTEXT, (WPARAM)0, (LPARAM)_T(""));
-            }
-            if (hInfoLabel[j])
-            {
-                EnableWindow(hInfoLabel[j], FALSE);
-            }
-        }
-
-        nBurnDrvActive = nBurnDrvSelect[nSlot];
-        if (nBurnDrvActive < nBurnDrvCount)
-        {
-            UpdateInfoROMInfo();
-            UpdateInfoRelease();
-            UpdateInfoGameInfo();
-            nPrevDrvSelect[nSlot] = nBurnDrvActive;
-
-        }
-        else
-        {
-            SendMessage(hInfoText[0], WM_SETTEXT, (WPARAM)0, (LPARAM)FBALoadStringEx(hAppInst, IDS_EMPTY, true));
-        }
-
-        SendDlgItemMessage(hDlg, IDC_MVS_CART1 + nSlot, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hMVSpreview[nSlot]);
-    }
-
-    nBurnDrvActive = nOldSelect;
-
-    return 0;
-}
-
-static int MVSpreviewEndDialog()
-{
-    for (int i = 0; i < 6; i++)
-    {
-        DeleteObject((HGDIOBJ)hMVSpreview[i]);
-        hMVSpreview[i] = NULL;
-    }
-
-    return 0;
-}
-
-static INT_PTR CALLBACK MVSpreviewProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM)
-{
-    switch (Msg)
-    {
-    case WM_INITDIALOG:
-    {
-
-        nDialogSelect = ~0U;
-
-        for (int i = 0; i < 6; i++)
-        {
-            nPrevDrvSelect[i] = nBurnDrvSelect[i];
-            MVSpreviewUpdateSlot(i, hDlg);
-        }
-
-        WndInMid(hDlg, hScrnWnd);
-
-        return TRUE;
-    }
-    case WM_COMMAND:
-        if (LOWORD(wParam) == ID_VALUE_CLOSE)
-        {
-            SendMessage(hDlg, WM_CLOSE, 0, 0);
-            break;
-        }
-        if (HIWORD(wParam) == BN_CLICKED)
-        {
-            if (LOWORD(wParam) == IDOK)
-            {
-                if (nPrevDrvSelect[0] == ~0U)
-                {
-                    MessageBox(hSelDlg, FBALoadStringEx(hAppInst, IDS_ERR_NO_DRIVER_SEL_SLOT1, true), FBALoadStringEx(hAppInst, IDS_ERR_ERROR, true), MB_OK);
-                    break;
-                }
-                MVSpreviewEndDialog();
-                for (int i = 0; i < 6; i++)
-                {
-                    nBurnDrvSelect[i] = nPrevDrvSelect[i];
-                }
-                EndDialog(hDlg, 0);
-                break;
-            }
-            if (LOWORD(wParam) == IDCANCEL)
-            {
-                SendMessage(hDlg, WM_CLOSE, 0, 0);
-                break;
-            }
-
-            if (LOWORD(wParam) >= IDC_MVS_CLEAR1 && LOWORD(wParam) <= IDC_MVS_CLEAR6)
-            {
-                int nSlot = LOWORD(wParam) - IDC_MVS_CLEAR1;
-
-                nBurnDrvSelect[nSlot] = ~0U;
-                nPrevDrvSelect[nSlot] = ~0U;
-                MVSpreviewUpdateSlot(nSlot, hDlg);
-                break;
-            }
-
-            if (LOWORD(wParam) >= IDC_MVS_SELECT1 && LOWORD(wParam) <= IDC_MVS_SELECT6)
-            {
-                int nSlot = LOWORD(wParam) - IDC_MVS_SELECT1;
-
-                nBurnDrvSelect[nSlot] = SelDialog(HARDWARE_PREFIX_CARTRIDGE | HARDWARE_SNK_NEOGEO, hDlg);
-                MVSpreviewUpdateSlot(nSlot, hDlg);
-                break;
-            }
-        }
-        break;
-
-    case WM_CLOSE:
-    {
-        MVSpreviewEndDialog();
-        for (int i = 0; i < 6; i++)
-        {
-            nBurnDrvSelect[i] = nPrevDrvSelect[i];
-        }
-        EndDialog(hDlg, 1);
-        break;
-    }
-    }
-
-    return 0;
-}
-
-int SelMVSDialog()
-{
-    return FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_MVS_SELECT_CARTS), hScrnWnd, (DLGPROC)MVSpreviewProc);
-}

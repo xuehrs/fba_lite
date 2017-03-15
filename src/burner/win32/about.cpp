@@ -200,6 +200,7 @@ static INT_PTR CALLBACK AboutProc(HWND hDlg , UINT Msg, WPARAM wParam, LPARAM lP
 int AboutCreate()
 {
     HMODULE hRiched = NULL;
+
 	hRiched = LoadLibrary(_T("RICHED20.DLL"));
     if (hRiched)
     {

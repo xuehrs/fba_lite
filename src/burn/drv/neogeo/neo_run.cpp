@@ -105,7 +105,6 @@ struct NeoMediaInfo {
 #include "bitswap.h"
 
 // #undef USE_SPEEDHACKS
-
 // #define LOG_IRQ
 // #define LOG_DRAW
 

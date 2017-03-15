@@ -709,17 +709,6 @@ void scrnSSUndo() // called from the menu (shift+F8) and CheckSystemMacros() in 
 
 static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
 {
-    //if(id >= ID_MDI_START_CHILD) {
-    //	DefFrameProc(hwndCtl, hWndChildFrame, WM_COMMAND, wParam, lParam);
-    //	return;
-    //} else {
-    //	HWND hWndCurrent = (HWND)SendMessage(hWndChildFrame, WM_MDIGETACTIVE,0,0);
-    //	if(hWndCurrent) {
-    //		SendMessage(hWndCurrent, WM_COMMAND, wParam, lParam);
-    //		return;
-    //	}
-    //}
-
     if (bLoading)
     {
         return;

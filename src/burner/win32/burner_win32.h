@@ -285,21 +285,8 @@ extern int nLoadMenuFamilyFilter;
 extern int nSelDlgWidth;
 extern int nSelDlgHeight;
 int SelDialog(int nMVSCartsOnly, HWND hParentWND);
-extern UINT_PTR nTimer;
-extern HBITMAP hPrevBmp;
-extern HBITMAP hTitleBmp;
 extern int nDialogSelect;
 void CreateToolTipForRect(HWND hwndParent, PTSTR pszText);
-int SelMVSDialog();
-void LoadDrvIcons();
-void UnloadDrvIcons();
-#define		ICON_16x16			0
-#define		ICON_24x24			1
-#define		ICON_32x32			2
-extern bool bEnableIcons;
-extern bool bIconsLoaded;
-extern int nIconsSize, nIconsSizeXY, nIconsYDiff;
-extern bool bGameInfoOpen;
 
 // cona.cpp
 extern int nIniVersion;

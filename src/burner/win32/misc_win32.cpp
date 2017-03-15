@@ -282,3 +282,4 @@ int WndInMid(HWND hMid, HWND hBase)
 
     return 0;
 }
+
