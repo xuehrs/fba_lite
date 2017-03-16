@@ -189,7 +189,7 @@ BEGIN
 	IDS_SEL_HOMEBREW			"Homebrew"
 	IDS_SEL_DEMO				"Demo"
 	IDS_SEL_GENUINE				"Genuine"
-	IDS_SEL_SETSTATUS			"Showing %i of %i sets [%i Unavailable sets]"
+	IDS_SEL_SETSTATUS			"Showing %i/%i [%i Unavailable]"
 	IDS_SEL_KANEKO				"Kaneko"
 	IDS_SEL_SNES				"SNES"
 	IDS_SEL_DATAEAST			"Data East"

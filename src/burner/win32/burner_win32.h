@@ -284,7 +284,7 @@ extern int nLoadMenuGenreFilter;
 extern int nLoadMenuFamilyFilter;
 extern int nSelDlgWidth;
 extern int nSelDlgHeight;
-int SelDialog(int nMVSCartsOnly, HWND hParentWND);
+int PopupSelectDialog(HWND hParentWND);
 extern int nDialogSelect;
 void CreateToolTipForRect(HWND hwndParent, PTSTR pszText);
 

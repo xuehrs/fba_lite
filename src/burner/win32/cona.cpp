@@ -194,15 +194,11 @@ int ConfigAppLoad()
 
         VAR(nLoadMenuShowX);
         VAR(nLoadMenuBoardTypeFilter);
-        VAR(nLoadMenuGenreFilter);
-        VAR(nLoadMenuFamilyFilter);
 
         STR(szAppRomPaths[0]);
         STR(szAppRomPaths[1]);
         STR(szAppRomPaths[2]);
         STR(szAppRomPaths[3]);
-
-
 
         VAR(bNoChangeNumLock);
         VAR(nAutoFireRate);
@@ -491,12 +487,6 @@ int ConfigAppSave()
 
     _ftprintf(h, _T("\n// Load game dialog board type filter options\n"));
     VAR(nLoadMenuBoardTypeFilter);
-
-    _ftprintf(h, _T("\n// Load game dialog genre filter options\n"));
-    VAR(nLoadMenuGenreFilter);
-
-    _ftprintf(h, _T("\n// Load game dialog family filter options\n"));
-    VAR(nLoadMenuFamilyFilter);
 
     _ftprintf(h, _T("\n// The paths to search for rom zips (include trailing backslash)\n"));
     STR(szAppRomPaths[0]);

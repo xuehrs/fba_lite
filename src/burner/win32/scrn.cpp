@@ -729,7 +729,7 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         bLoading = 1;
         AudSoundStop();						// Stop while the dialog is active or we're loading ROMs
 
-        nGame = SelDialog(0, hScrnWnd);		// Bring up select dialog to pick a driver
+        nGame = PopupSelectDialog(hScrnWnd);		// Bring up select dialog to pick a driver
 
         extern bool bDialogCancel;
 
