@@ -111,8 +111,6 @@ int ConfigAppLoad()
         VAR(nScreenSizeVer);
 
         VAR(nWindowSize);
-        VAR(nWindowPosX);
-        VAR(nWindowPosY);
         VAR(bDoGamma);
         VAR(bVidUseHardwareGamma);
         VAR(bHardwareGammaOnly);
@@ -193,14 +191,13 @@ int ConfigAppLoad()
         VAR(bSaveInputs);
 
         VAR(nLoadMenuShowX);
-        VAR(nLoadMenuBoardTypeFilter);
+        VAR(nLoadMenuBoardFilter);
 
         STR(szAppRomPaths[0]);
         STR(szAppRomPaths[1]);
         STR(szAppRomPaths[2]);
         STR(szAppRomPaths[3]);
 
-        VAR(bNoChangeNumLock);
         VAR(nAutoFireRate);
 
         //VAR(nIpsSelectedLanguage);
@@ -336,9 +333,6 @@ int ConfigAppSave()
     VAR(nVidRotationAdjust);
     _ftprintf(h, _T("\n// Initial window size (0 = autosize)\n"));
     VAR(nWindowSize);
-    _ftprintf(h, _T("\n// Window position\n"));
-    VAR(nWindowPosX);
-    VAR(nWindowPosY);
     _ftprintf(h, _T("\n// If non-zero, perform gamma correction\n"));
     VAR(bDoGamma);
     _ftprintf(h, _T("\n// If non-zero, use the video hardware to correct gamma\n"));
@@ -486,7 +480,7 @@ int ConfigAppSave()
     VAR(nLoadMenuShowX);
 
     _ftprintf(h, _T("\n// Load game dialog board type filter options\n"));
-    VAR(nLoadMenuBoardTypeFilter);
+    VAR(nLoadMenuBoardFilter);
 
     _ftprintf(h, _T("\n// The paths to search for rom zips (include trailing backslash)\n"));
     STR(szAppRomPaths[0]);
@@ -504,12 +498,6 @@ int ConfigAppSave()
 
     _ftprintf(h, _T("\n\n\n"));
     _ftprintf(h, _T("// --- miscellaneous ---------------------------------------------------------\n"));
-
-    _ftprintf(h, _T("\n// If non-zero, don't change the status of the Num Lock key.\n"));
-    VAR(bNoChangeNumLock);
-
-    _ftprintf(h, _T("\n// If non-zero, create support folders at program start.\n"));
-    VAR(bAlwaysCreateSupportFolders);
 
     _ftprintf(h, _T("\n// Auto-Fire Rate, non-linear - use the GUI to change this setting!\n"));
     VAR(nAutoFireRate);

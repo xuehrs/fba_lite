@@ -180,6 +180,14 @@
 #define IDC_CHECKUNAVAILABLE              	20137
 #define IDC_SYSINFO_LOG_SAVE                20138
 #define IDC_LOCAL_DOWNLOAD_LANG				20139
+#define IDC_CHECK1							20140
+#define IDC_CHECK2							20141
+#define IDC_CHECK3							20142
+#define IDC_CHECK4							20143
+#define IDC_CHECK5							20144
+
+
+
 
 #define IDC_DRVCOUNT						20200
 #define IDC_TREE2							20201

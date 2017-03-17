@@ -100,9 +100,6 @@ extern TCHAR szAppBurnVer[16];
 
 extern bool bCmdOptUsed;
 extern bool bAlwaysProcessKeyboardInput;
-extern bool bAlwaysCreateSupportFolders;
-
-extern bool bNoChangeNumLock;
 extern bool bMonitorAutoCheck;
 
 // Used for the load/save dialog in commdlg.h
@@ -279,13 +276,9 @@ void MenuRemoveTheme();
 
 // sel.cpp
 extern int nLoadMenuShowX;
-extern int nLoadMenuBoardTypeFilter;
-extern int nLoadMenuGenreFilter;
-extern int nLoadMenuFamilyFilter;
-extern int nSelDlgWidth;
-extern int nSelDlgHeight;
-int PopupSelectDialog(HWND hParentWND);
+extern int nLoadMenuBoardFilter;
 extern int nDialogSelect;
+int PopupSelectDialog(HWND hParentWND);
 void CreateToolTipForRect(HWND hwndParent, PTSTR pszText);
 
 // cona.cpp
@@ -363,8 +356,6 @@ void PhosphorDialog();
 void ScreenAngleDialog();
 void CPUClockDialog();
 void CubicSharpnessDialog();
-// sfactd.cpp
-int SFactdCreate();
 
 // roms.cpp
 extern char *gameAv;

@@ -730,10 +730,7 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         AudSoundStop();						// Stop while the dialog is active or we're loading ROMs
 
         nGame = PopupSelectDialog(hScrnWnd);		// Bring up select dialog to pick a driver
-
-        extern bool bDialogCancel;
-
-        if (nGame >= 0 && bDialogCancel == false)
+        if (nGame >= 0)
         {
             DrvExit();
             DrvInit(nGame, true);			// Init the game driver
@@ -774,28 +771,10 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         BurnerLoadDriver(szPrevGames[id - MENU_PREVIOUSGAMES1]);
         break;
     }
-
-    case MENU_START_NEOGEO_MVS:
-    {
-        BurnerLoadDriver(_T("neogeo"));
-        break;
-    }
-
-    case MENU_START_NEOGEO_CD:
-    {
-        BurnerLoadDriver(_T("neocdz"));
-        break;
-    }
     case MENU_STARTNET:
         if (Init_Network())
         {
             MessageBox(hScrnWnd, FBALoadStringEx(hAppInst, IDS_ERR_NO_NETPLAYDLL, true), FBALoadStringEx(hAppInst, IDS_ERR_ERROR, true), MB_OK);
-            break;
-        }
-        if (bBurnUseASMCPUEmulation)
-        {
-            FBAPopupAddText(PUF_TEXT_DEFAULT, _T("Please uncheck \"Misc -> Options -> Use Assembly MC68000 Core\" before starting a netgame!"));
-            FBAPopupDisplay(PUF_TYPE_ERROR);
             break;
         }
         if (!kNetGame)
@@ -1744,14 +1723,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
     case MENU_MODELESS:
         bModelessMenu = !bModelessMenu;
         POST_INITIALISE_MESSAGE;
-        break;
-
-    case MENU_NOCHANGENUMLOCK:
-        bNoChangeNumLock = !bNoChangeNumLock;
-        break;
-
-    case MENU_CREATEDIRS:
-        bAlwaysCreateSupportFolders = !bAlwaysCreateSupportFolders;
         break;
 
     case MENU_ROMDIRS:
@@ -3074,11 +3045,8 @@ int ScrnSize()
 
     MoveWindow(hScrnWnd, x, y, w, h, true);
 
-    //	SetWindowPos(hScrnWnd, NULL, x, y, w, h, SWP_NOREDRAW | SWP_NOACTIVATE | SWP_NOSENDCHANGING | SWP_NOZORDER);
-
     nWindowPosX = x;
     nWindowPosY = y;
-
     return 0;
 }
 

@@ -26,14 +26,13 @@ static int PgmValue				= HARDWARE_PREFIX_IGS_PGM >> 24;
 static int MASKPGM				= 1 << PgmValue;
 static int MASKALL				= MASKCPS | MASKCPS2 | MASKCPS3 | MASKNEOGEO | MASKPGM;
 
-#define UNAVAILABLE				(1 << 27)
-#define AVAILABLE				(1 << 28)
-#define AUTOEXPAND				(1 << 29)
-#define SHOWSHORT				(1 << 30)
+#define UNAVAILABLE				(1 << 28)
+#define AVAILABLE				(1 << 29)
+#define SHOWCLONE				(1 << 30)
 #define ASCIIONLY				(1 << 31)
 
-int nLoadMenuShowX				= 0;
-int nLoadMenuBoardTypeFilter	= 0;
+int nLoadMenuShowX				= AVAILABLE;
+int nLoadMenuBoardFilter	    = MASKALL;
 
 typedef struct 
 {
@@ -60,7 +59,7 @@ static void SetupListControl(void)
 	list_column.pszText = _T("GAME");
 	ListView_InsertColumn(hSelList,1,&list_column);
 
-	ListView_SetExtendedListViewStyleEx(hSelList,LVS_EX_FULLROWSELECT,LVS_EX_FULLROWSELECT);
+	ListView_SetExtendedListViewStyleEx(hSelList,LVS_EX_FULLROWSELECT|LVS_EX_DOUBLEBUFFER,LVS_EX_FULLROWSELECT|LVS_EX_DOUBLEBUFFER);
 }
 
 //检查是否正常工作
@@ -109,7 +108,8 @@ static int FilterSearch(void)
 //插入游戏到列表
 static void InsertDrvItem(unsigned int nDrvNo)
 {
-	LV_ITEM item;
+	UINT flag;
+	LVITEM item;
 	NODEINFO* pNode;
 	pNode = pDrvNode + nTmpDrvCount;
 	
@@ -126,13 +126,14 @@ static void InsertDrvItem(unsigned int nDrvNo)
 	item.pszText    = BurnDrvGetText(DRV_NAME);
 	ListView_SetItem(hSelList,&item);
 
+	flag = (nLoadMenuShowX&ASCIIONLY) ? DRV_FULLNAME|DRV_ASCIIONLY : DRV_FULLNAME;
 	item.iSubItem   = 1;
-	item.pszText    = BurnDrvGetText(DRV_FULLNAME);
+	item.pszText    = BurnDrvGetText(flag);
 	ListView_SetItem(hSelList,&item);
 }
 
 // Make a tree-view control with all drivers
-static int UpdateSelectList()
+static void RebuildGameList()
 {
     unsigned int i;
 	nTmpDrvCount = 0;
@@ -140,16 +141,20 @@ static int UpdateSelectList()
     
 	SendMessage(hSelList, WM_SETREDRAW, FALSE, 0);	// disable redraw
 	SendMessage(hSelList, LVM_DELETEALLITEMS,0,0);
-
-    // Add all the driver names to the list
+	
+    //添加游戏列表
     for (i = 0; i < nBurnDrvCount; i++)
     {
         nBurnDrvActive = i;
 		int nHardware = 1 << (BurnDrvGetHardwareCode() >> 24);
-        if ((nHardware & MASKALL) == 0)
+        if ((nHardware & nLoadMenuBoardFilter) == 0)
         {
             continue;
         }
+		if((!(nLoadMenuShowX & SHOWCLONE)) && (BurnDrvGetFlags()&BDF_CLONE))
+		{
+			continue;
+		}
 		if(avOk)
 		{
 			if((!(nLoadMenuShowX & AVAILABLE)) && gameAv[i])
@@ -168,27 +173,20 @@ static int UpdateSelectList()
 		InsertDrvItem(i);
     }
 	SendMessage(hSelList, WM_SETREDRAW, TRUE, 0);
-    return 0;
 }
 
 //选择OK
 static void SelectOkay()
 {
-    TV_ITEM TvItem;
-    unsigned int nSelect = 0;
-    HTREEITEM hSelectHandle = (HTREEITEM)SendMessage(hSelList, TVM_GETNEXTITEM, TVGN_CARET, ~0U);
-
-    if (!hSelectHandle)	 			// Nothing is selected, return without closing the window
-    {
-        return;
-    }
-
-    TvItem.hItem = hSelectHandle;
-    TvItem.mask = TVIF_PARAM;
-    SendMessage(hSelList, TVM_GETITEM, 0, (LPARAM)&TvItem);
-    nSelect = ((NODEINFO *)TvItem.lParam)->nBurnDrvNo;
-	
-    if (!IsBurnDrvWorking(nSelect))
+    NODEINFO* node;
+    unsigned int nSelect;
+	nSelect = ListView_GetSelectionMark(hSelList);
+	if(nSelect < 0)
+	{
+		return;
+	}
+	node = pDrvNode+nSelect;
+    if (!IsBurnDrvWorking(node->nBurnDrvNo))
     {
         TCHAR szWarningText[1024];
         _stprintf(szWarningText, _T("%s"), FBALoadStringEx(hAppInst, IDS_ERR_WARNING, true));
@@ -197,25 +195,30 @@ static void SelectOkay()
             return;
         }
     }
-    nDialogSelect = nSelect;
+    nDialogSelect = node->nBurnDrvNo;
     bDialogCancel = false;
 	EndDialog(hSelDlg, 0);
 }
 
 static void RefreshPanel()
 {
-    CheckDlgButton(hSelDlg, IDC_CHECKAUTOEXPAND, (nLoadMenuShowX & AUTOEXPAND) ? BST_CHECKED : BST_UNCHECKED);
+    CheckDlgButton(hSelDlg, IDC_CHECKAUTOEXPAND, (nLoadMenuShowX & SHOWCLONE) ? BST_CHECKED : BST_UNCHECKED);
     CheckDlgButton(hSelDlg, IDC_CHECKAVAILABLE, (nLoadMenuShowX & AVAILABLE) ? BST_CHECKED : BST_UNCHECKED);
     CheckDlgButton(hSelDlg, IDC_CHECKUNAVAILABLE, (nLoadMenuShowX & UNAVAILABLE) ? BST_CHECKED : BST_UNCHECKED);
-    CheckDlgButton(hSelDlg, IDC_SEL_SHORTNAME, nLoadMenuShowX & SHOWSHORT ? BST_CHECKED : BST_UNCHECKED);
     CheckDlgButton(hSelDlg, IDC_SEL_ASCIIONLY, nLoadMenuShowX & ASCIIONLY ? BST_CHECKED : BST_UNCHECKED);
+	
+	CheckDlgButton(hSelDlg, IDC_CHECK1, nLoadMenuBoardFilter& MASKCPS ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(hSelDlg, IDC_CHECK2, nLoadMenuBoardFilter& MASKCPS2 ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(hSelDlg, IDC_CHECK3, nLoadMenuBoardFilter& MASKCPS3 ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(hSelDlg, IDC_CHECK4, nLoadMenuBoardFilter& MASKPGM ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(hSelDlg, IDC_CHECK5, nLoadMenuBoardFilter& MASKNEOGEO ? BST_CHECKED : BST_UNCHECKED);
 }
 
 static void UpdateCounter(void)
 {
     TCHAR szRomsAvailableInfo[128];
-    _stprintf(szRomsAvailableInfo, FBALoadStringEx(hAppInst, IDS_SEL_SETSTATUS, true), nTmpDrvCount, nBurnDrvCount, nBurnDrvCount-nTmpDrvCount);
-    SendDlgItemMessage(hSelDlg, IDC_DRVCOUNT, WM_SETTEXT, 0, (LPARAM)(LPCTSTR)szRomsAvailableInfo);
+    _stprintf(szRomsAvailableInfo, FBALoadStringEx(hAppInst, IDS_SEL_SETSTATUS, true), nTmpDrvCount, nBurnDrvCount);
+    SendDlgItemMessage(hSelDlg, IDC_DRVCOUNT, WM_SETTEXT, 0, (LPARAM)szRomsAvailableInfo);
 }
 
 static void RebuildEverything()
@@ -223,7 +226,7 @@ static void RebuildEverything()
     RefreshPanel();
     bDrvSelected = false;
     TreeBuilding = 1;
-    UpdateSelectList();
+    RebuildGameList();
 	UpdateCounter();
     TreeBuilding = 0;
 }
@@ -231,9 +234,7 @@ static void RebuildEverything()
 static BOOL OnInitDialog(HWND hDlg)
 {
 	hSelDlg  = hDlg;
-    hSelList = GetDlgItem(hSelDlg, IDC_LIST1);
-	pDrvNode = (NODEINFO *)malloc(nBurnDrvCount * sizeof(NODEINFO));
-    memset(pDrvNode, 0, nBurnDrvCount * sizeof(NODEINFO));
+    hSelList = GetDlgItem(hDlg, IDC_LIST1);
 	SetupListControl();
     RebuildEverything();
     WndInMid(hDlg, hParent);
@@ -280,128 +281,99 @@ static void OnCommand(HWND hDlg, WPARAM wParam)
             RebuildEverything();
             break;
         case IDC_CHECKAUTOEXPAND:
-            nLoadMenuShowX ^= AUTOEXPAND;
+            nLoadMenuShowX ^= SHOWCLONE;
             RebuildEverything();
             break;
         case IDC_SEL_ASCIIONLY:
             nLoadMenuShowX ^= ASCIIONLY;
             RebuildEverything();
             break;
+		case IDC_CHECK1:
+			nLoadMenuBoardFilter ^= MASKCPS;
+			RebuildEverything();
+			break;
+		case IDC_CHECK2:
+			nLoadMenuBoardFilter ^= MASKCPS2;
+			RebuildEverything();
+			break;
+		case IDC_CHECK3:
+			nLoadMenuBoardFilter ^= MASKCPS3;
+			RebuildEverything();
+			break;
+		case IDC_CHECK4:
+			nLoadMenuBoardFilter ^= MASKPGM;
+			RebuildEverything();
+			break;
+		case IDC_CHECK5:
+			nLoadMenuBoardFilter ^= MASKNEOGEO;
+			RebuildEverything();
+			break;
         }
 		break;
 	}
 }
 
 //双击列表启动游戏
-static BOOL OnTree1DblClick(HWND hDlg, NMTREEVIEW* pnmtv)
+static BOOL OnListLDoubleClicked(HWND hDlg, NMITEMACTIVATE* pnmia)
 {
-	if (!TreeBuilding)
+	if (!TreeBuilding && (pnmia->iItem>=0))
 	{
-		DWORD dwpos = GetMessagePos();
-		TVHITTESTINFO thi;
-		thi.pt.x	= GET_X_LPARAM(dwpos);
-		thi.pt.y	= GET_Y_LPARAM(dwpos);
-
-		MapWindowPoints(HWND_DESKTOP, hSelList, &thi.pt, 1);
-		TreeView_HitTest(hSelList, &thi);
-		HTREEITEM hSelectHandle = thi.hItem;
-		if(hSelectHandle == NULL) return 1;
-		TreeView_SelectItem(hSelList, hSelectHandle);
-
-		NODEINFO* node;
-		TVITEM TvItem;
-	    TvItem.hItem = hSelectHandle;
-	    TvItem.mask = TVIF_PARAM;
-	    SendMessage(hSelList, TVM_GETITEM, 0, (LPARAM)&TvItem);
-		node = (NODEINFO*)TvItem.lParam;
-		nBurnDrvActive	= node->nBurnDrvNo;
-        nDialogSelect	= node->nBurnDrvNo;
-        bDrvSelected	= true;
-
-		SelectOkay();
 		SetWindowLongPtr(hSelDlg, DWLP_MSGRESULT, 1);
+		SelectOkay();
 		return 1;
 	}
 	return 0;
 }
 
 //自绘控件
-static BOOL OnTree1CustomDraw(HWND hDlg, LPNMLVCUSTOMDRAW lplvcd)
+static BOOL OnList1CustomDraw(HWND hDlg, LPNMLVCUSTOMDRAW lplvcd)
 {
+	NODEINFO* node;
     switch (lplvcd->nmcd.dwDrawStage)
     {
    	case CDDS_PREPAINT:
 		SetWindowLongPtr(hSelDlg, DWLP_MSGRESULT, CDRF_NOTIFYITEMDRAW);
 	    return 1;
     case CDDS_ITEMPREPAINT:
-		SetWindowLongPtr(hSelDlg, DWLP_MSGRESULT, CDRF_NOTIFYSUBITEMDRAW);
-	    return 1;
-	case CDDS_ITEMPREPAINT|CDDS_SUBITEM:
+		node = pDrvNode+lplvcd->nmcd.dwItemSpec;
+		printf("item=%d,drv=%d,uItemState=%d\n", lplvcd->nmcd.dwItemSpec, node->nBurnDrvNo,lplvcd->nmcd.uItemState);
+		//if((lplvcd->nmcd.uItemState&CDIS_FOCUS))
 		{
-			int i;
-			NODEINFO* node;
-	        i = lplvcd->nmcd.dwItemSpec;
-			node = pDrvNode+i;
-	        //设置非选中状态的颜色
-	        //if (!(TvItem.state & (TVIS_SELECTED | TVIS_DROPHILITED)))
-	        {
-	            //设置克隆的颜色
-	            if (!node->bIsParent)
-	            {
-	                lplvcd->clrTextBk = RGB(0xD7, 0xD7, 0xD7);
-	            }
-	            //设置不工作的颜色
-	            if (!IsBurnDrvWorking(node->nBurnDrvNo))
-	            {
-	                lplvcd->clrText = RGB(0x7F, 0x7F, 0x7F);
-	            }
-				//设置不可用的颜色
-				if(!gameAv[node->nBurnDrvNo])
-				{
-					lplvcd->clrText = RGB(0xFF, 0x10, 0x10);
-				}
-	        }
-	        break;
-	    }
+			//设置克隆的颜色
+            if (node->bIsClone)
+            {
+                lplvcd->clrTextBk = RGB(0xD7, 0xD7, 0xD7);
+            }
+            //设置不工作的颜色
+            if (!IsBurnDrvWorking(node->nBurnDrvNo))
+            {
+                lplvcd->clrTextBk = RGB(0xFF, 0xD7, 0xD7);
+            }
+			//设置不可用的颜色
+			if(!gameAv[node->nBurnDrvNo])
+			{
+				lplvcd->clrText = RGB(0xFF, 0x20, 0x20);
+			}
+		}
+	    return 1;
     }
-	SetWindowLongPtr(hSelDlg, DWLP_MSGRESULT, CDRF_DODEFAULT);
-	return 1;
-}
-
-//选中
-static void OnTree1SelChanged(HWND hDlg)
-{
-    if (!TreeBuilding)
-    {
-        HTREEITEM hSelectHandle = (HTREEITEM)SendMessage(hSelList, TVM_GETNEXTITEM, TVGN_CARET, ~0U);
-		NODEINFO* node;
-		TVITEM TvItem;
-	    TvItem.hItem = hSelectHandle;
-	    TvItem.mask = TVIF_PARAM;
-	    SendMessage(hSelList, TVM_GETITEM, 0, (LPARAM)&TvItem);
-		node = (NODEINFO*)TvItem.lParam;
-		nBurnDrvActive	= node->nBurnDrvNo;
-        nDialogSelect	= node->nBurnDrvNo;
-        bDrvSelected	= true;
-    }
+	return 0;
 }
 
 static BOOL OnNotify(HWND hDlg, WPARAM wParam, LPARAM lParam)
 {
     NMHDR *pNmHdr = (NMHDR *)lParam;
-	if(LOWORD(wParam) != IDC_LIST1)
+	if(pNmHdr->idFrom == IDC_LIST1)
 	{
-		return 0;
-	}
-	switch(pNmHdr->code)
-	{
-	case NM_DBLCLK:
-		return OnTree1DblClick(hDlg, (NMTREEVIEW *)lParam);
-	case NM_CUSTOMDRAW:
-		return OnTree1CustomDraw(hDlg, (LPNMLVCUSTOMDRAW)lParam);
-	case LVN_ITEMACTIVATE:
-		OnTree1SelChanged(hDlg);
-		return 0;
+		switch(pNmHdr->code)
+		{
+		case NM_DBLCLK:
+			OnListLDoubleClicked(hDlg, (NMITEMACTIVATE*)lParam);
+			return 1;
+		case NM_CUSTOMDRAW:
+			OnList1CustomDraw(hDlg, (LPNMLVCUSTOMDRAW)lParam);
+			return 1;
+		}
 	}
 	return 0;
 }
@@ -420,10 +392,9 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
 		bDialogCancel = true;
         nDialogSelect = nOldDlgSelected;
         EndDialog(hSelDlg, 0);
-		return 0;
+		return 1;
 	case WM_NOTIFY:
-		OnNotify(hDlg, wParam, lParam);
-		break;
+		return OnNotify(hDlg, wParam, lParam);
 	}
     return 0;
 }
@@ -431,22 +402,17 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
 int PopupSelectDialog(HWND hParentWND)
 {
     int nOldSelect = nBurnDrvActive;
-
+	hParent = hParentWND;
     if(bDrvOkay)
     {
         nOldDlgSelected = nBurnDrvActive;
     }
-    hParent = hParentWND;
-
+	pDrvNode = (NODEINFO *)malloc(nBurnDrvCount * sizeof(NODEINFO));
+	memset(pDrvNode, 0, nBurnDrvCount * sizeof(NODEINFO));
     FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_SELNEW), hParent, (DLGPROC)DialogProc);
-
+	free(pDrvNode);
     hSelDlg = NULL;
-    if (pDrvNode)
-    {
-        free(pDrvNode);
-        pDrvNode = NULL;
-    }
     nBurnDrvActive = nOldSelect;
-    return nDialogSelect;
+    return bDialogCancel?-1:nDialogSelect;
 }
 

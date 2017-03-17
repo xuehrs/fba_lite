@@ -1167,45 +1167,27 @@ void MenuUpdate()
     }
     CheckMenuItem(hMenu, MENU_DISPLAYINDICATOR, nVidSDisplayStatus ? MF_CHECKED : MF_UNCHECKED);
     CheckMenuItem(hMenu, MENU_MODELESS, bModelessMenu ? MF_CHECKED : MF_UNCHECKED);
-    CheckMenuItem(hMenu, MENU_NOCHANGENUMLOCK, bNoChangeNumLock ? MF_CHECKED : MF_UNCHECKED);
-    CheckMenuItem(hMenu, MENU_CREATEDIRS, bAlwaysCreateSupportFolders ? MF_CHECKED : MF_UNCHECKED);
-
-    if (nAppThreadPriority == THREAD_PRIORITY_TIME_CRITICAL)
-    {
-        var = MENU_PRIORITY_REALTIME;
-    }
-    else
-    {
-        if (nAppThreadPriority == THREAD_PRIORITY_HIGHEST)
-        {
-            var = MENU_PRIORITY_HIGH;
-        }
-        else
-        {
-            if (nAppThreadPriority == THREAD_PRIORITY_ABOVE_NORMAL)
-            {
-                var = MENU_PRIORITY_ABOVE_NORMAL;
-            }
-            else
-            {
-                if (nAppThreadPriority == THREAD_PRIORITY_BELOW_NORMAL)
-                {
-                    var = MENU_PRIORITY_BELOW_NORMAL;
-                }
-                else
-                {
-                    if (nAppThreadPriority == THREAD_PRIORITY_LOWEST)
-                    {
-                        var = MENU_PRIORITY_LOW;
-                    }
-                    else
-                    {
-                        var = MENU_PRIORITY_NORMAL;
-                    }
-                }
-            }
-        }
-    }
+	switch(nAppThreadPriority)
+	{
+	case THREAD_PRIORITY_TIME_CRITICAL:
+		var = MENU_PRIORITY_REALTIME;
+		break;
+	case THREAD_PRIORITY_HIGHEST:
+		var = MENU_PRIORITY_HIGH;
+		break;
+	case THREAD_PRIORITY_ABOVE_NORMAL:
+		var = MENU_PRIORITY_ABOVE_NORMAL;
+		break;
+	case THREAD_PRIORITY_BELOW_NORMAL:
+		var = MENU_PRIORITY_BELOW_NORMAL;
+		break;
+	case THREAD_PRIORITY_LOWEST:
+		var = MENU_PRIORITY_LOW;
+		break;
+	default:
+		var = MENU_PRIORITY_NORMAL;
+		break;
+	}
     CheckMenuRadioItem(hMenu, MENU_PRIORITY_REALTIME, MENU_PRIORITY_LOW, var, MF_BYCOMMAND);
     CheckMenuItem(hMenu, MENU_SAVEGAMEINPUT, bSaveInputs ? MF_CHECKED : MF_UNCHECKED);
 

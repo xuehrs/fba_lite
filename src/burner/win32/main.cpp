@@ -8,6 +8,7 @@
 #define APP_DEBUG_LOG			// log debug messages to zzBurnDebug.html
 
 #include "burner.h"
+#include <wininet.h>
 
 #ifdef _MSC_VER
 //  #include <winable.h>
@@ -33,11 +34,6 @@ TCHAR szAppExeName[EXE_NAME_SIZE + 1];
 
 bool bCmdOptUsed = 0;
 bool bAlwaysProcessKeyboardInput = false;
-bool bAlwaysCreateSupportFolders = false;
-
-bool bNoChangeNumLock = 1;
-static bool bNumlockStatus;
-
 bool bMonitorAutoCheck = true;
 
 // Used for the load/save dialog in commdlg.h (savestates, input replay, wave logging)
@@ -504,24 +500,7 @@ void MonitorAutoCheck()
 	}
 }
 
-bool SetNumLock(bool bState)
-{
-    BYTE keyState[256];
 
-    if (bNoChangeNumLock) return 0;
-
-    GetKeyboardState(keyState);
-    if ((bState && !(keyState[VK_NUMLOCK] & 1)) || (!bState && (keyState[VK_NUMLOCK] & 1)))
-    {
-        keybd_event(VK_NUMLOCK, 0, KEYEVENTF_EXTENDEDKEY, 0 );
-
-        keybd_event(VK_NUMLOCK, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-    }
-
-    return keyState[VK_NUMLOCK] & 1;
-}
-
-#include <wininet.h>
 
 static int AppInit()
 {
@@ -582,15 +561,11 @@ static int AppInit()
     create_datfile(_T("fba.dat"), 0);
 #endif
 
-    bNumlockStatus = SetNumLock(false);
-
     return 0;
 }
 
 static int AppExit()
 {
-    SetNumLock(bNumlockStatus);
-
     DrvExit();						// Make sure any game driver is exitted
     FreeROMInfo();
     MediaExit();
@@ -688,15 +663,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nShowCmd
     };
     InitCommonControlsEx(&initCC);
 
+	AllocConsole();
+	freopen("CONOUT$", "w+t", stdout);
+	
     if (!(AppInit()))  							// Init the application
     {
-            MediaInit();
-            RunMessageLoop();					// Run the application message loop
+        MediaInit();
+        RunMessageLoop();					// Run the application message loop
     }
 
     ConfigAppSave();							// Save config for the application
 
     AppExit();									// Exit the application
-
+    
+	fclose(stdout);
+	FreeConsole();
     return 0;
 }
