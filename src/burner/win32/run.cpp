@@ -416,14 +416,6 @@ int RunMessageLoop()
                     break;
                 }
 
-                if (bMenuEnabled && nVidFullscreen == 0)  								// Handle keyboard messages for the menu
-                {
-                    if (MenuHandleKeyboard(&Msg))
-                    {
-                        continue;
-                    }
-                }
-
                 if (Msg.message == WM_SYSKEYDOWN || Msg.message == WM_KEYDOWN)
                 {
                     if (Msg.lParam & 0x20000000)

@@ -3,7 +3,7 @@ alldir	+= 	burner burner/win32 dep/kaillera/client dep/libs/libpng dep/libs/lib7
 			intf/perfcount intf/perfcount/win32 dep/generated
 
 depobj	+= 	about.o bzip.o cona.o debugger.o drv.o fba_kaillera.o inpc.o \
-			inpcheat.o inpd.o inpdipsw.o inps.o localise.o localise_gamelist.o main.o mdi.o \
+			inpcheat.o inpd.o inpdipsw.o inps.o localise.o localise_gamelist.o main.o\
 			media.o memcard.o menu.o misc_win32.o numdial.o numpluscommas.o paletteviewer.o popup_win32.o \
 			progress.o res.o roms.o run.o scrn.o sel.o stated.o systeminfo.o wave.o \
 			\

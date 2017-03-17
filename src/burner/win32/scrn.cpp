@@ -399,21 +399,12 @@ static LRESULT CALLBACK ScrnProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPar
     HANDLE_MSG(hWnd, WM_ENTERSIZEMOVE,	OnEnterSizeMove);
     HANDLE_MSG(hWnd, WM_EXITSIZEMOVE,	OnExitSizeMove);
     HANDLE_MSG(hWnd, WM_ENTERIDLE,		OnEnterIdle);
-
     HANDLE_MSG(hWnd, WM_LBUTTONDBLCLK,	OnLButtonDblClk);
-
     HANDLE_MSG(hWnd, WM_NOTIFY,			OnNotify);
-    HANDLE_MSG(hWnd, WM_MENUSELECT,		OnMenuSelect);
-    HANDLE_MSG(hWnd, WM_ENTERMENULOOP,	OnEnterMenuLoop);
-    HANDLE_MSGB(hWnd, WM_EXITMENULOOP,	OnExitMenuLoop);
-    HANDLE_MSGB(hWnd, WM_INITMENUPOPUP,	OnInitMenuPopup);
-    HANDLE_MSG(hWnd, WM_UNINITMENUPOPUP, OnUnInitMenuPopup);
-
     HANDLE_MSG(hWnd, WM_DISPLAYCHANGE,	OnDisplayChange);
     }
 
-    //return DefWindowProc(hWnd, Msg, wParam, lParam);
-    return nVidFullscreen ? DefWindowProc(hWnd, Msg, wParam, lParam) : DefFrameProc(hWnd, hWndChildFrame, Msg, wParam, lParam);
+    return DefWindowProc(hWnd, Msg, wParam, lParam);
 }
 
 static int OnDisplayChange(HWND, UINT, UINT, UINT)
@@ -442,10 +433,6 @@ static int OnLButtonDblClk(HWND hwnd, BOOL, int, int, UINT)
 
 static int OnCreate(HWND hWnd, LPCREATESTRUCT /*lpCreateStruct*/)	// HWND hwnd, LPCREATESTRUCT lpCreateStruct
 {
-    if(!nVidFullscreen)
-    {
-        InitBurnerMDI(hWnd);
-    }
     return 1;
 }
 
@@ -525,10 +512,9 @@ static void OnClose(HWND)
 
 static void OnDestroy(HWND)
 {
+	MenuDestroy();
     VidExit();							// Stop using video with the Window
     hScrnWnd = NULL;					// Make sure handle is not used again
-
-    DestroyBurnerMDI(0);
 }
 
 OPENFILENAME	bgFn;
@@ -2596,13 +2582,6 @@ static void OnSize(HWND, UINT state, int cx, int cy)
     else
     {
         bool bSizeChanged = false;
-
-        MoveWindow(hRebar, 0, 0, cx, nMenuHeight, TRUE);
-
-        SetWindowPos(hWndChildFrame, NULL, 0, nMenuHeight, cx, bMenuEnabled ? (cy - nMenuHeight) : cy, SWP_NOREDRAW | SWP_NOACTIVATE | SWP_NOSENDCHANGING | SWP_NOZORDER);
-
-        //MoveWindow(hWndChildFrame, 0, nMenuHeight, cx, bMenuEnabled ? (cy-nMenuHeight) : cy, TRUE );
-
         if (hwndChat)
         {
             MoveWindow(hwndChat, 0, cy - 32, cx, 32, FALSE);
@@ -2667,19 +2646,6 @@ static void OnEnterIdle(HWND /*hwnd*/, UINT /*source*/, HWND /*hwndSource*/)
     {
         RunIdle();
     }
-}
-
-static void OnEnterMenuLoop(HWND, BOOL)
-{
-    if (!kNetGame && bAutoPause)
-    {
-        bRunPause = 1;
-    }
-}
-
-static void OnExitMenuLoop(HWND, BOOL)
-{
-
 }
 
 static int ScrnRegister()
@@ -2958,8 +2924,6 @@ int ScrnTitle()
 // Init the screen window (create it)
 int ScrnInit()
 {
-    REBARINFO rebarInfo;
-    REBARBANDINFO rebarBandInfo;
     RECT rect;
     int nWindowStyles, nWindowExStyles;
 
@@ -2989,64 +2953,21 @@ int ScrnInit()
         }
     }
 
-    //RegNewMDIChild();
-
     hScrnWnd = CreateWindowEx(nWindowExStyles, szClass, _T(APP_TITLE), nWindowStyles,
                               0, 0, 0, 0,									   			// size of window
                               NULL, NULL, hAppInst, NULL);
-
     if (hScrnWnd == NULL)
     {
         ScrnExit();
         return 1;
     }
-
+	MenuCreate();
     nMenuHeight = 0;
     if (!nVidFullscreen)
     {
-
-        // Create the menu toolbar itself
-        //MenuCreate();
-#if 0
-        // Create the toolbar
-        if (bMenuEnabled)
-        {
-            // Create the Rebar control that will contain the menu toolbar
-            hRebar = CreateWindowEx(WS_EX_TOOLWINDOW,
-                                    REBARCLASSNAME, NULL,
-                                    RBS_BANDBORDERS | CCS_NOPARENTALIGN | CCS_NODIVIDER | WS_BORDER | WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE,
-                                    0, 0, 0, 0,
-                                    hScrnWnd, NULL, hAppInst, NULL);
-
-            rebarInfo.cbSize = sizeof(REBARINFO);
-            rebarInfo.fMask = 0;
-            rebarInfo.himl = NULL;
-
-            SendMessage(hRebar, RB_SETBARINFO, 0, (LPARAM)&rebarInfo);
-
-            // Add the menu toolbar to the rebar
-            GetWindowRect(hMenubar, &rect);
-
-            rebarBandInfo.cbSize		= sizeof(REBARBANDINFO);
-            rebarBandInfo.fMask			= RBBIM_CHILD | RBBIM_CHILDSIZE | RBBIM_SIZE | RBBIM_STYLE;// | RBBIM_BACKGROUND;
-            rebarBandInfo.fStyle		= 0;//RBBS_GRIPPERALWAYS;// | RBBS_FIXEDBMP;
-            rebarBandInfo.hwndChild		= hMenubar;
-            rebarBandInfo.cxMinChild	= 100;
-            rebarBandInfo.cyMinChild	= ((SendMessage(hMenubar, TB_GETBUTTONSIZE, 0, 0)) >> 16) + 1;
-            rebarBandInfo.cx			= rect.right - rect.left;
-
-            SendMessage(hRebar, RB_INSERTBAND, (WPARAM) - 1, (LPARAM)&rebarBandInfo);
-
-            GetWindowRect(hRebar, &rect);
-            nMenuHeight = rect.bottom - rect.top;
-
-        }
-#endif
-
         ScrnTitle();
         ScrnSize();
     }
-
     return 0;
 }
 
@@ -3056,14 +2977,6 @@ int ScrnExit()
     // Ensure the window is destroyed
     DeActivateChat();
 
-    DestroyBurnerMDI(1);
-
-    if (hRebar)
-    {
-        DestroyWindow(hRebar);
-        hRebar = NULL;
-    }
-
     if (hScrnWnd)
     {
         DestroyWindow(hScrnWnd);
@@ -3071,9 +2984,6 @@ int ScrnExit()
     }
 
     UnregisterClass(szClass, hAppInst);		// Unregister the scrn class
-
-    MenuDestroy();
-
     return 0;
 }
 

@@ -212,14 +212,6 @@ int RunMessageLoop();
 int RunReset();
 void ToggleLayer(unsigned char thisLayer);
 
-// mdi.cpp
-#define ID_MDI_START_CHILD		2990
-extern HWND hWndChildFrame;
-extern HWND hVideoWindow;
-BOOL RegNewMDIChild();
-int InitBurnerMDI(HWND hParentWnd);
-void DestroyBurnerMDI(int nAction);
-
 // scrn.cpp
 extern HWND hScrnWnd;								// Handle to the screen window
 extern HWND hRebar;									// Handle to the Rebar control containing the menu
@@ -244,7 +236,6 @@ int BurnerLoadDriver(TCHAR *szDriverName);
 
 extern HANDLE hMenuThread;							// Handle to the thread that executes TrackPopupMenuEx
 extern DWORD nMenuThreadID;							// ID of the thread that executes TrackPopupMenuEx
-extern HWND hMenubar;								// Handle to the Toolbar control comprising the menu
 extern HWND hMenuWindow;
 extern bool bMenuDisplayed;
 extern int nLastMenu;
@@ -266,7 +257,6 @@ int SetMenuPriority();
 void MenuUpdate();
 void CreateArcaderesItem();
 void MenuEnableItems();
-bool MenuHandleKeyboard(MSG *);
 void MenuRemoveTheme();
 
 // sel.cpp

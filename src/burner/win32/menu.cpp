@@ -8,8 +8,6 @@
 int nOtherRes = 0;
 
 HMENU hMenu = NULL;
-HMENU hMenuPopup = NULL;
-HWND hMenubar = NULL;			  			// Handle to the Toolbar control comprising the menu
 static HMENU hBlitterMenu[8] = {NULL, };	// Handles to the blitter-specific sub-menus
 static HMENU hAudioPluginMenu[8] = {NULL, };
 
@@ -100,7 +98,6 @@ int OnInitMenuPopup(HWND, HMENU hNewMenuPopup, UINT, BOOL bWindowsMenu)
         if (!nRecursions)
         {
             bMenuDisplayed = true;
-            SendMessage(hMenubar, TB_PRESSBUTTON, nLastMenu + MENU_MENU_0, MAKELONG(1, 0));
             hCurrentMenu = hNewMenuPopup;
         }
         nRecursions++;
@@ -113,7 +110,6 @@ int OnUnInitMenuPopup(HWND, HMENU, UINT, BOOL)
     if (nRecursions <= 1)
     {
         bMenuDisplayed = false;
-        SendMessage(hMenubar, TB_PRESSBUTTON, nLastMenu + MENU_MENU_0, MAKELONG(0, 0));
         if(!bAltPause)
         {
             if (bRunPause)
@@ -128,221 +124,17 @@ int OnUnInitMenuPopup(HWND, HMENU, UINT, BOOL)
     return 0;
 }
 
-bool MenuHandleKeyboard(MSG *Msg)
-{
-    static bool bProcessAltKeyUp = true;
-
-    if (!bMenuEnabled)
-    {
-        return 0;
-    }
-
-    if (Msg->message == WM_KEYDOWN)
-    {
-        switch (Msg->wParam)
-        {
-        case VK_ESCAPE:
-        {
-            if (bMenuDisplayed)
-            {
-                if (nRecursions > 1)
-                {
-                    break;
-                }
-                else
-                {
-                    EndMenu();
-                    SendMessage(hMenubar, TB_SETHOTITEM, nLastMenu, 0);
-                    return 1;
-                }
-            }
-            else
-            {
-                if (SendMessage(hMenubar, TB_GETHOTITEM, 0, 0) != -1)
-                {
-                    SendMessage(hMenubar, TB_SETHOTITEM, (WPARAM) - 1, 0);
-                    if (!bAltPause)
-                    {
-                        GameInpCheckMouse();
-                    }
-                    return 1;
-                }
-            }
-            break;
-        }
-        case VK_LEFT:
-        {
-            int nItem;
-            if (bMenuDisplayed)
-            {
-                if (nRecursions > 1)
-                {
-                    break;
-                }
-                else
-                {
-                    nItem = nLastMenu;
-                }
-            }
-            else
-            {
-                nItem = SendMessage(hMenubar, TB_GETHOTITEM, 0, 0);
-            }
-            if (nItem != -1)
-            {
-                if (nItem)
-                {
-                    nItem -= 1;
-                }
-                else
-                {
-                    nItem = 5;
-                }
-                SendMessage(hMenubar, TB_SETHOTITEM, (WPARAM)nItem, 0);
-                return 1;
-            }
-            break;
-        }
-        case VK_RIGHT:
-        {
-            int nItem;
-            if (bMenuDisplayed)
-            {
-                if (nCurrentItemFlags & MF_POPUP)
-                {
-                    break;
-                }
-                else
-                {
-                    nItem = nLastMenu;
-                }
-            }
-            else
-            {
-                nItem = SendMessage(hMenubar, TB_GETHOTITEM, 0, 0);
-            }
-            if (nItem != -1)
-            {
-                if (nItem != 5)
-                {
-                    nItem += 1;
-                }
-                else
-                {
-                    nItem = 0;
-                }
-                SendMessage(hMenubar, TB_SETHOTITEM, (WPARAM)nItem, 0);
-                return 1;
-            }
-            break;
-        }
-        case VK_UP:
-        {
-            if (!bMenuDisplayed)
-            {
-                int nItem = SendMessage(hMenubar, TB_GETHOTITEM, 0, 0);
-                if (nItem == -1)
-                {
-                    break;
-                }
-                else
-                {
-                    SendMessage(hMenubar, TB_SETHOTITEM, (WPARAM) - 1, 0);
-                    DisplayPopupMenu(nItem);
-                    return 1;
-                }
-            }
-            break;
-        }
-        case VK_DOWN:
-        {
-            if (!bMenuDisplayed)
-            {
-                int nItem = SendMessage(hMenubar, TB_GETHOTITEM, 0, 0);
-                if (nItem == -1)
-                {
-                    break;
-                }
-                else
-                {
-                    SendMessage(hMenubar, TB_SETHOTITEM, (WPARAM) - 1, 0);
-                    DisplayPopupMenu(nItem);
-                    return 1;
-                }
-            }
-            break;
-        }
-        }
-    }
-    else
-    {
-        if (!bLeftAltkeyMapped || bRunPause || !bDrvOkay)
-        {
-            if (Msg->message == WM_SYSKEYDOWN && Msg->wParam == VK_MENU)
-            {
-                if (bMenuDisplayed)
-                {
-                    bProcessAltKeyUp = false;
-                    EndMenu();
-                    if (!bAltPause)
-                    {
-                        GameInpCheckMouse();
-                    }
-                    return 1;
-                }
-            }
-            else
-            {
-                if (Msg->message == WM_SYSKEYUP && Msg->wParam == VK_MENU)
-                {
-                    if (bProcessAltKeyUp)
-                    {
-                        int nItem = SendMessage(hMenubar, TB_GETHOTITEM, 0, 0);
-                        if (nItem == -1)  													// Menu enabled
-                        {
-                            SendMessage(hMenubar, TB_SETHOTITEM, 0, 0);
-                            InputSetCooperativeLevel(false, bAlwaysProcessKeyboardInput);
-                            return 1;
-                        }
-                        else  															// Menu disabled
-                        {
-                            SendMessage(hMenubar, TB_SETHOTITEM, (WPARAM) - 1, 0);
-                            if (!bAltPause)
-                            {
-                                GameInpCheckMouse();
-                            }
-                            return 1;
-                        }
-                    }
-                }
-                else
-                {
-                    if (Msg->message == UM_DISPLAYPOPUP)
-                    {
-                        DisplayPopupMenu(Msg->wParam);
-                        InputSetCooperativeLevel(false, bAlwaysProcessKeyboardInput);
-                        return 1;
-                    }
-                }
-            }
-        }
-    }
-
-    bProcessAltKeyUp = true;
-
-    return 0;
-}
-
 int MenuCreate()
 {
-    TBBUTTON button;
     TCHAR szButtonText[32];
     MENUITEMINFO menuItemInfo;
     MENUINFO menu;
-
+	
     if (hMenu == NULL)
     {
-        hMenu = FBALoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU));					// Main application menu
+    	hMenu = GetMenu(hScrnWnd);
+		printf("hMenu=%p\n", hMenu);
+        //hMenu = FBALoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU));					// Main application menu
         hBlitterMenu[0] = FBALoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_BLITTER_1));	// DirectDraw Standard blitter
         hBlitterMenu[1] = FBALoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_BLITTER_2));	// Direct3D
         hBlitterMenu[2] = FBALoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_BLITTER_3));	// Software effects blitter
@@ -352,121 +144,20 @@ int MenuCreate()
         hAudioPluginMenu[0] = FBALoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_AUD_PLUGIN_1));
         hAudioPluginMenu[1] = FBALoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_AUD_PLUGIN_2));
     }
-
-    if (hMenuPopup == NULL)
-    {
-        hMenuPopup = CreatePopupMenu();
-
-        menuItemInfo.cbSize = sizeof(MENUITEMINFO);
-        menuItemInfo.fMask = MIIM_TYPE;
-        menuItemInfo.dwTypeData = szButtonText;
-
-        for (int i = 0; i < 6; i++)
-        {
-            menuItemInfo.cch = 32;
-            GetMenuItemInfo(hMenu, i, true, &menuItemInfo);
-            AppendMenu(hMenuPopup, MF_POPUP | MF_STRING, (UINT_PTR)GetSubMenu(hMenu, i), szButtonText);
-        }
-    }
-
     MenuEnableItems();
     MenuUpdate();
 
     bMenuDisplayed = false;
     nLastMenu = -1;
 
-    hMenubar = CreateWindowEx(0,
-                              TOOLBARCLASSNAME, NULL,
-                              TBSTYLE_FLAT | TBSTYLE_LIST | CCS_NODIVIDER | CCS_NOPARENTALIGN | CCS_NORESIZE | WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE,
-                              0, 0, 0, 0,
-                              hScrnWnd, NULL, hAppInst, NULL);
-
-    SendMessage(hMenubar, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
-    SendMessage(hMenubar, TB_SETBITMAPSIZE, 0, 0);
-
-    // Reset window menu to default
-    GetSystemMenu(hScrnWnd, TRUE);
-
-    // Add buttons to the menu toolbar
-    memset(&button, 0, sizeof(TBBUTTON));
-    memset(&menuItemInfo, 0, sizeof(MENUITEMINFO));
-
-    menuItemInfo.cbSize = sizeof(MENUITEMINFO);
-    menuItemInfo.fMask = MIIM_TYPE;
-    menuItemInfo.dwTypeData = szButtonText;
-
-    for (int i = 0; i < 6; i++)
-    {
-
-        menuItemInfo.cch = 32;
-        GetMenuItemInfo(hMenu, i, true, &menuItemInfo);
-
-        button.iBitmap = 0;
-        button.idCommand = MENU_MENU_0 + i;
-        button.fsState = TBSTATE_ENABLED;
-        button.fsStyle = TBSTYLE_DROPDOWN | TBSTYLE_AUTOSIZE;
-
-        button.iString = (INT_PTR)szButtonText;
-
-        SendMessage(hMenubar, TB_ADDBUTTONS, 1, (LPARAM)&button);
-    }
-
-    SendMessage(hMenubar, TB_AUTOSIZE, 0, 0);
-
     return 0;
 }
 
 void MenuDestroy()
 {
-    if (hMenubar)
-    {
-        DestroyWindow(hMenubar);
-        hMenubar = NULL;
-    }
-
-    {
-        MENUITEMINFO myMenuItemInfo;
-        myMenuItemInfo.cbSize = sizeof(MENUITEMINFO);
-        myMenuItemInfo.fMask = MIIM_SUBMENU | MIIM_STATE;
-        myMenuItemInfo.fState = MFS_GRAYED;
-        myMenuItemInfo.hSubMenu = NULL;
-        if (hMenu)
-        {
-            SetMenuItemInfo(GetSubMenu(hMenu, 1), 1, TRUE, &myMenuItemInfo);
-        }
-        if (hMenuPopup)
-        {
-            SetMenuItemInfo(GetSubMenu(hMenuPopup, 1), 1, TRUE, &myMenuItemInfo);
-        }
-
-        for (int i = 0; i < 5; i++)
-        {
-            if (hBlitterMenu[i])
-            {
-                DestroyMenu(hBlitterMenu[i]);
-                hBlitterMenu[i] = 0;
-            }
-        }
-
-        for (int i = 0; i < 2; i++)
-        {
-            if (hAudioPluginMenu[i])
-            {
-                DestroyMenu(hAudioPluginMenu[i]);
-                hAudioPluginMenu[i] = 0;
-            }
-        }
-    }
-
     if(hMenu)
     {
-        DestroyMenu(hMenu);
         hMenu = NULL;
-    }
-    if (hMenuPopup)
-    {
-        DestroyMenu(hMenuPopup);
-        hMenuPopup = NULL;
     }
 }
 
@@ -1265,25 +956,6 @@ void MenuEnableItems()
         EnableMenuItem(GetSubMenu(hMenu, 1), 10,	MF_ENABLED | MF_BYPOSITION);
     }
     EnableMenuItem(GetSubMenu(hMenu, 1), 11,		MF_ENABLED | MF_BYPOSITION);
-
-#if 0
-    if (nVidSelect == 3 && !(nVidBlitterOpt[3] & (1 <<  9)))
-    {
-        EnableMenuItem(hMenu, MENU_DX9_CUBIC0,		MF_GRAYED  | MF_BYCOMMAND);
-        EnableMenuItem(hMenu, MENU_DX9_CUBIC1,		MF_GRAYED  | MF_BYCOMMAND);
-        EnableMenuItem(hMenu, MENU_DX9_CUBIC2,		MF_GRAYED  | MF_BYCOMMAND);
-        EnableMenuItem(hMenu, MENU_DX9_CUBIC3,		MF_GRAYED  | MF_BYCOMMAND);
-        EnableMenuItem(hMenu, MENU_DX9_CUBIC4,		MF_GRAYED  | MF_BYCOMMAND);
-    }
-    else
-    {
-        EnableMenuItem(hMenu, MENU_DX9_CUBIC0,		MF_ENABLED | MF_BYCOMMAND);
-        EnableMenuItem(hMenu, MENU_DX9_CUBIC1,		MF_ENABLED | MF_BYCOMMAND);
-        EnableMenuItem(hMenu, MENU_DX9_CUBIC2,		MF_ENABLED | MF_BYCOMMAND);
-        EnableMenuItem(hMenu, MENU_DX9_CUBIC3,		MF_ENABLED | MF_BYCOMMAND);
-        EnableMenuItem(hMenu, MENU_DX9_CUBIC4,		MF_ENABLED | MF_BYCOMMAND);
-    }
-#endif
 
     if (nVidSelect == 3 && (!(nVidBlitterOpt[3] & (1 <<  9)) || (nVidBlitterOpt[nVidSelect] & (7 << 28)) == (4 << 28)))
     {
