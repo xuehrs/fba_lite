@@ -52,11 +52,11 @@ static void SetupListControl(void)
 	ZeroMemory(&list_column,sizeof(list_column));
 	list_column.mask = LVCF_WIDTH|LVCF_TEXT|LVCF_SUBITEM;
 	list_column.cx = 100;
-	list_column.pszText = _T("ZIP");
+	list_column.pszText = FBALoadStringEx(hAppInst, IDS_SEL_ZIPNAME, true);
 	ListView_InsertColumn(hSelList,0,&list_column);
 
 	list_column.cx = 400;
-	list_column.pszText = _T("GAME");
+	list_column.pszText = FBALoadStringEx(hAppInst, IDS_SEL_FULLNAME, true);
 	ListView_InsertColumn(hSelList,1,&list_column);
 
 	ListView_SetExtendedListViewStyleEx(hSelList,LVS_EX_FULLROWSELECT|LVS_EX_DOUBLEBUFFER,LVS_EX_FULLROWSELECT|LVS_EX_DOUBLEBUFFER);
@@ -336,24 +336,18 @@ static BOOL OnList1CustomDraw(HWND hDlg, LPNMLVCUSTOMDRAW lplvcd)
 	    return 1;
     case CDDS_ITEMPREPAINT:
 		node = pDrvNode+lplvcd->nmcd.dwItemSpec;
-		printf("item=%d,drv=%d,uItemState=%d\n", lplvcd->nmcd.dwItemSpec, node->nBurnDrvNo,lplvcd->nmcd.uItemState);
-		//if((lplvcd->nmcd.uItemState&CDIS_FOCUS))
+		if(!(lplvcd->nmcd.uItemState&CDIS_FOCUS))
 		{
-			//设置克隆的颜色
-            if (node->bIsClone)
-            {
-                lplvcd->clrTextBk = RGB(0xD7, 0xD7, 0xD7);
-            }
             //设置不工作的颜色
             if (!IsBurnDrvWorking(node->nBurnDrvNo))
             {
-                lplvcd->clrTextBk = RGB(0xFF, 0xD7, 0xD7);
+                lplvcd->clrText = RGB(220, 40, 40);
             }
-			//设置不可用的颜色
-			if(!gameAv[node->nBurnDrvNo])
-			{
-				lplvcd->clrText = RGB(0xFF, 0x20, 0x20);
-			}
+			//设置克隆的颜色
+            if (node->bIsClone)
+            {
+                lplvcd->clrText = RGB(128, 128, 128);
+            }
 		}
 	    return 1;
     }

@@ -182,8 +182,6 @@ int ConfigAppLoad()
         VAR(nMinChatFontSize);
         VAR(nMaxChatFontSize);
 
-        VAR(bModelessMenu);
-
         VAR(bDrvSaveAll);
         VAR(nAppThreadPriority);
         VAR(bAlwaysProcessKeyboardInput);
@@ -458,9 +456,6 @@ int ConfigAppSave()
     VAR(nMinChatFontSize);
     _ftprintf(h, _T("\n// Maximum height (in pixels) of the font used for the Kaillera chat function (used for 1280x960 or higher).\n"));
     VAR(nMaxChatFontSize);
-
-    _ftprintf(h, _T("\n// Make the menu modeless\n"));
-    VAR(bModelessMenu);
 
     _ftprintf(h, _T("\n// If non-zero, load and save all ram (the state)\n"));
     VAR(bDrvSaveAll);

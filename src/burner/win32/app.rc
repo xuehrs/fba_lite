@@ -54,32 +54,32 @@ END
 
 IDD_INPD DIALOGEX 0, 0, 283, 244
 STYLE DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Map Game Inputs"
+CAPTION "输入映射"
 FONT 9, "宋体", 0, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDCANCEL,228,225,50,14
+    DEFPUSHBUTTON   "确定",IDCANCEL,228,225,50,14
     GROUPBOX        "", IDC_STATIC, 3, 0, 277, 220
-    CTEXT           "Double-click an input to change its mapping",IDC_STATIC,7,7,265,15,SS_CENTERIMAGE
+    CTEXT           "要修改按键映射请双击该选项",IDC_STATIC,7,7,265,15,SS_CENTERIMAGE
     CONTROL         "List1",IDC_INPD_LIST,"SysListView32",LVS_REPORT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP, 9, 24, 265, 128
     CONTROL         "", IDC_STATIC, "Static", SS_SUNKEN, 9, 156, 265, 58
-    CTEXT           "Make selection in all three drop-down boxes, click apropriate button",IDC_STATIC,11,159,261,15,SS_CENTERIMAGE
+    CTEXT           "点击适当的按钮,在下拉菜单中选择.",IDC_STATIC,11,159,261,15,SS_CENTERIMAGE
     COMBOBOX        IDC_INPD_GI,15,177,81,128,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_INPD_PCI,101,177,81,128,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_INPD_ANALOG,187,177,81,48,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Save preset",IDC_INPD_SAVE_AS_PRESET,15,194,81,14
-    PUSHBUTTON      "Make default",IDC_INPD_DEFAULT,101,194,81,14
-    PUSHBUTTON      "Use preset",IDC_INPD_USE,187,194,81,14
+    PUSHBUTTON      "保存预设",IDC_INPD_SAVE_AS_PRESET,15,194,81,14
+    PUSHBUTTON      "恢复默认",IDC_INPD_DEFAULT,101,194,81,14
+    PUSHBUTTON      "使用预设",IDC_INPD_USE,187,194,81,14
 END
 
 IDD_INPS DIALOGEX 0, 0, 195, 64
 STYLE DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Select Control"
+CAPTION "选择控制键"
 FONT 9, "宋体"
 BEGIN
-    CONTROL         "Grab mouse",IDC_INPS_GRABMOUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,5,50,10
-    PUSHBUTTON      "Activate",IDC_INPS_PUSH,5,15,50,11
-    PUSHBUTTON      "Clear Input",IDCANCEL+1,5,26,50,11
-    CONTROL         "Clear Lock",IDC_INPS_CLEARLOCK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,38,50,10
+    CONTROL         "捕获鼠标",IDC_INPS_GRABMOUSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,5,50,10
+    PUSHBUTTON      "激活",IDC_INPS_PUSH,5,15,50,11
+    PUSHBUTTON      "清除输入",IDCANCEL+1,5,26,50,11
+    CONTROL         "清除锁定",IDC_INPS_CLEARLOCK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,38,50,10
     CONTROL         "",IDC_INPS_CONTROL,"Static",SS_SUNKEN | SS_CENTER | SS_CENTERIMAGE,60,5,130,45, WS_EX_STATICEDGE
     CONTROL         "",IDC_INPS_CONTROL_NAME,"Edit",ES_CENTER | ES_AUTOHSCROLL | ES_READONLY,5,53,185,8
 END
@@ -90,42 +90,42 @@ CAPTION "Edit Constant"
 FONT 9, "宋体", 0, 0, 0x1
 BEGIN
     EDITTEXT        IDC_INPC_VALUE,5,5,40,15,ES_AUTOHSCROLL
-    PUSHBUTTON      "Close",IDCANCEL,50,5,40,15
+    PUSHBUTTON      "关闭",IDCANCEL,50,5,40,15
 END
 
 IDD_INPCHEAT DIALOGEX 0, 0, 250, 200
 STYLE DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Edit Cheat Settings"
+CAPTION "编辑作弊设置"
 FONT 9, "宋体", 0, 0, 0x1
 BEGIN
     GROUPBOX        "", IDC_STATIC, 3, 0, 244, 176
-    CTEXT           "Select a cheat to change it.", IDC_STATIC, 7, 7, 232, 15, SS_CENTERIMAGE
+    CTEXT           "选中一个作弊项目然后修改.", IDC_STATIC, 7, 7, 232, 15, SS_CENTERIMAGE
     CONTROL         "List1", IDC_INPCHEAT_LIST, "SysListView32", LVS_REPORT | LVS_SINGLESEL | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP, 9, 24, 232, 128
     COMBOBOX        IDC_INPCX1_VALUE, 9, 157, 177, 128, CBS_DROPDOWNLIST | WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL
-    PUSHBUTTON      "Defaults",IDC_INPC_RESET,191,156,50,14
-    DEFPUSHBUTTON   "OK",IDOK,195,181,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,140,181,50,14
+    PUSHBUTTON      "默认",IDC_INPC_RESET,191,156,50,14
+    DEFPUSHBUTTON   "确定",IDOK,195,181,50,14
+    PUSHBUTTON      "取消",IDCANCEL,140,181,50,14
 END
 
 IDD_INPDIP DIALOGEX 0, 0, 270, 200
 STYLE DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Edit DIPswitch Settings"
+CAPTION "跳线设置"
 FONT 9, "宋体", 0, 0, 0x1
 BEGIN
     GROUPBOX        "", IDC_STATIC, 3, 0, 264, 176
-    CTEXT           "Select a setting to change it.", IDC_STATIC, 7, 7, 252, 15, SS_CENTERIMAGE
+    CTEXT           "选中一个设置然后进行修改.", IDC_STATIC, 7, 7, 252, 15, SS_CENTERIMAGE
     CONTROL         "List1", IDC_INPCHEAT_LIST, "SysListView32", LVS_REPORT | LVS_SINGLESEL | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP, 9, 24, 252, 128
     COMBOBOX        IDC_INPCX1_VALUE, 9, 157, 197, 128, CBS_DROPDOWNLIST | WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL
-    PUSHBUTTON      "Defaults",IDC_INPC_RESET,211,156,50,14
-    DEFPUSHBUTTON   "OK",IDOK,215,181,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,160,181,50,14
+    PUSHBUTTON      "默认值",IDC_INPC_RESET,211,156,50,14
+    DEFPUSHBUTTON   "确定",IDOK,215,181,50,14
+    PUSHBUTTON      "取消",IDCANCEL,160,181,50,14
 END
 
 IDD_VALUE DIALOGEX DISCARDABLE  0, 0, 140, 20
 STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 FONT 9, "宋体"
 BEGIN
-    DEFPUSHBUTTON   "Close",ID_VALUE_CLOSE,86,3,50,13
+    DEFPUSHBUTTON   "关闭",ID_VALUE_CLOSE,86,3,50,13
     EDITTEXT        IDC_VALUE_EDIT,4,3,78,12,ES_AUTOHSCROLL | ES_NUMBER
 END
 
@@ -139,24 +139,24 @@ BEGIN
     LTEXT           "",IDC_WAIT_LABEL_A,65,23,134,14,SS_CENTERIMAGE | NOT WS_VISIBLE
     LTEXT           "",IDC_WAIT_LABEL_B1,65,19,134,10,SS_CENTERIMAGE | NOT WS_VISIBLE
     LTEXT           "",IDC_WAIT_LABEL_B2,65,29,134,10,SS_CENTERIMAGE | NOT WS_VISIBLE
-    PUSHBUTTON      "Cancel",IDCANCEL,151,23,50,14, NOT WS_VISIBLE
+    PUSHBUTTON      "取消",IDCANCEL,151,23,50,14, NOT WS_VISIBLE
 END
 
 IDD_ROMSDIR DIALOGEX 0, 0, 242, 100
 STYLE DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Edit ROMs Paths"
+CAPTION "游戏路径设置"
 FONT 9, "宋体"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,91,81,50,14
-    GROUPBOX        "Paths",IDC_STATIC,5,0,233,76
+    DEFPUSHBUTTON   "确定",IDOK,91,81,50,14
+    GROUPBOX        "",IDC_STATIC,5,0,233,76
     EDITTEXT        IDC_ROMSDIR_EDIT1,14,11,154,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "Browse...",IDC_ROMSDIR_BR1,177,10,50,14
+    PUSHBUTTON      "选择...",IDC_ROMSDIR_BR1,177,10,50,14
     EDITTEXT        IDC_ROMSDIR_EDIT2,14,26,154,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "Browse...",IDC_ROMSDIR_BR2,177,25,50,14
+    PUSHBUTTON      "选择...",IDC_ROMSDIR_BR2,177,25,50,14
     EDITTEXT        IDC_ROMSDIR_EDIT3,14,41,154,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "Browse...",IDC_ROMSDIR_BR3,177,40,50,14
+    PUSHBUTTON      "选择...",IDC_ROMSDIR_BR3,177,40,50,14
     EDITTEXT        IDC_ROMSDIR_EDIT4,14,56,154,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "Browse...",IDC_ROMSDIR_BR4,177,55,50,14
+    PUSHBUTTON      "选择...",IDC_ROMSDIR_BR4,177,55,50,14
 END
 
 IDD_ABOUT DIALOGEX 0, 0, 349, 107
@@ -168,7 +168,7 @@ BEGIN
     CONTROL         "version",IDC_FBA_VER,"Static",SS_OWNERDRAW | WS_GROUP,78,63,264,10
     CONTROL         "specialbuild",IDC_SPECIALSTRING,"Static",SS_OWNERDRAW | WS_GROUP,78,71,264,10
     LTEXT           "FB Alpha contains parts of MAME && Final Burn.\n2004-2015, Team FB Alpha.",IDC_STATIC,6,86,230,16,WS_DISABLED
-    DEFPUSHBUTTON   "OK",IDOK,294,88,50,14
+    DEFPUSHBUTTON   "确定",IDOK,294,88,50,14
     PUSHBUTTON      "License",IDC_SHOWLICENSE,240,88,50,14
     CONTROL         "",IDC_LICENSE,"RICHEDIT20A",ES_MULTILINE | ES_READONLY | WS_VSCROLL | ES_NOIME,3,107,342,77, WS_EX_STATICEDGE | ES_EX_NOCALLOLEINIT
 END
@@ -182,7 +182,7 @@ BEGIN
     CONTROL         "version",IDC_FBA_VER,"Static",SS_OWNERDRAW | WS_GROUP,78,63,264,10
     CONTROL         "specialbuild",IDC_SPECIALSTRING,"Static",SS_OWNERDRAW | WS_GROUP,78,71,264,10
     CONTROL         "",IDC_LICENSE,"RICHEDIT20A",ES_MULTILINE | ES_READONLY | WS_VSCROLL | ES_NOIME,3,88,342,77, WS_EX_STATICEDGE | ES_EX_NOCALLOLEINIT
-    DEFPUSHBUTTON   "OK",IDOK,294,170,50,14
+    DEFPUSHBUTTON   "确定",IDOK,294,170,50,14
     CONTROL			" I understand and agree to be bound by the terms of the above license agreement",IDC_ACCEPTLICENSE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,170,282,14
 END
 
@@ -192,26 +192,26 @@ CAPTION "载入游戏"
 FONT 9, "宋体", 0, 0, 0x1
 BEGIN
     CONTROL         "GameList",IDC_LIST1,"SysListView32",LVS_ALIGNLEFT|LVS_REPORT|LVS_SINGLESEL|LVS_SHOWSELALWAYS|WS_BORDER|WS_TABSTOP,0,0,350,272
-    GROUPBOX        "Options",IDC_STATIC_OPT,355,0,100,65
-    CONTROL         "Show Available",IDC_CHECKAVAILABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,360,12,80,10
-    CONTROL         "Show Unavailable",IDC_CHECKUNAVAILABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,360,24,80,10
-    CONTROL         "Show Clones",IDC_CHECKAUTOEXPAND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,360,36,80,10
-    CONTROL         "Show Latin Text",IDC_SEL_ASCIIONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,360,48,80,10
+    GROUPBOX        "选项",IDC_STATIC_OPT,355,0,100,65
+    CONTROL         "显示可用的",IDC_CHECKAVAILABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,360,12,80,10
+    CONTROL         "显示不可用的",IDC_CHECKUNAVAILABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,360,24,80,10
+    CONTROL         "显示克隆的",IDC_CHECKAUTOEXPAND,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,360,36,80,10
+    CONTROL         "显示拉丁字符",IDC_SEL_ASCIIONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,360,48,80,10
     
-    GROUPBOX        "Filter",IDC_STATIC,355,70,100,75
-    CONTROL         "Show CPS-1", IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,360,82,80,10
-    CONTROL         "Show CPS-2", IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,360,94,80,10
-    CONTROL         "Show CPS-3", IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,360,106,80,10
-    CONTROL         "Show PGM-1", IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,360,118,80,10
-    CONTROL         "Show NEOGEO",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,360,130,80,10
+    GROUPBOX        "",IDC_STATIC,355,70,100,75
+    CONTROL         "CPS-1", IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,360,82,80,10
+    CONTROL         "CPS-2", IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,360,94,80,10
+    CONTROL         "CPS-3", IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,360,106,80,10
+    CONTROL         "PGM-1", IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,360,118,80,10
+    CONTROL         "NEOGEO",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,360,130,80,10
     
-    GROUPBOX        "Search",IDC_SEL_SEARCHGROUP,355,150,100,30
+    GROUPBOX        "查找",IDC_SEL_SEARCHGROUP,355,150,100,30
     EDITTEXT        IDC_SEL_SEARCH,360,162,90,12,ES_AUTOHSCROLL | WS_TABSTOP
     
-    GROUPBOX        "Action",IDC_STATIC,355,185,100,70
-    CONTROL         "Game Path",IDROM,"Button",WS_TABSTOP,360,197,90,14
-    CONTROL         "Scan Game",IDRESCAN,"Button",WS_TABSTOP,360,215,90,14
-    CONTROL         "Play Game",IDOK,"Button",WS_TABSTOP,360,233,90,14
+    GROUPBOX        "",IDC_STATIC,355,185,100,70
+    CONTROL         "设置路径",IDROM,"Button",WS_TABSTOP,360,197,90,14
+    CONTROL         "扫描游戏",IDRESCAN,"Button",WS_TABSTOP,360,215,90,14
+    CONTROL         "加载游戏",IDOK,"Button",WS_TABSTOP,360,233,90,14
 
     CONTROL         "",IDC_DRVCOUNT,"Static",SS_SUNKEN|SS_CENTER|SS_CENTERIMAGE,355,259,100,12
 END
@@ -222,11 +222,11 @@ STYLE DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Select Desired Gamma Value"
 FONT 9, "宋体", 0, 0, 0x1
 BEGIN
-        DEFPUSHBUTTON "OK",IDOK,159,40,50,14
+        DEFPUSHBUTTON "确定",IDOK,159,40,50,14
 		GROUPBOX "", IDC_STATIC, 3, 0, 208, 35
         CONTROL "Gamma value",IDC_GAMMA_SLIDER,"msctls_trackbar32", WS_TABSTOP, 5, 10, 160, 18
         EDITTEXT IDC_GAMMA_EDIT,167,10,35,14,SS_CENTERIMAGE
-        PUSHBUTTON "Cancel",IDCANCEL,105,40,50,14
+        PUSHBUTTON "取消",IDCANCEL,105,40,50,14
 END
 
 IDD_SCANLINE DIALOGEX 0, 0, 214, 59
@@ -234,11 +234,11 @@ STYLE DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Select desired scanline intensity"
 FONT 9, "宋体", 0, 0, 0x1
 BEGIN
-        DEFPUSHBUTTON "OK",IDOK,159,40,50,14
+        DEFPUSHBUTTON "确定",IDOK,159,40,50,14
 	GROUPBOX "", IDC_STATIC, 3, 0, 208, 35
         CONTROL "Scanline intensity",IDC_SCANLINE_SLIDER,"msctls_trackbar32", WS_TABSTOP, 5, 10, 160, 18
         EDITTEXT IDC_SCANLINE_EDIT,167,10,35,14,SS_CENTERIMAGE
-        PUSHBUTTON "Cancel",IDCANCEL,105,40,50,14
+        PUSHBUTTON "取消",IDCANCEL,105,40,50,14
 END
 
 IDD_PHOSPHOR DIALOGEX 0, 0, 214, 82
@@ -246,14 +246,14 @@ STYLE DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Select desired feedback intensity"
 FONT 9, "宋体", 0, 0, 0x1
 BEGIN
-        DEFPUSHBUTTON "OK",IDOK,159,63,50,14
+        DEFPUSHBUTTON "确定",IDOK,159,63,50,14
 	GROUPBOX "", IDC_STATIC, 3, 0, 208, 58
         CONTROL "Feedback strength",IDC_PHOSPHOR_1_SLIDER,"msctls_trackbar32", WS_TABSTOP, 5, 10, 160, 18
         EDITTEXT IDC_PHOSPHOR_1_EDIT,167,10,35,14,SS_CENTERIMAGE
         RTEXT "Max. Oversaturation:", IDC_STATIC, 8, 35, 75, 10, SS_CENTERIMAGE
         CONTROL "Feedback oversaturation",IDC_PHOSPHOR_2_SLIDER,"msctls_trackbar32", WS_TABSTOP, 85, 33, 80, 18
         EDITTEXT IDC_PHOSPHOR_2_EDIT,167,33,35,14,SS_CENTERIMAGE
-        PUSHBUTTON "Cancel",IDCANCEL,105,63,50,14
+        PUSHBUTTON "取消",IDCANCEL,105,63,50,14
 END
 
 IDD_SCREENANGLE DIALOGEX 0, 0, 234, 82
@@ -261,7 +261,7 @@ STYLE DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Select desired 3D projection properties"
 FONT 9, "宋体", 0, 0, 0x1
 BEGIN
-        DEFPUSHBUTTON "OK",IDOK,179,63,50,14
+        DEFPUSHBUTTON "确定",IDOK,179,63,50,14
 		GROUPBOX "", IDC_STATIC, 3, 0, 228, 58
         RTEXT "Angle:", IDC_STATIC, 8, 12, 25, 10, SS_CENTERIMAGE
         CONTROL "Screen Angle",IDC_SCREENANGLE_SLIDER,"msctls_trackbar32", WS_TABSTOP, 35, 10, 150, 18
@@ -269,7 +269,7 @@ BEGIN
         RTEXT "Fishbowl Factor:", IDC_STATIC, 8, 35, 55, 10, SS_CENTERIMAGE
         CONTROL "Fishbowl Factor",IDC_SCREENCURVATURE_SLIDER,"msctls_trackbar32", WS_TABSTOP, 65, 33, 120, 18
         EDITTEXT IDC_SCREENCURVATURE_EDIT,187,33,35,14,SS_CENTERIMAGE
-        PUSHBUTTON "Cancel",IDCANCEL,125,63,50,14
+        PUSHBUTTON "取消",IDCANCEL,125,63,50,14
 END
 
 IDD_CHOOSERES DIALOGEX 0, 0, 134, 54
@@ -277,24 +277,24 @@ STYLE DS_MODALFRAME | DS_CENTER | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSME
 CAPTION "Select desired resolution"
 FONT 9, "宋体", 0, 0, 0x1
 BEGIN
-        DEFPUSHBUTTON "OK", IDOK, 79, 35, 50, 14
+        DEFPUSHBUTTON "确定", IDOK, 79, 35, 50, 14
 	GROUPBOX "", IDC_STATIC, 3, 0, 128, 30
 	LTEXT "Resolution:", IDC_RESOLUTION, 8, 11, 48, 10, SS_CENTERIMAGE
 	COMBOBOX IDC_CHOOSE_LIST, 60, 10, 64, 128, CBS_DROPDOWNLIST | WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL
-        PUSHBUTTON "Cancel", IDCANCEL, 25, 35, 50, 14
+        PUSHBUTTON "取消", IDCANCEL, 25, 35, 50, 14
 END
 
 IDD_CPUCLOCK DIALOGEX 0, 0, 222, 59
 STYLE DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Adjust speed of the emulated CPU"
+CAPTION "调整CPU运行速度"
 FONT 9, "宋体", 0, 0, 0x1
 BEGIN
-        DEFPUSHBUTTON "OK",IDOK,167,40,50,14
+    DEFPUSHBUTTON "确定",IDOK,167,40,50,14
 	GROUPBOX "", IDC_STATIC, 3, 0, 216, 35
-        CONTROL "CPU speed",IDC_CPUCLOCK_SLIDER,"msctls_trackbar32", WS_TABSTOP, 5, 10, 160, 18
-        EDITTEXT IDC_CPUCLOCK_EDIT,167,10,35,14,SS_CENTERIMAGE
+    CONTROL "CPU速度",IDC_CPUCLOCK_SLIDER,"msctls_trackbar32", WS_TABSTOP, 5, 10, 160, 18
+    EDITTEXT IDC_CPUCLOCK_EDIT,167,10,35,14,SS_CENTERIMAGE
 	LTEXT "%", IDC_STATIC, 206, 11, 8, 10, SS_CENTERIMAGE
-        PUSHBUTTON "Cancel",IDCANCEL,113,40,50,14
+    PUSHBUTTON "取消",IDCANCEL,113,40,50,14
 END
 
 IDD_EXCEPTION DIALOGEX 0, 0, 349, 69
@@ -303,7 +303,7 @@ CAPTION "FB Alpha has encountered an unrecoverable problem and will be terminate
 FONT 8, "MS Shell Dlg"
 BEGIN
     CONTROL         "", IDC_SYSINFO_CODE, "Static", SS_SUNKEN | SS_CENTER | SS_CENTERIMAGE, 3,3,342,40, WS_EX_STATICEDGE
-    DEFPUSHBUTTON   "OK",IDOK,294,49,50,14
+    DEFPUSHBUTTON   "确定",IDOK,294,49,50,14
     PUSHBUTTON      "Debug",IDC_SYSINFO_DEBUG,240,49,50,14
     PUSHBUTTON      "Details",IDC_SYSINFO_SHOW,186,49,50,14
     PUSHBUTTON      "Log",IDC_SYSINFO_LOG,132,49,50,14
@@ -315,8 +315,8 @@ STYLE DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "FB Alpha system information report"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,274,131,70,14
-    PUSHBUTTON      "Save...",IDC_SYSINFO_LOG_SAVE,200,131,70,14
+    DEFPUSHBUTTON   "确定",IDOK,274,131,70,14
+    PUSHBUTTON      "保存...",IDC_SYSINFO_LOG_SAVE,200,131,70,14
     CONTROL         "",IDC_SYSINFO_EDIT,"EDIT",ES_MULTILINE | ES_WANTRETURN | ES_READONLY | WS_TABSTOP | WS_VSCROLL,3,3,342,122, WS_EX_STATICEDGE
 END
 
@@ -390,7 +390,7 @@ STYLE DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "FB Alpha Message"
 FONT 9, "宋体"
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,38,16,50,14
+    DEFPUSHBUTTON   "确定",IDOK,38,16,50,14
     CONTROL         "",IDC_MESSAGE_BACK,"Static",SS_WHITERECT | NOT WS_VISIBLE,0,0,0,0
 	CONTROL			"",IDC_MESSAGE_ICON,"Static",SS_OWNERDRAW,7,7,30,30
     CONTROL         "",IDC_MESSAGE_EDIT_LOCAL,"RICHEDIT20A",ES_MULTILINE | ES_READONLY | ES_WANTRETURN | ES_NOIME | WS_TABSTOP | NOT WS_VISIBLE,38,7,4,2 | ES_EX_NOCALLOLEINIT
@@ -399,7 +399,7 @@ END
 
 IDD_PALETTEVIEWER DIALOGEX 0, 0, 320, 240
 STYLE DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Palette Viewer"
+CAPTION "调色板查看器"
 FONT 9, "宋体", 0, 0, 0x1
 BEGIN
     CONTROL         "00000",IDC_GFX_VIEWER_VERT_1,"Static",SS_RIGHT,1,15,22,8
@@ -452,17 +452,17 @@ BEGIN
         MENUITEM "载入游戏\tF6",					MENU_LOAD
         MENUITEM "联机对战",				MENU_STARTNET
         POPUP "最近的游戏"
-	BEGIN
-            MENUITEM "no game selected",				MENU_PREVIOUSGAMES1, GRAYED
-            MENUITEM "no game selected",				MENU_PREVIOUSGAMES2, GRAYED
-            MENUITEM "no game selected",				MENU_PREVIOUSGAMES3, GRAYED
-            MENUITEM "no game selected",				MENU_PREVIOUSGAMES4, GRAYED
-            MENUITEM "no game selected",				MENU_PREVIOUSGAMES5, GRAYED
-            MENUITEM "no game selected",				MENU_PREVIOUSGAMES6, GRAYED
-            MENUITEM "no game selected",				MENU_PREVIOUSGAMES7, GRAYED
-            MENUITEM "no game selected",				MENU_PREVIOUSGAMES8, GRAYED
-            MENUITEM "no game selected",				MENU_PREVIOUSGAMES9, GRAYED
-            MENUITEM "no game selected",				MENU_PREVIOUSGAMES10, GRAYED
+		BEGIN
+            MENUITEM "空白",				MENU_PREVIOUSGAMES1, GRAYED
+            MENUITEM "空白",				MENU_PREVIOUSGAMES2, GRAYED
+            MENUITEM "空白",				MENU_PREVIOUSGAMES3, GRAYED
+            MENUITEM "空白",				MENU_PREVIOUSGAMES4, GRAYED
+            MENUITEM "空白",				MENU_PREVIOUSGAMES5, GRAYED
+            MENUITEM "空白",				MENU_PREVIOUSGAMES6, GRAYED
+            MENUITEM "空白",				MENU_PREVIOUSGAMES7, GRAYED
+            MENUITEM "空白",				MENU_PREVIOUSGAMES8, GRAYED
+            MENUITEM "空白",				MENU_PREVIOUSGAMES9, GRAYED
+            MENUITEM "空白",				MENU_PREVIOUSGAMES10, GRAYED
         END
         MENUITEM SEPARATOR
         MENUITEM "退出游戏\tCtrl+F4",					MENU_QUIT, GRAYED
@@ -473,283 +473,230 @@ BEGIN
         MENUITEM SEPARATOR
         POPUP "储存卡"
         BEGIN
-	        MENUITEM "Create new memory card...\tCtrl+Shift+F7",		MENU_MEMCARD_CREATE
-        	MENUITEM "Select memory card...\tCtrl+F7",			MENU_MEMCARD_SELECT
-	        MENUITEM "Insert memory card\tF7",				MENU_MEMCARD_INSERT
-        	MENUITEM "Eject memory card\tF7",				MENU_MEMCARD_EJECT
+	        MENUITEM "新建...\tCtrl+Shift+F7",		MENU_MEMCARD_CREATE
+        	MENUITEM "选择...\tCtrl+F7",			MENU_MEMCARD_SELECT
+	        MENUITEM "插入\tF7",				MENU_MEMCARD_INSERT
+        	MENUITEM "弹出\tF7",				MENU_MEMCARD_EJECT
         END
         MENUITEM SEPARATOR
-        POPUP "保存状态"
+        POPUP "游戏进度"
         BEGIN
-	        MENUITEM "Load state...\tCtrl+F9",				MENU_STATE_LOAD_DIALOG, GRAYED
-        	MENUITEM "Save state...\tCtrl+F10",				MENU_STATE_SAVE_DIALOG, GRAYED
-	        POPUP "State slots..."
-		BEGIN
-	            MENUITEM "Activate previous slot\tF8",			MENU_STATE_PREVSLOT
-        	    MENUITEM "Activate next slot\tF11",				MENU_STATE_NEXTSLOT
+	        MENUITEM "读取存档...\tCtrl+F9",				MENU_STATE_LOAD_DIALOG, GRAYED
+        	MENUITEM "保存存档...\tCtrl+F10",				MENU_STATE_SAVE_DIALOG, GRAYED
+	        POPUP "存档位置..."
+			BEGIN
+	            MENUITEM "激活上一个\tF8",			MENU_STATE_PREVSLOT
+        	    MENUITEM "激活下一个\tF11",				MENU_STATE_NEXTSLOT
     		    MENUITEM "MENU_STATE_LOAD_SLOT",				MENU_STATE_LOAD_SLOT, GRAYED
-            	    MENUITEM "MENU_STATE_SAVE_SLOT",				MENU_STATE_SAVE_SLOT, GRAYED
-        	    MENUITEM "Undo last state save\tShift+F8",			MENU_STATE_UNDO
+            	MENUITEM "MENU_STATE_SAVE_SLOT",				MENU_STATE_SAVE_SLOT, GRAYED
+        	    MENUITEM "撤销上一个\tShift+F8",			MENU_STATE_UNDO
         	END
-        	MENUITEM "Restore full state on load",				MENU_ALLRAM
+        	MENUITEM "自动读取存档",				MENU_ALLRAM
         END
         MENUITEM SEPARATOR
         MENUITEM "退出\tAlt+F4",				MENU_EXIT
     END
     POPUP "视频"
     BEGIN
-        POPUP "&Select blitter"
+        POPUP "渲染器"
         BEGIN
             MENUITEM "Basic\t(DirectDraw 7)",				MENU_BLITTER_1
             MENUITEM "SoftFX\t(DirectDraw 7)",				MENU_BLITTER_3
             MENUITEM "Enhanced\t(Direct3D 7)",				MENU_BLITTER_2
-            MENUITEM "Experimental\t(DirectX Graphics 9)",	MENU_BLITTER_4
-			MENUITEM "DirectX9 Alt\t(DirectX Graphics 9)",	MENU_BLITTER_5
+            MENUITEM "Experimental\t(DirectX 9)",	MENU_BLITTER_4
+			MENUITEM "DirectX9 Alt\t(DirectX 9)",	MENU_BLITTER_5
         END
-        MENUITEM "&Blitter options",					MENU_BLITTEROPTIONS, GRAYED
-        POPUP "&Stretch"
+        MENUITEM "渲染选项",					MENU_BLITTEROPTIONS, GRAYED
+        POPUP "缩放方式"
         BEGIN
-            MENUITEM "&Normal stretch",					MENU_NOSTRETCH
-            MENUITEM "&Full stretch",					MENU_STRETCH
-            MENUITEM "Correct &aspect ratio",				MENU_ASPECT
+            MENUITEM "原始大小",				MENU_NOSTRETCH
+            MENUITEM "适应屏幕",				MENU_STRETCH
+            MENUITEM "等比缩放",				MENU_ASPECT
         END
         MENUITEM SEPARATOR
-        MENUITEM "&Enable gamma correction",				MENU_GAMMA_DO
-        POPUP "&Gamma correction settings"
+        MENUITEM "开启伽玛校正",				MENU_GAMMA_DO
+        POPUP "伽玛校正设置"
         BEGIN
-            MENUITEM "&Darken midtones\t(1.25)",			MENU_GAMMA_DARKER
-            MENUITEM "&Lighten midtones\t(0.80)",			MENU_GAMMA_LIGHTER
+            MENUITEM "暗色调",			MENU_GAMMA_DARKER
+            MENUITEM "亮色调",			MENU_GAMMA_LIGHTER
             MENUITEM "MENU_GAMMA_OTHER",				MENU_GAMMA_OTHER
             MENUITEM SEPARATOR
-            MENUITEM "Use video &hardware when possible",		MENU_GAMMA_USE_HARDWARE
-            MENUITEM "Use video hardware &exclusively",			MENU_GAMMA_HARDWARE_ONLY
-            MENUITEM "Use &software exclusively",			MENU_GAMMA_SOFTWARE_ONLY
+            MENUITEM "优先使用硬件显示",		MENU_GAMMA_USE_HARDWARE
+            MENUITEM "强制使用硬件显示",			MENU_GAMMA_HARDWARE_ONLY
+            MENUITEM "强制使用软件显示",			MENU_GAMMA_SOFTWARE_ONLY
         END
         MENUITEM SEPARATOR
-        POPUP "&Window size"
+        POPUP "窗口大小"
         BEGIN
-             MENUITEM "&Auto",						MENU_AUTOSIZE
+             MENUITEM "自动调整",						MENU_AUTOSIZE
              MENUITEM SEPARATOR
-             MENUITEM "&Single size",					MENU_SINGLESIZEWINDOW
-             MENUITEM "&Double size",					MENU_DOUBLESIZEWINDOW
-             MENUITEM "&Triple size",					MENU_TRIPLESIZEWINDOW
-             MENUITEM "&Quadruple size",				MENU_QUADSIZEWINDOW
-             MENUITEM "&Maximum size",					MENU_MAXIMUMSIZEWINDOW
+             MENUITEM "原始大小",					MENU_SINGLESIZEWINDOW
+             MENUITEM "两倍大小",					MENU_DOUBLESIZEWINDOW
+             MENUITEM "三倍大小",					MENU_TRIPLESIZEWINDOW
+             MENUITEM "四倍大小",				MENU_QUADSIZEWINDOW
+             MENUITEM "最大化",					MENU_MAXIMUMSIZEWINDOW
         END
         MENUITEM SEPARATOR
-        MENUITEM "Toggle &fullscreen mode\tAlt+Enter",			MENU_FULL
-        MENUITEM "Auto Switch to Fullscreen after loading",		MENU_AUTOSWITCHFULL
-	POPUP "Fullscreen Resolution (Horizontal)"
-	BEGIN
-		MENUITEM "MENU_RES_ARCADE",					MENU_RES_ARCADE
-		MENUITEM SEPARATOR
-		MENUITEM "&Single size",					MENU_SINGLESIZESCREEN
-		MENUITEM "&Double size",					MENU_DOUBLESIZESCREEN
-		MENUITEM "&Triple size",					MENU_TRIPLESIZESCREEN
-		MENUITEM "&Quadruple size",					MENU_QUADSIZESCREEN
-		MENUITEM SEPARATOR
-		MENUITEM "MENU_RES_1",						MENU_RES_1
-		MENUITEM "MENU_RES_2",						MENU_RES_2
-		MENUITEM "MENU_RES_3",						MENU_RES_3
-		MENUITEM "MENU_RES_4",						MENU_RES_4
-		MENUITEM SEPARATOR
-		MENUITEM "MENU_RES_OTHER",					MENU_RES_OTHER
-	END
-	POPUP "Fullscreen Resolution (Vertical)"
-	BEGIN
-		MENUITEM "MENU_RES_ARCADE_VERTICAL",		MENU_RES_ARCADE_VERTICAL
-		MENUITEM SEPARATOR
-		MENUITEM "&Single size",					MENU_SINGLESIZESCREEN_VERTICAL
-		MENUITEM "&Double size",					MENU_DOUBLESIZESCREEN_VERTICAL
-		MENUITEM "&Triple size",					MENU_TRIPLESIZESCREEN_VERTICAL
-		MENUITEM "&Quadruple size",					MENU_QUADSIZESCREEN_VERTICAL
-		MENUITEM SEPARATOR
-		MENUITEM "MENU_RES_1_VERTICAL",				MENU_RES_1_VERTICAL
-		MENUITEM "MENU_RES_2_VERTICAL",				MENU_RES_2_VERTICAL
-		MENUITEM "MENU_RES_3_VERTICAL",				MENU_RES_3_VERTICAL
-		MENUITEM "MENU_RES_4_VERTICAL",				MENU_RES_4_VERTICAL
-		MENUITEM SEPARATOR
-		MENUITEM "MENU_RES_OTHER_VERTICAL",			MENU_RES_OTHER_VERTICAL
-	END
-        POPUP "Fullscreen bit&depth"
+        MENUITEM "全屏显示\tAlt+Enter",			MENU_FULL
+        POPUP "全屏选项"
         BEGIN
-            MENUITEM "&16bit",						MENU_16
-            MENUITEM "&24bit",						MENU_24
-            MENUITEM "&32bit",						MENU_32
-        END
+        	MENUITEM "自动全屏",		MENU_AUTOSWITCHFULL
+        	MENUITEM "使用三倍缓冲",			MENU_TRIPLE
+			POPUP "分辨率(水平方向)"
+			BEGIN
+				MENUITEM "MENU_RES_ARCADE",					MENU_RES_ARCADE
+				MENUITEM SEPARATOR
+				MENUITEM "原始大小",					MENU_SINGLESIZESCREEN
+				MENUITEM "两倍大小",					MENU_DOUBLESIZESCREEN
+				MENUITEM "三倍大小",					MENU_TRIPLESIZESCREEN
+				MENUITEM "四倍大小",					MENU_QUADSIZESCREEN
+				MENUITEM SEPARATOR
+				MENUITEM "MENU_RES_1",						MENU_RES_1
+				MENUITEM "MENU_RES_2",						MENU_RES_2
+				MENUITEM "MENU_RES_3",						MENU_RES_3
+				MENUITEM "MENU_RES_4",						MENU_RES_4
+				MENUITEM SEPARATOR
+				MENUITEM "MENU_RES_OTHER",					MENU_RES_OTHER
+			END
+			POPUP "分辨率(垂直方向)"
+			BEGIN
+				MENUITEM "MENU_RES_ARCADE_VERTICAL",		MENU_RES_ARCADE_VERTICAL
+				MENUITEM SEPARATOR
+				MENUITEM "原始大小",					MENU_SINGLESIZESCREEN_VERTICAL
+				MENUITEM "二倍大小",					MENU_DOUBLESIZESCREEN_VERTICAL
+				MENUITEM "三倍大小",					MENU_TRIPLESIZESCREEN_VERTICAL
+				MENUITEM "四倍大小",					MENU_QUADSIZESCREEN_VERTICAL
+				MENUITEM SEPARATOR
+				MENUITEM "MENU_RES_1_VERTICAL",				MENU_RES_1_VERTICAL
+				MENUITEM "MENU_RES_2_VERTICAL",				MENU_RES_2_VERTICAL
+				MENUITEM "MENU_RES_3_VERTICAL",				MENU_RES_3_VERTICAL
+				MENUITEM "MENU_RES_4_VERTICAL",				MENU_RES_4_VERTICAL
+				MENUITEM SEPARATOR
+				MENUITEM "MENU_RES_OTHER_VERTICAL",			MENU_RES_OTHER_VERTICAL
+			END
+	        POPUP "色彩位深"
+	        BEGIN
+	            MENUITEM "&16bit",						MENU_16
+	            MENUITEM "&24bit",						MENU_24
+	            MENUITEM "&32bit",						MENU_32
+	        END
+	    END
         MENUITEM SEPARATOR
-        POPUP "&Monitor properties"
+        POPUP "显示器属性"
         BEGIN
-            MENUITEM "Automatically detect aspect ratio",		MENU_MONITORAUTOCHECK
+            MENUITEM "自动检测比例",		MENU_MONITORAUTOCHECK
             MENUITEM SEPARATOR
-            MENUITEM "Normal CRT aspect ratio\t(4:3)",			MENU_ASPECTNORMAL
-            MENUITEM "Normal LCD aspect ratio\t(5:4)",			MENU_ASPECTLCD
-            MENUITEM "Widescreen CRT aspect ratio\t(16:9)",		MENU_ASPECTWIDE
-            MENUITEM "Widescreen LCD aspect ratio\t(16:10)",	MENU_ASPECTWIDELCD
+            MENUITEM "4:3",			MENU_ASPECTNORMAL
+            MENUITEM "5:4",			MENU_ASPECTLCD
+            MENUITEM "16:9",		MENU_ASPECTWIDE
+            MENUITEM "16:10",	MENU_ASPECTWIDELCD
             MENUITEM SEPARATOR
-            MENUITEM "Mirrored vertical alignment",				MENU_MONITORMIRRORVERT
+            MENUITEM "垂直镜像",				MENU_MONITORMIRRORVERT
         END
         MENUITEM SEPARATOR
-        MENUITEM "&Rotate vertically aligned games",			MENU_ROTATEVERTICAL
-        MENUITEM "Force 60Hz refresh rate",						MENU_FORCE60HZ
-        MENUITEM "Enable &Triple Buffering (Fullscreen)",			MENU_TRIPLE
-		MENUITEM "Enable VSync (Windowed)",						MENU_VIDEOVSYNC
-		MENUITEM "Enable Win7 DWM Fix (Windowed)",				MENU_DWMFIX
-		MENUITEM "Auto Frameskip",								MENU_AUTOFRAMESKIP
+        MENUITEM "自动跳帧",				MENU_AUTOFRAMESKIP
+        MENUITEM "自动旋转画面",			MENU_ROTATEVERTICAL
+        MENUITEM "强制刷新率为60HZ",		MENU_FORCE60HZ
+		MENUITEM "开启垂直同步(窗口)",		MENU_VIDEOVSYNC
     END
     POPUP "音频"
     BEGIN
-    	POPUP "Select &plugin"
+    	POPUP "选择插件"
     	BEGIN
     	    MENUITEM "DirectSound",					MENU_AUD_PLUGIN_1
     	    MENUITEM "XAudio2",						MENU_AUD_PLUGIN_2
     	END
-    	MENUITEM "Plugin &options",					MENU_AUDIO_OPTIONS, GRAYED
+    	MENUITEM "插件选项",					MENU_AUDIO_OPTIONS, GRAYED
+    	MENUITEM "缓冲大小...",					MENU_FRAMES
     	MENUITEM SEPARATOR
-        MENUITEM "2-point 1st order sample interpolation",		MENU_INTERPOLATE_1
-        MENUITEM "4-point 3rd order sample interpolation",		MENU_INTERPOLATE_3
+        MENUITEM "2点采样插值",		MENU_INTERPOLATE_1
+        MENUITEM "4点采样插值",		MENU_INTERPOLATE_3
         MENUITEM SEPARATOR
-        MENUITEM "Disable FM interpolation",				MENU_INTERPOLATE_FM_0
-        MENUITEM "4-point 3rd order FM interpolation",			MENU_INTERPOLATE_FM_3
+        MENUITEM "禁用FM插值",				MENU_INTERPOLATE_FM_0
+        MENUITEM "4 点FM插值",			MENU_INTERPOLATE_FM_3
         MENUITEM SEPARATOR
-        POPUP "&Sound logging"
+        POPUP "录制声音"
         BEGIN
-	   MENUITEM "Log to file...",					MENU_WLOGSTART, GRAYED
-	   MENUITEM "Stop logging",					MENU_WLOGEND, GRAYED
-	END
-        MENUITEM "Buffer size...",					MENU_FRAMES
+		   MENUITEM "保存到文件",					MENU_WLOGSTART, GRAYED
+		   MENUITEM "停止录制",					MENU_WLOGEND, GRAYED
+		END
     END
     POPUP "输入"
     BEGIN
-    	POPUP "Select &plugin"
+    	POPUP "选择插件"
     	BEGIN
     	    MENUITEM "DirectInput",					MENU_INP_PLUGIN_1, GRAYED
     	END
 		MENUITEM SEPARATOR
-    	POPUP "&Auto-Fire Rate"
+    	POPUP "连发速度"
     	BEGIN
-    	    MENUITEM "Slow",						MENU_INPUT_AUTOFIRE_RATE_1
-    	    MENUITEM "Medium",						MENU_INPUT_AUTOFIRE_RATE_2
-    	    MENUITEM "Fast",						MENU_INPUT_AUTOFIRE_RATE_3
-    	    MENUITEM "Very Fast",					MENU_INPUT_AUTOFIRE_RATE_4
+    	    MENUITEM "慢",						MENU_INPUT_AUTOFIRE_RATE_1
+    	    MENUITEM "中",						MENU_INPUT_AUTOFIRE_RATE_2
+    	    MENUITEM "快",						MENU_INPUT_AUTOFIRE_RATE_3
+    	    MENUITEM "极快",					MENU_INPUT_AUTOFIRE_RATE_4
     	END
     	MENUITEM SEPARATOR
-        MENUITEM "Map game inputs...\tF5",				MENU_INPUT, GRAYED
-        MENUITEM "Set dipswitches...\tCtrl+F5",			MENU_DIPSW, GRAYED
+        MENUITEM "键位设置...\tF5",				MENU_INPUT, GRAYED
+        MENUITEM "跳线设置...\tCtrl+F5",		MENU_DIPSW, GRAYED
+        MENUITEM "保存当前按键设定",			MENU_SAVEGAMEINPUTNOW
+        MENUITEM "自动保存按键设定",			MENU_SAVEGAMEINPUT
     END
     POPUP "杂项"
     BEGIN
-        POPUP "Options"
+        POPUP "选项"
         BEGIN
-           MENUITEM "Auto pause",					MENU_AUTOPAUSE
-           MENUITEM "Always process keyboard input",			MENU_PROCESSINPUT, GRAYED
-           MENUITEM "Display mode indicator",				MENU_DISPLAYINDICATOR
-           MENUITEM "Modeless menu",					MENU_MODELESS
-           MENUITEM "Don't change Num Lock status",			MENU_NOCHANGENUMLOCK
-		   MENUITEM "Create support folders at runtime",	MENU_CREATEDIRS
-           MENUITEM SEPARATOR
-           POPUP "Set application thread priority"
-           BEGIN
-//              MENUITEM "Realtime",					MENU_PRIORITY_REALTIME
-              MENUITEM "High",						MENU_PRIORITY_HIGH
-              MENUITEM "Above normal",					MENU_PRIORITY_ABOVE_NORMAL
-              MENUITEM "Normal",					MENU_PRIORITY_NORMAL
-              MENUITEM "Below normal",					MENU_PRIORITY_BELOW_NORMAL
-              MENUITEM "Low",						MENU_PRIORITY_LOW
-           END
-           MENUITEM SEPARATOR
-           MENUITEM "Use assembly MC68000 core",				MENU_ASSEMBLYCORE
-           MENUITEM SEPARATOR
-           MENUITEM "Save High Scores when supported",				MENU_SAVEHISCORES
-		   MENUITEM "Use alpha blend effects when supported",		MENU_USEBLEND
-#ifdef INCLUDE_AVI_RECORDING
-		   MENUITEM "AVI Writer Ouput 3x Pixels",					MENU_AVI3X
-#endif
+           MENUITEM "自动暂停",					MENU_AUTOPAUSE
+           MENUITEM "总是响应键盘输入",			MENU_PROCESSINPUT, GRAYED
+           MENUITEM "显示提示信息",				MENU_DISPLAYINDICATOR
 		END
-        MENUITEM SEPARATOR
-        POPUP    "Generate dat file"
-        BEGIN
-	        MENUITEM "Generate dat (Arcade only)...",			MENU_CLRMAME_PRO_XML
-	        MENUITEM "Generate dat (Megadrive only)...",		MENU_CLRMAME_PRO_XML_MD_ONLY
-			MENUITEM "Generate dat (PC-Engine only)...",		MENU_CLRMAME_PRO_XML_PCE_ONLY
-			MENUITEM "Generate dat (TurboGrafx16 only)...",		MENU_CLRMAME_PRO_XML_TG16_ONLY
-			MENUITEM "Generate dat (SuprGrafx only)...",		MENU_CLRMAME_PRO_XML_SGX_ONLY
-			MENUITEM "Generate dat (Sega SG-1000 only)...",		MENU_CLRMAME_PRO_XML_SG1000_ONLY
-			MENUITEM "Generate dat (ColecoVision only)...",		MENU_CLRMAME_PRO_XML_COLECO_ONLY
-			MENUITEM "Generate dat (Master System only)...",	MENU_CLRMAME_PRO_XML_SMS_ONLY
-			MENUITEM "Generate dat (Game Gear only)...",	MENU_CLRMAME_PRO_XML_GG_ONLY
-	END
-        MENUITEM SEPARATOR
-        MENUITEM "Configure ROM paths...",				MENU_ROMDIRS
-        MENUITEM "Configure support file paths...",			MENU_SUPPORTDIRS
-        MENUITEM SEPARATOR
-       	POPUP    "UI language"
-       	BEGIN
-       		MENUITEM "Select UI language...",				MENU_LANGUAGE_SELECT
-       		MENUITEM "Export UI translation template...",			MENU_LANGUAGE_EXPORT
-       		MENUITEM "Reset UI default language",				MENU_LANGUAGE_RESET
-			MENUITEM "Download UI language...",				MENU_LANGUAGE_DOWNLOAD
-        END
-		POPUP    "Gamelist language"
-       	BEGIN
-       		MENUITEM "Select gamelist language...",				MENU_LANGUAGE_GL_SELECT
-       		MENUITEM "Export gamelist translation template...",			MENU_LANGUAGE_GL_EXPORT
-       		MENUITEM "Reset gamelist default language",				MENU_LANGUAGE_GL_RESET
-        END
+		POPUP "程序优先级"
+           BEGIN
+              MENUITEM "实时",					MENU_PRIORITY_REALTIME
+              MENUITEM "高",					MENU_PRIORITY_HIGH
+              MENUITEM "较高",					MENU_PRIORITY_ABOVE_NORMAL
+              MENUITEM "普通",					MENU_PRIORITY_NORMAL
+              MENUITEM "较低",					MENU_PRIORITY_BELOW_NORMAL
+              MENUITEM "低",					MENU_PRIORITY_LOW
+           END
+	    POPUP "语言"
+	    BEGIN
+       		MENUITEM "选择界面语言",				MENU_LANGUAGE_SELECT
+       		MENUITEM "导出界面翻译模板",			MENU_LANGUAGE_EXPORT
+       		MENUITEM "恢复默认界面语言",			MENU_LANGUAGE_RESET
+			MENUITEM SEPARATOR
+       		MENUITEM "选择游戏列表语言",				MENU_LANGUAGE_GL_SELECT
+       		MENUITEM "导出游戏列表翻译模板",			MENU_LANGUAGE_GL_EXPORT
+       		MENUITEM "恢复默认游戏列表语言",			MENU_LANGUAGE_GL_RESET
+	    END
 		MENUITEM SEPARATOR
-        POPUP    "Icons"
+        MENUITEM "开启作弊码...\tCtrl+F1",				MENU_ENABLECHEAT, GRAYED
+        POPUP "搜索作弊码"
         BEGIN
-			MENUITEM "Enable driver icons display",					MENU_ENABLEICONS
-			POPUP	"Icon size"
-			BEGIN
-				MENUITEM "16 x 16 pixels",							MENU_ICONS_SIZE_16
-				MENUITEM "24 x 24 pixels",							MENU_ICONS_SIZE_24
-				MENUITEM "32 x 32 pixels",							MENU_ICONS_SIZE_32
-			END
+           MENUITEM "开始新的搜索\tCtrl+Home",				MENU_CHEATSEARCH_START, GRAYED
+           MENUITEM SEPARATOR
+           MENUITEM "目标值未改变\tCtrl+/",			MENU_CHEATSEARCH_NOCHANGE, GRAYED
+           MENUITEM "目标值已改变\tCtrl+*",			MENU_CHEATSEARCH_CHANGE, GRAYED
+           MENUITEM "目标值已减小\tCtrl+-",			MENU_CHEATSEARCH_DECREASE, GRAYED
+           MENUITEM "目标值已增大\tCtrl++",			MENU_CHEATSEARCH_INCREASE, GRAYED
+           MENUITEM SEPARATOR
+           MENUITEM "保存搜索结果到文件",				MENU_CHEATSEARCH_DUMPFILE, GRAYED
+           MENUITEM SEPARATOR
+           MENUITEM "退出作弊码搜索",				MENU_CHEATSEARCH_EXIT, GRAYED
         END
-       	MENUITEM SEPARATOR
-        MENUITEM "Save snapshot\tF12",					MENU_SAVESNAP
-        MENUITEM "Shot factory..\tCtrl+F12",				MENU_SNAPFACT
-        MENUITEM SEPARATOR
-        MENUITEM "Enable cheats...\tCtrl+F1",				MENU_ENABLECHEAT, GRAYED
-        POPUP "Cheat search"
-        BEGIN
-           MENUITEM "Start New Search\tCtrl+Home",				MENU_CHEATSEARCH_START, GRAYED
-           MENUITEM SEPARATOR
-           MENUITEM "Target value has not changed\tCtrl+/",			MENU_CHEATSEARCH_NOCHANGE, GRAYED
-           MENUITEM "Target value has changed\tCtrl+*",			MENU_CHEATSEARCH_CHANGE, GRAYED
-           MENUITEM "Target value has decreased\tCtrl+-",			MENU_CHEATSEARCH_DECREASE, GRAYED
-           MENUITEM "Target value has increased\tCtrl++",			MENU_CHEATSEARCH_INCREASE, GRAYED
-           MENUITEM SEPARATOR
-           MENUITEM "Dump search to file",				MENU_CHEATSEARCH_DUMPFILE, GRAYED
-           MENUITEM SEPARATOR
-           MENUITEM "Exit Cheat Search",				MENU_CHEATSEARCH_EXIT, GRAYED
-        END
-        MENUITEM SEPARATOR
-        MENUITEM "Invoke 68K debugger...\tCtrl+Shift+F1",	MENU_DEBUG
+    MENUITEM SEPARATOR
+    MENUITEM "68000调试器...\tCtrl+Shift+F1",	MENU_DEBUG
 	MENUITEM SEPARATOR
-	MENUITEM "Palette Viewer...\tCtrl+Shift+F5",			MENU_PALETTEVIEWER, GRAYED
+	MENUITEM "调色板查看器...\tCtrl+Shift+F5",			MENU_PALETTEVIEWER, GRAYED
 	MENUITEM SEPARATOR
-        MENUITEM "Associate with .fs and .fr files",			MENU_ASSOCIATE
-        MENUITEM "Disassociate from .fs and .fr files",			MENU_DISASSOCIATE
-        MENUITEM SEPARATOR
-        MENUITEM "Save input mapping now",				MENU_SAVEGAMEINPUTNOW
-        MENUITEM "Auto-save input mapping",				MENU_SAVEGAMEINPUT
-        MENUITEM SEPARATOR
-        MENUITEM "Save settings to .ini now",				MENU_SAVESET
-        MENUITEM "Reload settings from .ini",				MENU_LOADSET
+	MENUITEM "生成DAT文件...",			MENU_CLRMAME_PRO_XML
     END
     POPUP "帮助"
     BEGIN
-        MENUITEM "&Help",					MENU_CONTENTS
+        MENUITEM "FB Alpha主页",					MENU_WWW_HOME
+        MENUITEM "Neo-Source论坛",					MENU_WWW_NSFORUM
         MENUITEM SEPARATOR
-        MENUITEM "&What's New",					MENU_WHATSNEW
-        MENUITEM SEPARATOR
-        MENUITEM "&FB Alpha homepage",					MENU_WWW_HOME
-        MENUITEM "&Neo-Source forums",					MENU_WWW_NSFORUM
-        MENUITEM SEPARATOR
-        MENUITEM "&System information",				MENU_SYSINFO
-        MENUITEM "&About FB Alpha",					MENU_ABOUT
+        MENUITEM "系统信息",				MENU_SYSINFO
+        MENUITEM "关于FBAlpha",					MENU_ABOUT
     END
 END
 
@@ -852,7 +799,6 @@ BEGIN
                 END
                 MENUITEM SEPARATOR
                 MENUITEM "Set 3&D projection properties...",            MENU_3DSCREENANGLE
-//              MENUITEM "Enable &lighting",                            MENU_3DUSELIGHTING
                 MENUITEM SEPARATOR
                 POPUP "Advanced settings"
                 BEGIN

@@ -14,7 +14,7 @@ static void MakeOfn(TCHAR *pszFilter)
     ofn.lpstrFilter = pszFilter;
     ofn.lpstrFile = szChoice;
     ofn.nMaxFile = sizeof(szChoice) / sizeof(TCHAR);
-    ofn.lpstrInitialDir = _T(".\\savestates");
+    ofn.lpstrInitialDir = _T(".\\states");
     ofn.Flags = OFN_NOCHANGEDIR | OFN_HIDEREADONLY;
     ofn.lpstrDefExt = _T("fs");
     return;
@@ -46,7 +46,7 @@ int StatedAuto(int bSave)
 
 static void CreateStateName(int nSlot)
 {
-    _stprintf(szChoice, _T("./savestates/%s slot %02x.fs"), BurnDrvGetText(DRV_NAME), nSlot);
+    _stprintf(szChoice, _T("./states/%s slot %02x.fs"), BurnDrvGetText(DRV_NAME), nSlot);
 }
 
 int StatedUNDO(int nSlot)

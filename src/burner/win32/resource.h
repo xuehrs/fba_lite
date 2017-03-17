@@ -187,8 +187,6 @@
 #define IDC_CHECK5							20144
 
 
-
-
 #define IDC_DRVCOUNT						20200
 #define IDC_TREE2							20201
 #define IDC_LAYER1							20202
@@ -519,7 +517,6 @@
 #define MENU_AUTOPAUSE                 	 	10300
 #define MENU_PROCESSINPUT					10301
 #define MENU_DISPLAYINDICATOR				10302
-#define MENU_MODELESS						10303
 #define MENU_ROMSDIR                    	10304
 #define MENU_ENABLECHEAT                	10306
 #define MENU_LANGUAGE_SELECT            	10307

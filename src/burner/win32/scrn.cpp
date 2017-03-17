@@ -15,13 +15,10 @@ int OnUnInitMenuPopup(HWND, HMENU, UINT, BOOL);
 void DisplayPopupMenu(int nMenu);
 
 RECT SystemWorkArea = { 0, 0, 640, 480 };				// Work area on the desktop
-int nWindowPosX = -1, nWindowPosY = -1;					// Window position
 
 int bAutoPause = 1;
-
 bool bMenuEnabled = true;
 bool bHasFocus = false;
-
 int nSavestateSlot = 1;
 
 static TCHAR *szClass = _T("FB Alpha");					// Window class name
@@ -30,17 +27,13 @@ HWND hRebar = NULL;										// Handle to the Rebar control containing the menu
 
 static bool bMaximised;
 static int nPrevWidth, nPrevHeight;
-
 static int bBackFromHibernation = 0;
 
 #define ID_NETCHAT 999
 HWND hwndChat = NULL;
 WNDPROC pOldWndProc = NULL;
 
-//static bool bDrag = false;
 static int nDragX, nDragY;
-//static int nOldWindowX, nOldWindowY;
-//static int nLeftButtonX, nLeftButtonY;
 
 static int OnCreate(HWND, LPCREATESTRUCT);
 static void OnActivateApp(HWND, BOOL, DWORD);
@@ -744,7 +737,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
                 nVidFullscreen = 1;
                 POST_INITIALISE_MESSAGE;
             }
-
             POST_INITIALISE_MESSAGE;
             break;
         }
@@ -1720,15 +1712,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         VidPaint(2);
         break;
 
-    case MENU_MODELESS:
-        bModelessMenu = !bModelessMenu;
-        POST_INITIALISE_MESSAGE;
-        break;
-
-    case MENU_ROMDIRS:
-        RomsDirCreate(hScrnWnd);
-        break;
-
     case MENU_LANGUAGE_SELECT:
         if (UseDialogs())
         {
@@ -1806,62 +1789,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         if (UseDialogs())
         {
             CreateDatfileWindows(DAT_ARCADE_ONLY);
-        }
-        break;
-
-    case MENU_CLRMAME_PRO_XML_MD_ONLY:
-        if (UseDialogs())
-        {
-            CreateDatfileWindows(DAT_MEGADRIVE_ONLY);
-        }
-        break;
-
-    case MENU_CLRMAME_PRO_XML_PCE_ONLY:
-        if (UseDialogs())
-        {
-            CreateDatfileWindows(DAT_PCENGINE_ONLY);
-        }
-        break;
-
-    case MENU_CLRMAME_PRO_XML_TG16_ONLY:
-        if (UseDialogs())
-        {
-            CreateDatfileWindows(DAT_TG16_ONLY);
-        }
-        break;
-
-    case MENU_CLRMAME_PRO_XML_SGX_ONLY:
-        if (UseDialogs())
-        {
-            CreateDatfileWindows(DAT_SGX_ONLY);
-        }
-        break;
-
-    case MENU_CLRMAME_PRO_XML_SG1000_ONLY:
-        if (UseDialogs())
-        {
-            CreateDatfileWindows(DAT_SG1000_ONLY);
-        }
-        break;
-
-    case MENU_CLRMAME_PRO_XML_COLECO_ONLY:
-        if (UseDialogs())
-        {
-            CreateDatfileWindows(DAT_COLECO_ONLY);
-        }
-        break;
-
-    case MENU_CLRMAME_PRO_XML_SMS_ONLY:
-        if (UseDialogs())
-        {
-            CreateDatfileWindows(DAT_MASTERSYSTEM_ONLY);
-        }
-        break;
-
-    case MENU_CLRMAME_PRO_XML_GG_ONLY:
-        if (UseDialogs())
-        {
-            CreateDatfileWindows(DAT_GAMEGEAR_ONLY);
         }
         break;
 
@@ -2050,35 +1977,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
             GameInpCheckMouse();
         }
         break;
-
-    case MENU_CONTENTS:
-    {
-        if (!nVidFullscreen)
-        {
-            FILE *fp = _tfopen(_T("fba.chm"), _T("r"));
-            if (fp)
-            {
-                fclose(fp);
-                ShellExecute(NULL, _T("open"), _T("fba.chm"), NULL, NULL, SW_SHOWNORMAL);
-            }
-        }
-        break;
-    }
-
-    case MENU_WHATSNEW:
-    {
-        if (!nVidFullscreen)
-        {
-            FILE *fp = _tfopen(_T("whatsnew.html"), _T("r"));
-            if (fp)
-            {
-                fclose(fp);
-                ShellExecute(NULL, _T("open"), _T("whatsnew.html"), NULL, NULL, SW_SHOWNORMAL);
-            }
-        }
-        break;
-    }
-
     case MENU_WWW_HOME:
         if (!nVidFullscreen)
         {
@@ -2095,7 +1993,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
 
         //		default:
         //			printf("  * Command %i sent.\n");
-
     }
 
     switch (nVidSelect)
@@ -2675,7 +2572,7 @@ static int OnSysCommand(HWND, UINT sysCommand, int, int)
     case SC_KEYMENU:
     case SC_MOUSEMENU:
     {
-        if (kNetGame && !bModelessMenu)
+        if (kNetGame)
         {
             return 1;
         }
@@ -2755,10 +2652,6 @@ static void OnExitSizeMove(HWND)
     {
         RefreshWindow(true);
     }
-
-    GetWindowRect(hScrnWnd, &rect);
-    nWindowPosX = rect.left;
-    nWindowPosY = rect.top;
 }
 
 static void OnEnterIdle(HWND /*hwnd*/, UINT /*source*/, HWND /*hwndSource*/)
@@ -2774,26 +2667,15 @@ static void OnEnterIdle(HWND /*hwnd*/, UINT /*source*/, HWND /*hwndSource*/)
 
 static void OnEnterMenuLoop(HWND, BOOL)
 {
-    if (!bModelessMenu)
+    if (!kNetGame && bAutoPause)
     {
-        InputSetCooperativeLevel(false, bAlwaysProcessKeyboardInput);
-        AudBlankSound();
-    }
-    else
-    {
-        if (!kNetGame && bAutoPause)
-        {
-            bRunPause = 1;
-        }
+        bRunPause = 1;
     }
 }
 
 static void OnExitMenuLoop(HWND, BOOL)
 {
-    if (!bModelessMenu)
-    {
-        GameInpCheckMouse();
-    }
+
 }
 
 static int ScrnRegister()
@@ -2811,7 +2693,7 @@ static int ScrnRegister()
     WndClassEx.hCursor			= LoadCursor(NULL, IDC_ARROW);
     WndClassEx.hbrBackground	= static_cast<HBRUSH>( GetStockObject ( BLACK_BRUSH ));
     WndClassEx.lpszClassName	= szClass;
-
+	WndClassEx.lpszMenuName     = MAKEINTRESOURCE(IDR_MENU);
     // Register the window class with the above information:
     Atom = RegisterClassEx(&WndClassEx);
     if (Atom)
@@ -3025,28 +2907,17 @@ int ScrnSize()
     w = rect.right - rect.left + ew;
     h = rect.bottom - rect.top + eh;
 
-    x = nWindowPosX;
-    y = nWindowPosY;
-    if (x + w > SystemWorkArea.right || y + h > SystemWorkArea.bottom)
-    {
-        // Find the midpoint for the window
-        x = SystemWorkArea.left + SystemWorkArea.right;
-        x /= 2;
-        y = SystemWorkArea.bottom + SystemWorkArea.top;
-        y /= 2;
-
-        x -= w / 2;
-        y -= h / 2;
-    }
+    // Find the midpoint for the window
+    x = SystemWorkArea.left + SystemWorkArea.right;
+    x /= 2;
+    y = SystemWorkArea.bottom + SystemWorkArea.top;
+    y /= 2;
+    x -= w / 2;
+    y -= h / 2;
 
     MenuUpdate();
-
     bMaximised = false;
-
     MoveWindow(hScrnWnd, x, y, w, h, true);
-
-    nWindowPosX = x;
-    nWindowPosY = y;
     return 0;
 }
 

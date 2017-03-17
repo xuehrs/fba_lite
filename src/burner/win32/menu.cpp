@@ -14,7 +14,6 @@ static HMENU hBlitterMenu[8] = {NULL, };	// Handles to the blitter-specific sub-
 static HMENU hAudioPluginMenu[8] = {NULL, };
 
 bool bMenuDisplayed = false;
-bool bModelessMenu = false;
 int nLastMenu = 0;
 static int nRecursions = -1;
 static HMENU hCurrentMenu;
@@ -29,59 +28,6 @@ int nScreenSizeVer = 0;
 
 TCHAR szPrevGames[SHOW_PREV_GAMES][32];
 
-static HHOOK hMenuHook;
-
-static LRESULT CALLBACK MenuHook(int nCode, WPARAM wParam, LPARAM lParam)
-{
-
-    switch (((MSG *)lParam)->message)
-    {
-
-    case WM_MOUSEMOVE:  				// Translate coordinates to menubar client coordinates
-    {
-        RECT rect;
-        POINT point = {GET_X_LPARAM(((MSG *)lParam)->lParam), GET_Y_LPARAM(((MSG *)lParam)->lParam)};
-
-        GetWindowRect(hMenubar, &rect);
-
-        if (point.x >= rect.left && point.y >= rect.top && point.x < rect.right && point.y < rect.bottom)
-        {
-            RECT buttonrect;
-            SendMessage(hMenubar, TB_GETITEMRECT, nLastMenu, (LPARAM)&buttonrect);
-
-            if (!(point.x >= rect.left + buttonrect.left && point.y >= rect.top + buttonrect.top && point.x < rect.left + buttonrect.right && point.y < rect.top + buttonrect.bottom))
-            {
-                SendNotifyMessage(hMenubar, WM_MOUSEMOVE, wParam, MAKELONG(point.x - rect.left, point.y - rect.top));
-            }
-        }
-        break;
-    }
-
-    case WM_LBUTTONDOWN:
-    {
-        RECT rect;
-        RECT buttonrect;
-        POINT point = {GET_X_LPARAM(((MSG *)lParam)->lParam), GET_Y_LPARAM(((MSG *)lParam)->lParam)};
-
-        GetWindowRect(hMenubar, &rect);
-        SendMessage(hMenubar, TB_GETITEMRECT, nLastMenu, (LPARAM)&buttonrect);
-
-        // If the button is pressed over the currently selected menu title, eat the message and close the menu
-        if (point.x >= rect.left + buttonrect.left && point.y >= rect.top + buttonrect.top && point.x < rect.left + buttonrect.right && point.y < rect.top + buttonrect.bottom)
-        {
-            PostMessage(hMenubar, WM_CANCELMODE, 0, 0);
-            return 1;
-        }
-        break;
-    }
-
-    }
-
-    MenuHandleKeyboard((MSG *)lParam);
-
-    return CallNextHookEx(hMenuHook, nCode, wParam, lParam);
-}
-
 void DisplayPopupMenu(int nMenu)
 {
     if (bMenuDisplayed)
@@ -90,29 +36,6 @@ void DisplayPopupMenu(int nMenu)
         if (nLastMenu != nMenu)
         {
             PostMessage(hScrnWnd, UM_DISPLAYPOPUP, nMenu, 0);
-        }
-    }
-    else
-    {
-        HMENU hPopupMenu = GetSubMenu(hMenu, nMenu);
-        RECT clientRect;
-        RECT buttonRect;
-
-        nLastMenu = nMenu;
-        nRecursions = 0;
-        nCurrentItemFlags = 0;
-
-        GetWindowRect(hMenubar, &clientRect);
-        SendMessage(hMenubar, TB_GETITEMRECT, nMenu, (LPARAM)&buttonRect);
-
-        if (!bModelessMenu)
-        {
-            hMenuHook = SetWindowsHookEx(WH_MSGFILTER, MenuHook, NULL, GetCurrentThreadId());
-        }
-        TrackPopupMenuEx(hPopupMenu, TPM_LEFTALIGN | TPM_TOPALIGN, clientRect.left + buttonRect.left, clientRect.top + buttonRect.bottom, hScrnWnd, NULL);
-        if (!bModelessMenu)
-        {
-            UnhookWindowsHookEx(hMenuHook);
         }
     }
 }
@@ -463,36 +386,6 @@ int MenuCreate()
 
     // Reset window menu to default
     GetSystemMenu(hScrnWnd, TRUE);
-
-    if (bModelessMenu)  							// Make menu modeless
-    {
-
-        memset(&menu, 0, sizeof(MENUINFO));
-        menu.cbSize = sizeof(MENUINFO);
-        menu.fMask = MIM_APPLYTOSUBMENUS | MIM_STYLE;
-        menu.dwStyle = MNS_MODELESS | MNS_CHECKORBMP;
-
-        SetMenuInfo(hMenuPopup, &menu);
-
-        for (int i = 0; i < 6; i++)
-        {
-            SetMenuInfo(GetSubMenu(hMenu, i), &menu);
-        }
-
-        memset(&menu, 0, sizeof(MENUINFO));
-        menu.cbSize = sizeof(MENUINFO);
-        menu.fMask = MIM_STYLE | MIM_MAXHEIGHT;
-
-#if 0
-        // Doesn't seem to work
-        {
-            HMENU hWindowMenu = GetSystemMenu(hScrnWnd, FALSE);
-            GetMenuInfo(hWindowMenu, &menu);
-            menu.dwStyle |= MNS_MODELESS;
-            SetMenuInfo(hWindowMenu, &menu);
-        }
-#endif
-    }
 
     // Add buttons to the menu toolbar
     memset(&button, 0, sizeof(TBBUTTON));
@@ -1157,16 +1050,8 @@ void MenuUpdate()
 
     CheckMenuItem(hMenu, MENU_AUTOPAUSE, bAutoPause ? MF_CHECKED : MF_UNCHECKED);
     CheckMenuItem(hMenu, MENU_PROCESSINPUT, !bAlwaysProcessKeyboardInput ? MF_CHECKED : MF_UNCHECKED);
-    if (bAutoPause)
-    {
-        EnableMenuItem(hMenu, MENU_PROCESSINPUT, MF_GRAYED | MF_BYCOMMAND);
-    }
-    else
-    {
-        EnableMenuItem(hMenu, MENU_PROCESSINPUT, MF_ENABLED | MF_BYCOMMAND);
-    }
+    EnableMenuItem(hMenu, MENU_PROCESSINPUT, bAutoPause?(MF_GRAYED|MF_BYCOMMAND) : (MF_ENABLED|MF_BYCOMMAND));
     CheckMenuItem(hMenu, MENU_DISPLAYINDICATOR, nVidSDisplayStatus ? MF_CHECKED : MF_UNCHECKED);
-    CheckMenuItem(hMenu, MENU_MODELESS, bModelessMenu ? MF_CHECKED : MF_UNCHECKED);
 	switch(nAppThreadPriority)
 	{
 	case THREAD_PRIORITY_TIME_CRITICAL:
@@ -1416,9 +1301,6 @@ void MenuEnableItems()
     {
         EnableMenuItem(hMenu, MENU_24,	                MF_GRAYED  | MF_BYCOMMAND);
     }
-
-    EnableMenuItem(hMenu, MENU_MODELESS,	                MF_ENABLED  | MF_BYCOMMAND);
-
 #if defined _MSC_VER && defined BUILD_X86_ASM
     EnableMenuItem(hBlitterMenu[1], MENU_ENHANCED_SOFT_HQ3XS_VBA, MF_ENABLED | MF_BYCOMMAND);
     EnableMenuItem(hBlitterMenu[2], MENU_SOFTFX_SOFT_HQ3XS_VBA, MF_ENABLED | MF_BYCOMMAND);
@@ -1629,3 +1511,4 @@ void MenuEnableItems()
         EnableMenuItem(hMenu, MENU_AUD_PLUGIN_2,		 MF_ENABLED  | MF_BYCOMMAND);
     }
 }
+

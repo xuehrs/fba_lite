@@ -42,17 +42,8 @@ LRESULT CALLBACK	VideoWndProc		(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPara
 BOOL				RegNewMDIChild		();
 HWND				CreateNewMDIChild	(HWND hMDIClient);
 void				DestroyBurnerMDI	(int nAction);
-bool				GetThemeStatus		();
-
-// Window message handling stuff
-static bool bDrag = false;
-static int nOldWindowX, nOldWindowY;
-static float nDownX, nDownY, nMoveX, nMoveY;
 
 static void OnPaint         (HWND);
-static int OnMouseMove		(HWND, int, int, UINT);
-static int OnLButtonDown	(HWND, BOOL, int, int, UINT);
-static int OnLButtonUp		(HWND, int, int, UINT);
 static int OnLButtonDblClk	(HWND, BOOL, int, int, UINT);
 static int OnSysCommand		(HWND, UINT, int, int);
 
@@ -78,9 +69,6 @@ LRESULT CALLBACK VideoWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
     switch (Msg)
     {
         HANDLE_MSGB(hWnd, WM_PAINT,			OnPaint);
-        HANDLE_MSG(hWnd, WM_MOUSEMOVE,		OnMouseMove);
-        HANDLE_MSG(hWnd, WM_LBUTTONUP,		OnLButtonUp);
-        HANDLE_MSG(hWnd, WM_LBUTTONDOWN,	OnLButtonDown);
         HANDLE_MSG(hWnd, WM_LBUTTONDBLCLK,	OnLButtonDblClk);
 	    // We can't use the macro from windowsx.h macro for this one
 	    case WM_SYSCOMMAND:
@@ -169,29 +157,6 @@ void DestroyBurnerMDI(int nAction)
     }
 }
 
-// Check if Windows has a Theme active (Windows XP+)
-bool GetThemeStatus()
-{
-    bool bThemeActive = false;
-
-    typedef BOOL WINAPI ISTHEMEACTIVE();
-    ISTHEMEACTIVE *pISTHEMEACTIVE = NULL;
-
-    HMODULE hMod = LoadLibrary(_T("uxtheme.dll"));
-
-    if(hMod)
-    {
-        pISTHEMEACTIVE = reinterpret_cast<ISTHEMEACTIVE *>(GetProcAddress(hMod, "IsThemeActive"));
-        if(pISTHEMEACTIVE)
-        {
-            bThemeActive = pISTHEMEACTIVE();
-        }
-        FreeLibrary(hMod);
-    }
-
-    return bThemeActive;
-}
-
 static void OnPaint(HWND hwnd)
 {
     if(!nVidFullscreen)
@@ -205,102 +170,6 @@ static void OnPaint(HWND hwnd)
         	VidPaint(1);
 		}
     }
-}
-
-// MOUSE MOVE (DRAG)
-static int OnMouseMove(HWND /*hwnd*/, int /*x*/, int /*y*/, UINT keyIndicators)
-{
-    if(bDrag && keyIndicators == MK_LBUTTON &&  !nVidFullscreen && !bMenuEnabled)
-    {
-        AudSoundStop();
-
-        // If UxThemes are active (Windows XP+) or DWM Composition is active
-        if(GetThemeStatus())
-        {
-            // Redraw everything on the MDI frame to get accurate calculatations
-            RedrawWindow(hWndChildFrame, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW | RDW_ALLCHILDREN);
-        }
-
-        POINT pointer;
-        memset(&pointer, 0, sizeof(POINT));
-
-        GetCursorPos(&pointer);
-
-        nMoveX = pointer.x;
-        nMoveY = pointer.y;
-
-        // negative (left / up) [-]
-        if((nMoveX < nDownX && nMoveX != 0) || (nMoveY < nDownY && nMoveY != 0))
-        {
-            nWindowPosX = nOldWindowX - (int)(nDownX - nMoveX);
-            nWindowPosY = nOldWindowY - (int)(nDownY - nMoveY);
-            SetWindowPos(hScrnWnd, NULL, nWindowPosX, nWindowPosY, 0, 0, SWP_NOREPOSITION | SWP_NOSIZE);
-        }
-
-        // positive (right / down) [+]
-        if((nMoveX > nDownX && nMoveX != 0) || (nMoveY > nDownY && nMoveY != 0))
-        {
-            nWindowPosX = nOldWindowX + (int)(nMoveX - nDownX);
-            nWindowPosY = nOldWindowY + (int)(nMoveY - nDownY);
-            SetWindowPos(hScrnWnd, NULL, nWindowPosX, nWindowPosY, 0, 0, SWP_NOREPOSITION | SWP_NOSIZE);
-        }
-
-        AudSoundPlay();
-        return 0;
-    }
-    return 1;
-}
-
-// MOUSE LEFT BUTTON (DOWN)
-static int OnLButtonDown(HWND /*hwnd*/, BOOL bDouble, int /*x*/, int /*y*/, UINT)
-{
-    if (!bDrag && !nVidFullscreen && !bMenuEnabled && !bDouble)
-    {
-        POINT pointer;
-        memset(&pointer, 0, sizeof(POINT));
-
-        GetCursorPos(&pointer);
-
-        nDownX = pointer.x;
-        nDownY = pointer.y;
-
-        RECT cr;
-        GetWindowRect(hScrnWnd, &cr);
-
-        nOldWindowX = cr.left;
-        nOldWindowY = cr.top;
-
-        bDrag = true;
-
-        return 0;
-    }
-    return 1;
-}
-
-// MOUSE LEFT BUTTON (UP)
-static int OnLButtonUp(HWND /*hwnd*/, int /*x*/, int /*y*/, UINT)
-{
-    RECT cr;
-    GetWindowRect(hScrnWnd, &cr);
-
-    if(bDrag && !nVidFullscreen && !bMenuEnabled)
-    {
-        if((nDownX != nMoveX || nDownY != nMoveY) && (nMoveX != 0 && nMoveY != 0))
-        {
-            // window moved	- NO MENU
-        }
-        else
-        {
-            // window was not moved - SHOW MENU
-            TrackPopupMenuEx(hMenuPopup, TPM_LEFTALIGN | TPM_TOPALIGN, (int)nDownX, (int)nDownY, hScrnWnd, NULL);
-        }
-
-        bDrag = false;
-        nDownX = nDownY = nMoveX = nMoveY = 0;
-
-        return 0;
-    }
-    return 1;
 }
 
 // MOUSE LEFT BUTTON (DOUBLE CLICK)
@@ -332,7 +201,7 @@ static int OnSysCommand(HWND, UINT sysCommand, int, int)
     case SC_KEYMENU:
     case SC_MOUSEMENU:
     {
-        if (kNetGame && !bModelessMenu)
+        if (kNetGame)
         {
             return 1;
         }

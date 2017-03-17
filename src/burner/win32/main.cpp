@@ -653,7 +653,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nShowCmd
 	CreateDirectory(_T("config/localisation"), NULL);
 	CreateDirectory(_T("config/presets"), NULL);
 	CreateDirectory(_T("roms"), NULL);
-	CreateDirectory(_T("savestates"), NULL);
+	CreateDirectory(_T("states"), NULL);
 
     //
     INITCOMMONCONTROLSEX initCC =
@@ -666,15 +666,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nShowCmd
 	AllocConsole();
 	freopen("CONOUT$", "w+t", stdout);
 	
-    if (!(AppInit()))  							// Init the application
+    if (!(AppInit()))  						// Init the application
     {
         MediaInit();
         RunMessageLoop();					// Run the application message loop
     }
 
-    ConfigAppSave();							// Save config for the application
+    ConfigAppSave();						// Save config for the application
 
-    AppExit();									// Exit the application
+    AppExit();								// Exit the application
     
 	fclose(stdout);
 	FreeConsole();

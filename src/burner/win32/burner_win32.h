@@ -226,10 +226,7 @@ extern HWND hRebar;									// Handle to the Rebar control containing the menu
 extern HWND hwndChat;
 extern bool bRescanRoms;
 extern bool bMenuEnabled;
-
 extern RECT SystemWorkArea;							// The full screen area
-extern int nWindowPosX, nWindowPosY;
-
 extern int nSavestateSlot;
 
 int ScrnInit();
@@ -262,8 +259,6 @@ extern int nWindowSize;
 
 #define SHOW_PREV_GAMES		10
 extern TCHAR szPrevGames[SHOW_PREV_GAMES][32];
-
-extern bool bModelessMenu;
 
 int MenuCreate();
 void MenuDestroy();
