@@ -954,7 +954,7 @@ static int dx9Init()
     dprintf(_T("*** Initialising Direct3D 9 blitter.\n"));
 #endif
 
-    hVidWnd = nVidFullscreen ? hScrnWnd : hVideoWindow;								// Use Screen window for video
+    hVidWnd = hScrnWnd;//nVidFullscreen ? hScrnWnd : hVideoWindow;								// Use Screen window for video
 
     // Get pointer to Direct3D
     if ((pD3D = _Direct3DCreate9(D3D_SDK_VERSION)) == NULL)

@@ -511,6 +511,10 @@ static void OnPaint(HWND hWnd)
         {
             RedrawWindow(hRebar, NULL, NULL, RDW_FRAME | RDW_UPDATENOW | RDW_ALLCHILDREN);
         }
+		if (bDrvOkay)
+        {
+        	VidPaint(1);
+		}
     }
 }
 
@@ -2985,7 +2989,7 @@ int ScrnInit()
         }
     }
 
-    RegNewMDIChild();
+    //RegNewMDIChild();
 
     hScrnWnd = CreateWindowEx(nWindowExStyles, szClass, _T(APP_TITLE), nWindowStyles,
                               0, 0, 0, 0,									   			// size of window
@@ -3002,8 +3006,8 @@ int ScrnInit()
     {
 
         // Create the menu toolbar itself
-        MenuCreate();
-
+        //MenuCreate();
+#if 0
         // Create the toolbar
         if (bMenuEnabled)
         {
@@ -3037,6 +3041,7 @@ int ScrnInit()
             nMenuHeight = rect.bottom - rect.top;
 
         }
+#endif
 
         ScrnTitle();
         ScrnSize();

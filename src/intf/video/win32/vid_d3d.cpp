@@ -1551,7 +1551,7 @@ static int vidInit()
 
     bUseTriplebuffer = false;
 
-    hVidWnd = nVidFullscreen ? hScrnWnd : hVideoWindow;								// Use Screen window for video
+    hVidWnd = hScrnWnd;//nVidFullscreen ? hScrnWnd : hVideoWindow;								// Use Screen window for video
 
     nWantDriver = 0;
 #if 1 && defined(PRINT_DEBUG_INFO)

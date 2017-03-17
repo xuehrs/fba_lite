@@ -154,6 +154,7 @@ INT32 VidInit()
         nVidActive = nVidSelect;
         if ((nRet = pVidOut[nVidActive]->Init()) == 0)
         {
+        	hVidWnd  = hScrnWnd;
             nBurnBpp = nVidImageBPP;								// Set Burn library Bytes per pixel
 
             bVidOkay = true;

@@ -286,7 +286,7 @@ static int Init()
         return 1;
     }
 
-    hVidWnd = nVidFullscreen ? hScrnWnd : hVideoWindow;								// Use Screen window for video
+    hVidWnd = hScrnWnd;//nVidFullscreen ? hScrnWnd : hVideoWindow;								// Use Screen window for video
 
     nUseBlitter = nVidBlitterOpt[nVidSelect] & 0xFF;
 
