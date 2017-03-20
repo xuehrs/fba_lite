@@ -663,8 +663,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nShowCmd
     };
     InitCommonControlsEx(&initCC);
 
-	AllocConsole();
-	freopen("CONOUT$", "w+t", stdout);
+	//AllocConsole();
+	//freopen("CONOUT$", "w+t", stdout);
 	
     if (!(AppInit()))  						// Init the application
     {
@@ -676,7 +676,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nShowCmd
 
     AppExit();								// Exit the application
     
-	fclose(stdout);
-	FreeConsole();
+	//fclose(stdout);
+	//FreeConsole();
     return 0;
 }

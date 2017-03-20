@@ -179,7 +179,7 @@ static void RebuildGameList()
 static void SelectOkay()
 {
     NODEINFO* node;
-    unsigned int nSelect;
+    int nSelect;
 	nSelect = ListView_GetSelectionMark(hSelList);
 	if(nSelect < 0)
 	{
@@ -346,7 +346,7 @@ static BOOL OnList1CustomDraw(HWND hDlg, LPNMLVCUSTOMDRAW lplvcd)
 			//设置克隆的颜色
             if (node->bIsClone)
             {
-                lplvcd->clrText = RGB(128, 128, 128);
+                lplvcd->clrText = RGB(100, 100, 100);
             }
 		}
 	    return 1;

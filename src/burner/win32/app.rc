@@ -505,25 +505,13 @@ BEGIN
             MENUITEM "DirectX 9",			MENU_BLITTER_3
         END
         MENUITEM "插件选项",					MENU_BLITTEROPTIONS, GRAYED
-        POPUP "缩放方式"
+        MENUITEM SEPARATOR
+         POPUP "缩放方式"
         BEGIN
             MENUITEM "原始大小",				MENU_NOSTRETCH
             MENUITEM "适应屏幕",				MENU_STRETCH
             MENUITEM "等比缩放",				MENU_ASPECT
         END
-        MENUITEM SEPARATOR
-        MENUITEM "开启伽玛校正",				MENU_GAMMA_DO
-        POPUP "伽玛校正设置"
-        BEGIN
-            MENUITEM "暗色调",			MENU_GAMMA_DARKER
-            MENUITEM "亮色调",			MENU_GAMMA_LIGHTER
-            MENUITEM "MENU_GAMMA_OTHER",				MENU_GAMMA_OTHER
-            MENUITEM SEPARATOR
-            MENUITEM "优先使用硬件显示",		MENU_GAMMA_USE_HARDWARE
-            MENUITEM "强制使用硬件显示",			MENU_GAMMA_HARDWARE_ONLY
-            MENUITEM "强制使用软件显示",			MENU_GAMMA_SOFTWARE_ONLY
-        END
-        MENUITEM SEPARATOR
         POPUP "窗口大小"
         BEGIN
              MENUITEM "原始大小",					MENU_SINGLESIZEWINDOW
@@ -577,6 +565,18 @@ BEGIN
 	            MENUITEM "&32bit",						MENU_32
 	        END
 	    END
+	    MENUITEM SEPARATOR
+	    MENUITEM "开启伽玛校正",				MENU_GAMMA_DO
+        POPUP "伽玛校正设置"
+        BEGIN
+            MENUITEM "暗色调",			MENU_GAMMA_DARKER
+            MENUITEM "亮色调",			MENU_GAMMA_LIGHTER
+            MENUITEM "MENU_GAMMA_OTHER",				MENU_GAMMA_OTHER
+            MENUITEM SEPARATOR
+            MENUITEM "优先使用硬件显示",		MENU_GAMMA_USE_HARDWARE
+            MENUITEM "强制使用硬件显示",			MENU_GAMMA_HARDWARE_ONLY
+            MENUITEM "强制使用软件显示",			MENU_GAMMA_SOFTWARE_ONLY
+        END
         MENUITEM SEPARATOR
         POPUP "显示器属性"
         BEGIN
