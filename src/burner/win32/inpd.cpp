@@ -804,7 +804,7 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
 
     if (Msg == WM_CLOSE)
     {
-        EnableWindow(hScrnWnd, TRUE);
+        EnableWindow(hMainWnd, TRUE);
         DestroyWindow(hInpdDlg);
         return 0;
     }
@@ -1037,13 +1037,13 @@ int InpdCreate()
 
     DestroyWindow(hInpdDlg);										// Make sure exitted
 
-    hInpdDlg = FBACreateDialog(hAppInst, MAKEINTRESOURCE(IDD_INPD), hScrnWnd, (DLGPROC)DialogProc);
+    hInpdDlg = FBACreateDialog(hAppInst, MAKEINTRESOURCE(IDD_INPD), hMainWnd, (DLGPROC)DialogProc);
     if (hInpdDlg == NULL)
     {
         return 1;
     }
 
-    WndInMid(hInpdDlg, hScrnWnd);
+    WndInMid(hInpdDlg, hMainWnd);
     ShowWindow(hInpdDlg, SW_NORMAL);
 
     return 0;

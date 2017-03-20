@@ -267,7 +267,7 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
     if (Msg == WM_INITDIALOG)
     {
 
-        //		EnableWindow(hScrnWnd, FALSE);
+        //		EnableWindow(hMainWnd, FALSE);
 
         hInpDIPSWDlg = hDlg;
         InpDIPSWInit();
@@ -276,7 +276,7 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
             bRunPause = 1;
         }
 
-        WndInMid(hDlg, hScrnWnd);
+        WndInMid(hDlg, hMainWnd);
         SetFocus(hDlg);											// Enable Esc=close
 
         return TRUE;
@@ -284,7 +284,7 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
 
     if (Msg == WM_CLOSE)
     {
-        EnableWindow(hScrnWnd, TRUE);
+        EnableWindow(hMainWnd, TRUE);
         DestroyWindow(hInpDIPSWDlg);
         return 0;
     }
@@ -416,7 +416,7 @@ int InpDIPSWCreate()
 
     bOK = false;
 
-    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_INPDIP), hScrnWnd, (DLGPROC)DialogProc);
+    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_INPDIP), hMainWnd, (DLGPROC)DialogProc);
 
     return 0;
 }

@@ -117,16 +117,16 @@ BEGIN
 	IDS_SEL_PGM					"PGM"
 	IDS_SEL_SETSTATUS			"显示%d/%d"
 	
-	IDS_MENU_0 					"&Arcade"
-    IDS_MENU_1 					"&Other..."
+	IDS_MENU_0 					"街机"
+    IDS_MENU_1 					"自定义..."
     IDS_MENU_2 					"自定义伽玛值..."
     IDS_MENU_3 					"调整CPU速度..."
     IDS_MENU_4 					"Load state from active slot (no %d)\tF9"
     IDS_MENU_5 					"Save state to active slot (no %d)\tF10"
 	IDS_MENU_6					"空白"
 	
-	IDS_NUMDIAL_NUM_FRAMES		"Number of Frames"
-	IDS_NUMDIAL_FILTER_SHARP	"Select desired filter sharpness"
+	IDS_NUMDIAL_NUM_FRAMES		"帧数"
+	IDS_NUMDIAL_FILTER_SHARP	"选择过滤清晰度"
 	
 	IDS_SCANNING_ROMS			"正在扫描..."
 	

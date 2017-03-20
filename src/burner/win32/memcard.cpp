@@ -14,7 +14,7 @@ static int MakeOfn()
 {
     memset(&ofn, 0, sizeof(ofn));
     ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner = hScrnWnd;
+    ofn.hwndOwner = hMainWnd;
     ofn.lpstrFile = szMemoryCardFile;
     ofn.nMaxFile = sizeof(szMemoryCardFile);
     ofn.lpstrInitialDir = _T(".");

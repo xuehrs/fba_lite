@@ -322,7 +322,7 @@ void WavClass::ShutdownWaveFile(IDirectSoundBuffer **secondaryBuffer)
 #include "cd_interface.h"
 
 WavClass *wav;
-extern HWND hScrnWnd;
+extern HWND hMainWnd;
 
 void wav_exit()
 {
@@ -338,10 +338,10 @@ int wav_open(TCHAR *szFile)
 {
     wav_exit();
 
-    if(hScrnWnd)
+    if(hMainWnd)
     {
         wav = new WavClass;
-        wav->Initialize(hScrnWnd, szFile);
+        wav->Initialize(hMainWnd, szFile);
     }
     else
     {

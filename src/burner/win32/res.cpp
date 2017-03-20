@@ -48,7 +48,7 @@ static INT_PTR CALLBACK ResProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM)	// L
         SendDlgItemMessage(hDlg, IDC_CHOOSE_LIST, CB_SETCURSEL, 0, 0);
 
         bOK = 0;
-        WndInMid(hDlg, hScrnWnd);
+        WndInMid(hDlg, hMainWnd);
 
         return TRUE;
     }
@@ -109,7 +109,7 @@ int ResCreate(int nResOrientation)
 {
     nOrientation = nResOrientation;
 
-    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_CHOOSERES), hScrnWnd, (DLGPROC)ResProc);
+    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_CHOOSERES), hMainWnd, (DLGPROC)ResProc);
     return 0;
 }
 

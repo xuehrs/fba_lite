@@ -1113,7 +1113,7 @@ static int cmd_go(TCHAR *arg)
     }
     if (bBreakpointHit)
     {
-        PostMessage(hScrnWnd, WM_APP + 0, 0, 0);
+        PostMessage(hMainWnd, WM_APP + 0, 0, 0);
     }
 
     return 0;
@@ -1250,7 +1250,7 @@ static int cmd_frame(TCHAR * /*arg*/)
     // Run until the next frame starts
     if (bBreakpointHit)
     {
-        PostMessage(hScrnWnd, WM_APP + 0, 0, 0);
+        PostMessage(hMainWnd, WM_APP + 0, 0, 0);
         return 0;
     }
     else
@@ -1767,7 +1767,7 @@ int DebugExit()
         DbgMemoryAreaInfo = NULL;
     }
 
-    EnableWindow(hScrnWnd, TRUE);
+    EnableWindow(hMainWnd, TRUE);
     DestroyWindow(hDbgDlg);
 
     DeleteObject(hCommandFont);
@@ -1809,7 +1809,7 @@ int DebugCreate()
 
     SystemParametersInfo(SPI_GETWORKAREA, 0, &SystemWorkArea, 0);
     bLargeWindow = (SystemWorkArea.right - SystemWorkArea.left >= 1024 && SystemWorkArea.bottom - SystemWorkArea.top >= 768) ? true : false;
-    hDbgDlg = FBACreateDialog(hAppInst, MAKEINTRESOURCE(bLargeWindow ? IDD_DEBUG_LRG : IDD_DEBUG_SML), hScrnWnd, (DLGPROC)DialogProc);
+    hDbgDlg = FBACreateDialog(hAppInst, MAKEINTRESOURCE(bLargeWindow ? IDD_DEBUG_LRG : IDD_DEBUG_SML), hMainWnd, (DLGPROC)DialogProc);
     if (hDbgDlg == NULL)
     {
         return 1;

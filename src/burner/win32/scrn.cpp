@@ -16,14 +16,13 @@ void DisplayPopupMenu(int nMenu);
 
 RECT SystemWorkArea = { 0, 0, 640, 480 };				// Work area on the desktop
 
-int bAutoPause = 1;
+int  bAutoPause = 1;
 bool bMenuEnabled = true;
 bool bHasFocus = false;
-int nSavestateSlot = 1;
+int  nSavestateSlot = 1;
 
 static TCHAR *szClass = _T("FB Alpha");					// Window class name
-HWND hScrnWnd = NULL;									// Handle to the screen window
-HWND hRebar = NULL;										// Handle to the Rebar control containing the menu
+HWND hMainWnd = NULL;									// Handle to the screen window
 
 static bool bMaximised;
 static int nPrevWidth, nPrevHeight;
@@ -46,8 +45,6 @@ static void OnSize(HWND, UINT, int, int);
 static void OnEnterSizeMove(HWND);
 static void OnExitSizeMove(HWND);
 static void OnEnterIdle(HWND, UINT, HWND);
-static void OnEnterMenuLoop(HWND, BOOL);
-static void OnExitMenuLoop(HWND, BOOL);
 static int OnLButtonDblClk(HWND, BOOL, int, int, UINT);
 static int OnDisplayChange(HWND, UINT, UINT, UINT);
 
@@ -145,16 +142,15 @@ void DeActivateChat()
 int ActivateChat()
 {
     RECT rect;
-    GetClientRect(hScrnWnd, &rect);
+    GetClientRect(hMainWnd, &rect);
 
     DeActivateChat();
 
     // Create an invisible edit control
     hwndChat = CreateWindow(
-                   _T("EDIT"), NULL,
-                   WS_CHILD | ES_LEFT,
+                   _T("EDIT"), NULL, WS_CHILD | ES_LEFT,
                    0, rect.bottom - 32, rect.right, 32,
-                   hScrnWnd, (HMENU)ID_NETCHAT, (HINSTANCE)GetWindowLongPtr(hScrnWnd, GWLP_HINSTANCE), NULL);                // pointer not needed
+                   hMainWnd, (HMENU)ID_NETCHAT, hAppInst, NULL);                // pointer not needed
 
     EditText[0] = 0;
     bEditTextChanged = true;
@@ -200,7 +196,7 @@ static int WINAPI gameCallback(char *game, int player, int numplayers)
     ScrnInit();
     AudSoundPlay();										// Restart sound
     VidInit();
-    SetFocus(hScrnWnd);
+    SetFocus(hMainWnd);
 
     //	dprintf(_T(" ** OSD startnet text sent.\n"));
 
@@ -314,7 +310,7 @@ int CreateDatfileWindows(int bType)
 
     memset(&ofn, 0, sizeof(ofn));
     ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner = hScrnWnd;
+    ofn.hwndOwner = hMainWnd;
     ofn.lpstrFilter = szFilter;
     ofn.lpstrFile = szChoice;
     ofn.nMaxFile = sizeof(szChoice) / sizeof(TCHAR);
@@ -421,7 +417,7 @@ static int OnLButtonDblClk(HWND hwnd, BOOL, int, int, UINT)
 {
     if(nVidFullscreen)
     {
-        if (hwnd == hScrnWnd && bDrvOkay)
+        if (hwnd == hMainWnd && bDrvOkay)
         {
             nVidFullscreen = !nVidFullscreen;
             POST_INITIALISE_MESSAGE;
@@ -443,7 +439,7 @@ static void OnActivateApp(HWND hwnd, BOOL fActivate, DWORD /* dwThreadId */)
     {
         bRunPause = fActivate ? 0 : 1;
     }
-    if (fActivate == false && hwnd == hScrnWnd)
+    if (fActivate == false && hwnd == hMainWnd)
     {
         EndMenu();
     }
@@ -483,7 +479,7 @@ static void PausedRedraw(void)
 
 static void OnPaint(HWND hWnd)
 {
-    if (hWnd == hScrnWnd)
+    if (hWnd == hMainWnd)
     {
         VidPaint(1);
 
@@ -491,12 +487,6 @@ static void OnPaint(HWND hWnd)
         {
             PausedRedraw(); // redraw game screen if paused and returning from hibernation - dink
             bBackFromHibernation = 0;
-        }
-
-        // draw menu
-        if (!nVidFullscreen)
-        {
-            RedrawWindow(hRebar, NULL, NULL, RDW_FRAME | RDW_UPDATENOW | RDW_ALLCHILDREN);
         }
 		if (bDrvOkay)
         {
@@ -514,7 +504,7 @@ static void OnDestroy(HWND)
 {
 	MenuDestroy();
     VidExit();							// Stop using video with the Window
-    hScrnWnd = NULL;					// Make sure handle is not used again
+    hMainWnd = NULL;					// Make sure handle is not used again
 }
 
 OPENFILENAME	bgFn;
@@ -712,7 +702,7 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         bLoading = 1;
         AudSoundStop();						// Stop while the dialog is active or we're loading ROMs
 
-        nGame = PopupSelectDialog(hScrnWnd);		// Bring up select dialog to pick a driver
+        nGame = PopupSelectDialog(hMainWnd);		// Bring up select dialog to pick a driver
         if (nGame >= 0)
         {
             DrvExit();
@@ -756,7 +746,7 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
     case MENU_STARTNET:
         if (Init_Network())
         {
-            MessageBox(hScrnWnd, FBALoadStringEx(hAppInst, IDS_ERR_NO_NETPLAYDLL, true), FBALoadStringEx(hAppInst, IDS_ERR_ERROR, true), MB_OK);
+            MessageBox(hMainWnd, FBALoadStringEx(hAppInst, IDS_ERR_NO_NETPLAYDLL, true), FBALoadStringEx(hAppInst, IDS_ERR_ERROR, true), MB_OK);
             break;
         }
         if (!kNetGame)
@@ -1023,21 +1013,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         VidSelect(4);
         POST_INITIALISE_MESSAGE;
         break;
-#if 0
-    case MENU_BLITTER_6:
-        VidSelect(5);
-        POST_INITIALISE_MESSAGE;
-        break;
-    case MENU_BLITTER_7:
-        VidSelect(6);
-        POST_INITIALISE_MESSAGE;
-        break;
-    case MENU_BLITTER_8:
-        VidSelect(7);
-        POST_INITIALISE_MESSAGE;
-        break;
-#endif
-
     case MENU_RES_ARCADE:
         bVidArcaderesHor = !bVidArcaderesHor;
         nScreenSizeHor = 0;
@@ -1800,7 +1775,7 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
     {
         AudBlankSound();
         InputSetCooperativeLevel(false, bAlwaysProcessKeyboardInput);
-        PaletteViewerDialogCreate(hScrnWnd);
+        PaletteViewerDialogCreate(hMainWnd);
         break;
     }
 
@@ -1924,13 +1899,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         EnableMenuItem(hMenu, MENU_CHEATSEARCH_EXIT, MF_GRAYED | MF_BYCOMMAND);
         break;
     }
-
-    case MENU_ASSOCIATE:
-        RegisterExtensions(true);
-        break;
-    case MENU_DISASSOCIATE:
-        RegisterExtensions(false);
-        break;
 
     case MENU_SAVEGAMEINPUTNOW:
         ConfigGameSave(true);
@@ -2621,7 +2589,7 @@ static void OnEnterSizeMove(HWND)
 
     AudBlankSound();
 
-    GetClientRect(hScrnWnd, &rect);
+    GetClientRect(hMainWnd, &rect);
     nPrevWidth = rect.right;
     nPrevHeight = rect.bottom;
 }
@@ -2630,7 +2598,7 @@ static void OnExitSizeMove(HWND)
 {
     RECT rect;
 
-    GetClientRect(hScrnWnd, &rect);
+    GetClientRect(hMainWnd, &rect);
     if (rect.right != nPrevWidth || rect.bottom != nPrevHeight)
     {
         RefreshWindow(true);
@@ -2686,7 +2654,7 @@ int ScrnSize()
 
     SystemParametersInfo(SPI_GETWORKAREA, 0, &SystemWorkArea, 0);	// Find the size of the visible WorkArea
 
-    if (hScrnWnd == NULL || nVidFullscreen)
+    if (hMainWnd == NULL || nVidFullscreen)
     {
         return 1;
     }
@@ -2887,7 +2855,7 @@ int ScrnSize()
 
     MenuUpdate();
     bMaximised = false;
-    MoveWindow(hScrnWnd, x, y, w, h, true);
+    MoveWindow(hMainWnd, x, y, w, h, true);
     return 0;
 }
 
@@ -2916,7 +2884,7 @@ int ScrnTitle()
         _stprintf(szText, _T(APP_TITLE) _T( " V%.20s"), szAppBurnVer);
     }
 
-    SetWindowText(hScrnWnd, szText);
+    SetWindowText(hMainWnd, szText);
     return 0;
 }
 
@@ -2924,7 +2892,6 @@ int ScrnTitle()
 // Init the screen window (create it)
 int ScrnInit()
 {
-    RECT rect;
     int nWindowStyles, nWindowExStyles;
 
     ScrnExit();
@@ -2953,10 +2920,10 @@ int ScrnInit()
         }
     }
 
-    hScrnWnd = CreateWindowEx(nWindowExStyles, szClass, _T(APP_TITLE), nWindowStyles,
+    hMainWnd = CreateWindowEx(nWindowExStyles, szClass, _T(APP_TITLE), nWindowStyles,
                               0, 0, 0, 0,									   			// size of window
                               NULL, NULL, hAppInst, NULL);
-    if (hScrnWnd == NULL)
+    if (hMainWnd == NULL)
     {
         ScrnExit();
         return 1;
@@ -2977,10 +2944,10 @@ int ScrnExit()
     // Ensure the window is destroyed
     DeActivateChat();
 
-    if (hScrnWnd)
+    if (hMainWnd)
     {
-        DestroyWindow(hScrnWnd);
-        hScrnWnd = NULL;
+        DestroyWindow(hMainWnd);
+        hMainWnd = NULL;
     }
 
     UnregisterClass(szClass, hAppInst);		// Unregister the scrn class

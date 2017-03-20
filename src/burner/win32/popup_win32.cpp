@@ -256,7 +256,7 @@ static INT_PTR CALLBACK FBAPopupProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
             SetWindowPos(hWnd, NULL, p.x - (rect.right - rect.left) / 2, rect.top - p.y + sizee.cy, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
         }
 
-        WndInMid(hDlg, hScrnWnd);
+        WndInMid(hDlg, hMainWnd);
         SetForegroundWindow(hDlg);
         MessageBeep(nBeep);
 
@@ -392,7 +392,7 @@ int FBAPopupDisplay(int nFlags)
 
     if (!(nPopupFlags & PUF_TYPE_LOGONLY) && hRiched)
     {
-        DialogBox(hAppInst, MAKEINTRESOURCE(IDD_POPUP), hScrnWnd, (DLGPROC)FBAPopupProc);
+        DialogBox(hAppInst, MAKEINTRESOURCE(IDD_POPUP), hMainWnd, (DLGPROC)FBAPopupProc);
         FreeLibrary(hRiched);
         hRiched = NULL;
     }

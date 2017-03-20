@@ -185,11 +185,8 @@ int MediaInit();
 int MediaExit();
 
 // misc_win32.cpp
-extern bool bIsWindowsXPorGreater;
-BOOL DetectWindowsVersion();
 int AppDirectory();
 void UpdatePath(TCHAR *path);
-void RegisterExtensions(bool bCreateKeys);
 int GetClientScreenRect(HWND hWnd, RECT *pRect);
 int WndInMid(HWND hMid, HWND hBase);
 char *DecorateGameName(unsigned int nBurnDrv);
@@ -213,13 +210,12 @@ int RunReset();
 void ToggleLayer(unsigned char thisLayer);
 
 // scrn.cpp
-extern HWND hScrnWnd;								// Handle to the screen window
-extern HWND hRebar;									// Handle to the Rebar control containing the menu
+extern HWND hMainWnd;								// Handle to the screen window
 extern HWND hwndChat;
 extern bool bRescanRoms;
 extern bool bMenuEnabled;
 extern RECT SystemWorkArea;							// The full screen area
-extern int nSavestateSlot;
+extern int  nSavestateSlot;
 
 int ScrnInit();
 int ScrnExit();

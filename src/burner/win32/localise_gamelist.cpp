@@ -162,7 +162,7 @@ static void MakeOfn()
 
     memset(&ofn, 0, sizeof(ofn));
     ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner = hScrnWnd;
+    ofn.hwndOwner = hMainWnd;
     ofn.lpstrFilter = szFilter;
     ofn.lpstrFile = szGamelistLocalisationTemplate;
     ofn.nMaxFile = sizeof(szGamelistLocalisationTemplate) / sizeof(TCHAR);

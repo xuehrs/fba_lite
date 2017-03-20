@@ -1,25 +1,5 @@
 #include "burner.h"
 
-bool bIsWindowsXPorGreater = FALSE;
-
-// Detect if we are using Windows XP/Vista/7
-BOOL DetectWindowsVersion()
-{
-    OSVERSIONINFO osvi;
-    BOOL bIsWindowsXPorLater;
-
-    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
-    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-
-    GetVersionEx(&osvi);
-
-    // osvi.dwMajorVersion returns the windows version: 5 = XP 6 = Vista/7
-    // osvi.dwMinorVersion returns the minor version, XP and 7 = 1, Vista = 0
-    bIsWindowsXPorLater = ((osvi.dwMajorVersion > 5) || ( (osvi.dwMajorVersion == 5) && (osvi.dwMinorVersion >= 1)));
-
-    return bIsWindowsXPorLater;
-}
-
 // Set the current directory to be the application's directory
 int AppDirectory()
 {
@@ -112,106 +92,11 @@ void UpdatePath(TCHAR *path)
 
 // ---------------------------------------------------------------------------
 
-static void MyRegCreateKeys(int nDepth, TCHAR *pNames[], HKEY *pResult)
-{
-    for (int i = 0; i < nDepth; i++)
-    {
-        pResult[i] = NULL;
-        RegCreateKeyEx((i ? pResult[i - 1] : HKEY_CLASSES_ROOT), pNames[i], 0, _T(""), 0, KEY_WRITE, NULL, &pResult[i], NULL);
-    }
-}
-
-static void MyRegCloseKeys(int nDepth, HKEY *pKeys)
-{
-    for (int i = nDepth - 1; i >= 0; i--)
-    {
-        if (pKeys[i])
-        {
-            RegCloseKey(pKeys[i]);
-        }
-    }
-}
-
-static void MyRegDeleteKeys(int nDepth, TCHAR *pNames[], HKEY *pKeys)
-{
-    for (int i = 0; i < nDepth - 1; i++)
-    {
-        pKeys[i] = NULL;
-        RegOpenKeyEx((i ? pKeys[i - 1] : HKEY_CLASSES_ROOT), pNames[i], 0, 0, &pKeys[i]);
-    }
-    for (int i = nDepth - 1; i >= 0; i--)
-    {
-        RegDeleteKey((i ? pKeys[i - 1] : HKEY_CLASSES_ROOT), pNames[i]);
-        if (i)
-        {
-            RegCloseKey(pKeys[i - 1]);
-        }
-    }
-}
-
-void RegisterExtensions(bool bCreateKeys)
-{
-    HKEY myKeys[4];
-
-    TCHAR *myKeynames1[1] = { _T(".fr") };
-    TCHAR *myKeynames2[1] = { _T(".fs") };
-    TCHAR *myKeynames3[4] = { _T("FBAlpha"), _T("shell"), _T("open"), _T("command") };
-    TCHAR *myKeynames4[2] = { _T("FBAlpha"), _T("DefaultIcon") };
-    TCHAR myKeyValue[MAX_PATH + 32] = _T("");
-
-    if (bCreateKeys)
-    {
-        TCHAR szExename[MAX_PATH] = _T("");
-        GetModuleFileName(NULL, szExename, MAX_PATH);
-
-        MyRegCreateKeys(1, myKeynames1, myKeys);
-        _stprintf(myKeyValue, _T("FBAlpha"));
-        RegSetValueEx(myKeys[0], NULL, 0, REG_SZ, (BYTE *)myKeyValue, (_tcslen(myKeyValue) + 1) * sizeof(TCHAR));
-        MyRegCloseKeys(2, myKeys);
-
-        MyRegCreateKeys(1, myKeynames2, myKeys);
-        _stprintf(myKeyValue, _T("FBAlpha"));
-        RegSetValueEx(myKeys[0], NULL, 0, REG_SZ, (BYTE *)myKeyValue, (_tcslen(myKeyValue) + 1) * sizeof(TCHAR));
-        MyRegCloseKeys(2, myKeys);
-
-        MyRegCreateKeys(4, myKeynames3, myKeys);
-        _stprintf(myKeyValue, _T("\"%s\" \"%%1\" -w"), szExename);
-        RegSetValueEx(myKeys[3], NULL, 0, REG_SZ, (BYTE *)myKeyValue, (_tcslen(myKeyValue) + 1) * sizeof(TCHAR));
-        _stprintf(myKeyValue, _T("FB Alpha file"));
-        RegSetValueEx(myKeys[0], NULL, 0, REG_SZ, (BYTE *)myKeyValue, (_tcslen(myKeyValue) + 1) * sizeof(TCHAR));
-        MyRegCloseKeys(4, myKeys);
-
-        MyRegCreateKeys(2, myKeynames4, myKeys);
-        _stprintf(myKeyValue, _T("\"%s\", 0"), szExename);
-        RegSetValueEx(myKeys[1], NULL, 0, REG_SZ, (BYTE *)myKeyValue, (_tcslen(myKeyValue) + 1) * sizeof(TCHAR));
-        MyRegCloseKeys(2, myKeys);
-    }
-    else
-    {
-        MyRegDeleteKeys(2, myKeynames4, myKeys);
-        MyRegDeleteKeys(4, myKeynames3, myKeys);
-        MyRegDeleteKeys(1, myKeynames2, myKeys);
-        MyRegDeleteKeys(1, myKeynames1, myKeys);
-    }
-
-    return;
-}
-
-// ---------------------------------------------------------------------------
-
 // Get the position of the client area of a window on the screen
 int GetClientScreenRect(HWND hWnd, RECT *pRect)
 {
-    POINT Corner = {0, 0};
-
     GetClientRect(hWnd, pRect);
-    ClientToScreen(hWnd, &Corner);
-
-    pRect->left += Corner.x;
-    pRect->right += Corner.x;
-    pRect->top += Corner.y;
-    pRect->bottom += Corner.y;
-
+	MapWindowRect(hWnd, NULL, pRect);
     return 0;
 }
 
@@ -232,7 +117,7 @@ int WndInMid(HWND hMid, HWND hBase)
     if (hBase && IsWindowVisible(hBase))
     {
         GetWindowRect(hBase, &BaseRect);
-        if (hBase == hScrnWnd)
+        if (hBase == hMainWnd)
         {
             // For the main window, center in the client area.
             BaseRect.left += GetSystemMetrics(SM_CXSIZEFRAME);

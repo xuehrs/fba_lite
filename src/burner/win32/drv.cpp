@@ -229,8 +229,8 @@ int DrvExit()
     {
         VidExit();
 
-        InvalidateRect(hScrnWnd, NULL, 1);
-        UpdateWindow(hScrnWnd);			// Blank screen window
+        InvalidateRect(hMainWnd, NULL, 1);
+        UpdateWindow(hMainWnd);			// Blank screen window
 
         DestroyWindow(hInpdDlg);		// Make sure the Input Dialog is exited
         DestroyWindow(hInpDIPSWDlg);	// Make sure the DipSwitch Dialog is exited

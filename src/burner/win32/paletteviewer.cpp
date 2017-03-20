@@ -97,7 +97,7 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
 
         EndDialog(hPaletteViewerDlg, 0);
 
-        EnableWindow(hScrnWnd, TRUE);
+        EnableWindow(hMainWnd, TRUE);
         DestroyWindow(hPaletteViewerDlg);
 
         if (bDrvOkay)

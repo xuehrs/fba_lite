@@ -50,7 +50,7 @@ static INT_PTR CALLBACK DefInpProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM)
 
 int NumDialCreate(int)
 {
-    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_VALUE), hScrnWnd, (DLGPROC)DefInpProc);
+    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_VALUE), hMainWnd, (DLGPROC)DefInpProc);
 
     return 1;
 }
@@ -72,7 +72,7 @@ static INT_PTR CALLBACK GammaProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM)	//
         nPrevGamma = nGamma;
         nExitStatus = 0;
 
-        WndInMid(hDlg, hScrnWnd);
+        WndInMid(hDlg, hMainWnd);
 
         // Initialise gamma slider
         SendDlgItemMessage(hDlg, IDC_GAMMA_SLIDER, TBM_SETRANGE, (WPARAM)0, (LPARAM)MAKELONG(1, 20000));
@@ -250,7 +250,7 @@ static INT_PTR CALLBACK GammaProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM)	//
 
 void GammaDialog()
 {
-    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_GAMMA), hScrnWnd, (DLGPROC)GammaProc);
+    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_GAMMA), hMainWnd, (DLGPROC)GammaProc);
 }
 
 // -----------------------------------------------------------------------------
@@ -268,7 +268,7 @@ static INT_PTR CALLBACK ScanlineProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM)
         nPrevIntensity = nVidScanIntensity;
         nExitStatus = 0;
 
-        WndInMid(hDlg, hScrnWnd);
+        WndInMid(hDlg, hMainWnd);
 
         // Initialise slider
         SendDlgItemMessage(hDlg, IDC_SCANLINE_SLIDER, TBM_SETRANGE, (WPARAM)0, (LPARAM)MAKELONG(0, 255));
@@ -416,7 +416,7 @@ static INT_PTR CALLBACK ScanlineProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM)
 
 void ScanlineDialog()
 {
-    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_SCANLINE), hScrnWnd, (DLGPROC)ScanlineProc);
+    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_SCANLINE), hMainWnd, (DLGPROC)ScanlineProc);
 }
 
 // -----------------------------------------------------------------------------
@@ -435,7 +435,7 @@ static INT_PTR CALLBACK PhosphorProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
         nPrevSaturation = nVidFeedbackOverSaturation;
         nExitStatus = 0;
 
-        WndInMid(hDlg, hScrnWnd);
+        WndInMid(hDlg, hMainWnd);
 
         // Initialise sliders
         SendDlgItemMessage(hDlg, IDC_PHOSPHOR_1_SLIDER, TBM_SETRANGE, (WPARAM)0, (LPARAM)MAKELONG(0, 255));
@@ -628,7 +628,7 @@ static INT_PTR CALLBACK PhosphorProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 
 void PhosphorDialog()
 {
-    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_PHOSPHOR), hScrnWnd, (DLGPROC)PhosphorProc);
+    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_PHOSPHOR), hMainWnd, (DLGPROC)PhosphorProc);
 }
 
 // -----------------------------------------------------------------------------
@@ -649,7 +649,7 @@ static INT_PTR CALLBACK ScreenAngleProc(HWND hDlg, UINT Msg, WPARAM wParam, LPAR
         hScreenAngleEdit = GetDlgItem(hDlg, IDC_SCREENANGLE_EDIT);
         nExitStatus = 0;
 
-        WndInMid(hDlg, hScrnWnd);
+        WndInMid(hDlg, hMainWnd);
 
         // Initialise sliders
         SendDlgItemMessage(hDlg, IDC_SCREENANGLE_SLIDER, TBM_SETRANGE, (WPARAM)0, (LPARAM)MAKELONG(0, 12000));
@@ -858,7 +858,7 @@ static INT_PTR CALLBACK ScreenAngleProc(HWND hDlg, UINT Msg, WPARAM wParam, LPAR
 
 void ScreenAngleDialog()
 {
-    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_SCREENANGLE), hScrnWnd, (DLGPROC)ScreenAngleProc);
+    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_SCREENANGLE), hMainWnd, (DLGPROC)ScreenAngleProc);
 }
 
 // -----------------------------------------------------------------------------
@@ -873,7 +873,7 @@ static INT_PTR CALLBACK CPUClockProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM)
         TCHAR szText[16];
         nExitStatus = 0;
 
-        WndInMid(hDlg, hScrnWnd);
+        WndInMid(hDlg, hMainWnd);
 
         // Initialise slider
         SendDlgItemMessage(hDlg, IDC_CPUCLOCK_SLIDER, TBM_SETRANGE, (WPARAM)0, (LPARAM)MAKELONG(0x80, 0x0200));
@@ -1022,7 +1022,7 @@ static INT_PTR CALLBACK CPUClockProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM)
 
 void CPUClockDialog()
 {
-    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_CPUCLOCK), hScrnWnd, (DLGPROC)CPUClockProc);
+    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_CPUCLOCK), hMainWnd, (DLGPROC)CPUClockProc);
 }
 
 // -----------------------------------------------------------------------------
@@ -1041,7 +1041,7 @@ static INT_PTR CALLBACK CubicProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM)	//
         dPrevC = dVidCubicC;
         nExitStatus = 0;
 
-        WndInMid(hDlg, hScrnWnd);
+        WndInMid(hDlg, hMainWnd);
 
         // Initialise slider
         SendDlgItemMessage(hDlg, IDC_SCANLINE_SLIDER, TBM_SETRANGE, (WPARAM)0, (LPARAM)MAKELONG(0, 10000));
@@ -1202,6 +1202,6 @@ static INT_PTR CALLBACK CubicProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM)	//
 
 void CubicSharpnessDialog()
 {
-    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_SCANLINE), hScrnWnd, (DLGPROC)CubicProc);
+    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_SCANLINE), hMainWnd, (DLGPROC)CubicProc);
 }
 

@@ -1077,7 +1077,7 @@ static int VidSInitChat(int /*nFlags*/)
     if (nVidFullscreen)
     {
         RECT rect;
-        GetClientScreenRect(hScrnWnd, &rect);
+        GetClientScreenRect(hMainWnd, &rect);
         ddsd.dwWidth = rect.right - rect.left;
     }
     else
@@ -1128,7 +1128,7 @@ static int VidSInitEdit(int nFlags)
     if (nVidFullscreen)
     {
         RECT rect;
-        GetClientScreenRect(hScrnWnd, &rect);
+        GetClientScreenRect(hMainWnd, &rect);
         ddsd.dwWidth = rect.right - rect.left;
     }
     else

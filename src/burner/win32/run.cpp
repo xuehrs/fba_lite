@@ -39,7 +39,7 @@ static void CheckSystemMacros() // These are the Pause / FFWD macros added to th
     {
         if (bHasFocus)
         {
-            PostMessage(hScrnWnd, WM_KEYDOWN, VK_PAUSE, 0);
+            PostMessage(hMainWnd, WM_KEYDOWN, VK_PAUSE, 0);
             prevPause_debounce = timeGetTime();
         }
     }
@@ -61,13 +61,13 @@ static void CheckSystemMacros() // These are the Pause / FFWD macros added to th
     // Load State
     if (macroSystemLoadState && macroSystemLoadState != prevLState)
     {
-        PostMessage(hScrnWnd, WM_KEYDOWN, VK_F9, 0);
+        PostMessage(hMainWnd, WM_KEYDOWN, VK_F9, 0);
     }
     prevLState = macroSystemLoadState;
     // Save State
     if (macroSystemSaveState && macroSystemSaveState != prevSState)
     {
-        PostMessage(hScrnWnd, WM_KEYDOWN, VK_F10, 0);
+        PostMessage(hMainWnd, WM_KEYDOWN, VK_F10, 0);
     }
     prevSState = macroSystemSaveState;
     // UNDO State
@@ -393,10 +393,10 @@ int RunMessageLoop()
 
         RunInit();
 
-        ShowWindow(hScrnWnd, nAppShowCmd);												// Show the screen window
+        ShowWindow(hMainWnd, nAppShowCmd);												// Show the screen window
         nAppShowCmd = SW_NORMAL;
 
-        SetForegroundWindow(hScrnWnd);
+        SetForegroundWindow(hMainWnd);
 
         GameInpCheckLeftAlt();
         GameInpCheckMouse();															// Hide the cursor
@@ -665,7 +665,7 @@ int RunMessageLoop()
                 // Check for messages for dialogs etc.
                 if (AppMessage(&Msg))
                 {
-                    if (TranslateAccelerator(hScrnWnd, hAccel, &Msg) == 0)
+                    if (TranslateAccelerator(hMainWnd, hAccel, &Msg) == 0)
                     {
                         if (hwndChat)
                         {

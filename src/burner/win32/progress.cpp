@@ -36,7 +36,7 @@ static int __cdecl ProgressUpdateBurn(double dProgress, const TCHAR *pszText, bo
     if (pszText)
     {
         SendDlgItemMessage(hProgressDlg, IDC_WAIT_LABEL_B2, WM_SETTEXT, 0, (LPARAM)pszText);
-        SetWindowText(hScrnWnd, pszText);
+        SetWindowText(hMainWnd, pszText);
     }
 
     if (bAbs)
@@ -77,7 +77,7 @@ int ProgressUpdateBurner(double dProgress, const TCHAR *pszText, bool bAbs)
     if (pszText)
     {
         SendDlgItemMessage(hProgressDlg, IDC_WAIT_LABEL_B2, WM_SETTEXT, 0, (LPARAM)pszText);
-        SetWindowText(hScrnWnd, pszText);
+        SetWindowText(hMainWnd, pszText);
     }
 
     if (bAbs)
@@ -124,7 +124,7 @@ static INT_PTR CALLBACK ProgressProc(HWND hDlg, UINT Msg, WPARAM /*wParam*/, LPA
         ShowWindow(GetDlgItem(hDlg, IDC_WAIT_LABEL_B1), TRUE);
         ShowWindow(GetDlgItem(hDlg, IDC_WAIT_LABEL_B2), TRUE);
 
-        WndInMid(hDlg, hScrnWnd);
+        WndInMid(hDlg, hMainWnd);
         SetForegroundWindow(hDlg);
         SetWindowPos(hDlg, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 

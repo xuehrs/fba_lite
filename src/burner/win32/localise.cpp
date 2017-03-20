@@ -1868,7 +1868,7 @@ static void MakeOfn()
 
     memset(&ofn, 0, sizeof(ofn));
     ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner = hScrnWnd;
+    ofn.hwndOwner = hMainWnd;
     ofn.lpstrFilter = szFilter;
     ofn.lpstrFile = szChoice;
     ofn.nMaxFile = sizeof(szChoice) / sizeof(TCHAR);

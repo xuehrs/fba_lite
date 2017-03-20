@@ -150,7 +150,7 @@ static INT_PTR CALLBACK AboutProc(HWND hDlg , UINT Msg, WPARAM wParam, LPARAM lP
 {
     if (Msg == WM_INITDIALOG)
     {
-        WndInMid(hDlg, hScrnWnd);
+        WndInMid(hDlg, hMainWnd);
         return TRUE;
     }
 
@@ -181,7 +181,7 @@ static INT_PTR CALLBACK AboutProc(HWND hDlg , UINT Msg, WPARAM wParam, LPARAM lP
         GetWindowRect(hDlg, &rect);
         MoveWindow(hDlg, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top + nSize, TRUE);
 
-        WndInMid(hDlg, hScrnWnd);
+        WndInMid(hDlg, hMainWnd);
         return 0;
     }
 
@@ -204,7 +204,7 @@ int AboutCreate()
 	hRiched = LoadLibrary(_T("RICHED20.DLL"));
     if (hRiched)
     {
-        FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_ABOUT), hScrnWnd, (DLGPROC)AboutProc);
+        FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_ABOUT), hMainWnd, (DLGPROC)AboutProc);
         FreeLibrary(hRiched);
         hRiched = NULL;
     }
@@ -313,7 +313,7 @@ int FirstUsageCreate()
 #endif
     if (hRiched)
     {
-        DialogBox(hAppInst, MAKEINTRESOURCE(IDD_FIRST), hScrnWnd, (DLGPROC)FirstProc);
+        DialogBox(hAppInst, MAKEINTRESOURCE(IDD_FIRST), hMainWnd, (DLGPROC)FirstProc);
         FreeLibrary(hRiched);
         hRiched = NULL;
     }

@@ -73,10 +73,7 @@ int ConfigAppLoad()
   if (szValue) x = NameToDriver(szValue); }
 
         VAR(nIniVersion);
-
-        // Emulation
-        VAR(bBurnUseASMCPUEmulation);
-
+		
         // Video
         VAR(nVidDepth);
         VAR(nVidRefresh);

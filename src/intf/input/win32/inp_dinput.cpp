@@ -302,7 +302,7 @@ int exit()
 
 int init()
 {
-    hDinpWnd = hScrnWnd;
+    hDinpWnd = hMainWnd;
 
     exit();
 

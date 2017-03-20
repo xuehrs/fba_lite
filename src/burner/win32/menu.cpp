@@ -33,7 +33,7 @@ void DisplayPopupMenu(int nMenu)
         EndMenu();
         if (nLastMenu != nMenu)
         {
-            PostMessage(hScrnWnd, UM_DISPLAYPOPUP, nMenu, 0);
+            PostMessage(hMainWnd, UM_DISPLAYPOPUP, nMenu, 0);
         }
     }
 }
@@ -126,20 +126,12 @@ int OnUnInitMenuPopup(HWND, HMENU, UINT, BOOL)
 
 int MenuCreate()
 {
-    TCHAR szButtonText[32];
-    MENUITEMINFO menuItemInfo;
-    MENUINFO menu;
-	
     if (hMenu == NULL)
     {
-    	hMenu = GetMenu(hScrnWnd);
-		printf("hMenu=%p\n", hMenu);
-        //hMenu = FBALoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU));					// Main application menu
+    	hMenu = GetMenu(hMainWnd);
         hBlitterMenu[0] = FBALoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_BLITTER_1));	// DirectDraw Standard blitter
         hBlitterMenu[1] = FBALoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_BLITTER_2));	// Direct3D
-        hBlitterMenu[2] = FBALoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_BLITTER_3));	// Software effects blitter
-        hBlitterMenu[3] = FBALoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_BLITTER_4));	// DirectX 9
-        hBlitterMenu[4] = FBALoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_BLITTER_5));	// DirectX 9 Alt
+        hBlitterMenu[2] = FBALoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_BLITTER_3));	// DirectX 9
 
         hAudioPluginMenu[0] = FBALoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_AUD_PLUGIN_1));
         hAudioPluginMenu[1] = FBALoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_AUD_PLUGIN_2));

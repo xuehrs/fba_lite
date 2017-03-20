@@ -325,7 +325,7 @@ static BOOL PASCAL MyEnumDisplayDrivers(GUID FAR *pGuid, LPSTR pszDesc, LPSTR /*
 
 static int vidInit()
 {
-    hVidWnd = hScrnWnd;//nVidFullscreen ? hScrnWnd : hVideoWindow;						// Use Screen window for video
+    hVidWnd = hMainWnd;//nVidFullscreen ? hMainWnd : hVideoWindow;						// Use Screen window for video
 
 #ifdef PRINT_DEBUG_INFO
     dprintf(_T("  * Enumerating available drivers:\n"));

@@ -9,9 +9,7 @@
 #if defined (BUILD_WIN32)
 extern struct VidOut VidOutDDraw;
 extern struct VidOut VidOutD3D;
-extern struct VidOut VidOutDDrawFX;
 extern struct VidOut VidOutDX9;
-extern struct VidOut VidOutDX9Alt;
 #elif defined (BUILD_SDL)
 extern struct VidOut VidOutSDLOpenGL;
 extern struct VidOut VidOutSDLFX;
@@ -26,9 +24,7 @@ static struct VidOut *pVidOut[] =
 #if defined (BUILD_WIN32)
     &VidOutDDraw,
     &VidOutD3D,
-    &VidOutDDrawFX,
     &VidOutDX9,
-    &VidOutDX9Alt,
 #elif defined (BUILD_SDL)
     &VidOutSDLOpenGL,
     &VidOutSDLFX,
@@ -154,7 +150,7 @@ INT32 VidInit()
         nVidActive = nVidSelect;
         if ((nRet = pVidOut[nVidActive]->Init()) == 0)
         {
-        	hVidWnd  = hScrnWnd;
+        	hVidWnd  = hMainWnd;
             nBurnBpp = nVidImageBPP;								// Set Burn library Bytes per pixel
 
             bVidOkay = true;

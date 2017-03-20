@@ -212,7 +212,7 @@ static int DxSoundInit()
     }
 
     // Set the coop level
-    nRet = pDS->SetCooperativeLevel(hScrnWnd, DSSCL_PRIORITY);
+    nRet = pDS->SetCooperativeLevel(hMainWnd, DSSCL_PRIORITY);
 
     // Make the primary sound buffer
     memset(&dsbd, 0, sizeof(dsbd));

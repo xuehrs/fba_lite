@@ -6,9 +6,8 @@
 
 #if !defined BUILD_X64_EXE
 
-// #include "vid_directx_support.h"
+#include "vid_directx_support.h"
 #include <InitGuid.h>
-#include "vid_softfx.h"
 
 // #define ENABLE_PROFILING FBA_DEBUG
 
@@ -314,10 +313,6 @@ static bool bUse3DProjection;
 
 static float fPreviousScreenAngle;
 static float fPreviousScreenCurvature;
-
-static int nPreScale = 0;
-static int nPreScaleZoom = 0;
-static int nPreScaleEffect = 0;
 
 static IDirectDraw7 *pDD = NULL;								// DirectDraw interface
 static IDirect3D7 *pD3D = NULL;									// Direct3D interface
@@ -713,8 +708,6 @@ static int vidExit()
         v3DScreen = NULL;
     }
 
-    VidSoftFXExit();
-
     ReleaseSurfaces();
 
     VidSRestoreGamma();
@@ -738,31 +731,6 @@ static int vidExit()
     return 0;
 }
 
-static HRESULT CALLBACK myEnumTexturesCallback(DDPIXELFORMAT *pddpf, void *pPreferredddpf)
-{
-    if (pddpf->dwFlags == DDPF_RGB && pddpf->dwRGBBitCount == 16)
-    {
-
-        if (VidSoftFXCheckDepth(nPreScaleEffect, 15) == 15)
-        {
-            // Use 15-bit format if supported by the 3D hardware and the effects blitter
-            if(pddpf->dwRBitMask == 0x7C00 && pddpf->dwGBitMask == 0x03E0 && pddpf->dwBBitMask == 0x001F)
-            {
-                memcpy(pPreferredddpf, pddpf, sizeof(DDPIXELFORMAT) );
-
-                return D3DENUMRET_CANCEL;
-            }
-        }
-
-        // Use 16-bit format otherwise
-        if(pddpf->dwRBitMask == 0xF800 && pddpf->dwGBitMask == 0x07E0 && pddpf->dwBBitMask == 0x001F)
-        {
-            memcpy(pPreferredddpf, pddpf, sizeof(DDPIXELFORMAT) );
-        }
-    }
-    return D3DENUMRET_OK;
-}
-
 static int vidCreateGameSurfaces()
 {
     bool bForceTextureFormat;
@@ -772,40 +740,6 @@ static int vidCreateGameSurfaces()
 
     // Determine if we should use a texture format different from the screen format
     bForceTextureFormat = false;
-    if ((VidSoftFXCheckDepth(nPreScaleEffect, 16) != 32 && nVidScrnDepth > 16 &&
-            (/*bDrvOkay &&*/ VidSoftFXCheckDepth(nPreScaleEffect, 32) != 32)) ||
-            (/*bDrvOkay &&*/ (bVidForce16bit ||
-                              (bDoGamma && nVidFullscreen && bVidUseHardwareGamma) ||
-                              (bDoGamma && !nVidFullscreen && bHardwareGammaOnly))))
-    {
-        memset(&ddpf, 0, sizeof(DDPIXELFORMAT));
-
-        pD3DDevice->EnumTextureFormats(&myEnumTexturesCallback, (void *)&ddpf);
-
-        if (ddpf.dwSize)
-        {
-            bForceTextureFormat = true; // NOTE: this makes emulation=16bpp
-        }
-    }
-    /*
-    	{ // debug code for the above if-statement *keep!* :)
-    		int ii;
-    		ii = VidSoftFXCheckDepth(nPreScaleEffect, 16) != 32 && nVidScrnDepth > 16;
-    		bprintf(0, _T("Part1 %d "), ii);
-    		ii = (bDrvOkay || VidSoftFXCheckDepth(nPreScaleEffect, 32) != 32);
-    		bprintf(0, _T("Part2 %d \n"), ii);
-    		ii = (bDoGamma && nVidFullscreen && bVidUseHardwareGamma);
-    		bprintf(0, _T("(bDoGamma && nVidFullscreen && bVidUseHardwareGamma) == [%d]\n"), ii);
-    		ii = (bDoGamma && !nVidFullscreen && bHardwareGammaOnly);
-    		bprintf(0, _T("(bDoGamma && !nVidFullscreen && bHardwareGammaOnly) == [%d]\n"), ii);
-    		bprintf(0, _T("nPreScaleEffect [%X]\n"), nPreScaleEffect);
-    		bprintf(0, _T("VidSoftFXCheckDepth(nPreScaleEffect, 16) [%d]\n"), VidSoftFXCheckDepth(nPreScaleEffect, 16));
-    		bprintf(0, _T("VidSoftFXCheckDepth(nPreScaleEffect, 32) [%d]\n"), VidSoftFXCheckDepth(nPreScaleEffect, 32));
-    		bprintf(0, _T("nVidScrnDepth [%X] bDrvOkay [%X]\n"), nVidScrnDepth, bDrvOkay);
-    		bprintf(0, _T("bVidForce16bit[%X] forcetexture[%X]\n"), bVidForce16bit, bForceTextureFormat);
-    		bprintf(0, _T("bDoGamma [%X] nVidFullscreen [%X] bVidUseHardwareGamma [%X] bHardwareGammaOnly [%X]\n"), bDoGamma, nVidFullscreen, bVidUseHardwareGamma, bHardwareGammaOnly);
-    	}
-    */
     // Create a secondary surface to render the game image onto for the feedback effect
     memset(&ddsd, 0, sizeof(ddsd));
     ddsd.dwSize = sizeof(ddsd);
@@ -813,8 +747,8 @@ static int vidCreateGameSurfaces()
 
     ddsd.ddsCaps.dwCaps = DDSCAPS_TEXTURE | DDSCAPS_3DDEVICE;
 
-    ddsd.dwWidth = (nPreScale & 1) ? nPreScaleTextureWidth : nTextureWidth;
-    ddsd.dwHeight = (nPreScale & 2) ? nPreScaleTextureHeight : nTextureHeight;
+    ddsd.dwWidth = nTextureWidth;
+    ddsd.dwHeight = nTextureHeight;
 
     memset(&ddsd.ddpfPixelFormat, 0, sizeof(DDPIXELFORMAT));
 
@@ -862,8 +796,8 @@ static int vidCreateGameSurfaces()
 
         ddsd.ddsCaps.dwCaps = DDSCAPS_TEXTURE;
 
-        ddsd.dwWidth = (nPreScale & 1) ? nPreScaleTextureWidth : nTextureWidth;
-        ddsd.dwHeight = (nPreScale & 2) ? nPreScaleTextureHeight : nTextureHeight;
+        ddsd.dwWidth = nTextureWidth;
+        ddsd.dwHeight = nTextureHeight;
 
         memset(&ddsd.ddpfPixelFormat, 0, sizeof(DDPIXELFORMAT));
 
@@ -883,8 +817,8 @@ static int vidCreateGameSurfaces()
 
         ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_3DDEVICE | DDSCAPS_VIDEOMEMORY;
 
-        ddsd.dwWidth = (nPreScale & 1) ? nPreScaleTextureWidth : nTextureWidth;
-        ddsd.dwHeight = (nPreScale & 2) ? nPreScaleTextureHeight : nTextureHeight;
+        ddsd.dwWidth = nTextureWidth;
+        ddsd.dwHeight = nTextureHeight;
 
         if (FAILED(pDD->CreateSurface(&ddsd, &pEmuImage[3], NULL)))
         {
@@ -908,12 +842,6 @@ static int vidCreateGameSurfaces()
 
         ddsd.dwWidth = nTextureWidth;
         ddsd.dwHeight = nTextureHeight;
-
-        if (nPreScaleEffect)
-        {
-            ddsd.dwWidth = nPreScaleTextureWidth;
-            ddsd.dwHeight = nPreScaleTextureHeight;
-        }
 
         if (bForceTextureFormat)
         {
@@ -947,12 +875,6 @@ static int vidCreateGameSurfaces()
 
     ddsd.dwWidth = nTextureWidth;
     ddsd.dwHeight = nTextureHeight;
-
-    if (nPreScaleEffect)
-    {
-        ddsd.dwWidth = nPreScaleTextureWidth;
-        ddsd.dwHeight = nPreScaleTextureHeight;
-    }
 
     if (bForceTextureFormat)
     {
@@ -1304,14 +1226,8 @@ static int vidAllocSurfaces()
 
     nTextureWidth = GetTextureSize(nGameImageWidth);
     nTextureHeight = GetTextureSize(nGameImageHeight);
-    nPreScaleTextureWidth = GetTextureSize(nGameImageWidth * nPreScaleZoom);
-    nPreScaleTextureHeight = GetTextureSize(nGameImageHeight * nPreScaleZoom);
-
-    // 2xSaI etc. needs an extra line below the image
-    if (nPreScaleEffect >= FILTER_SUPEREAGLE && nPreScaleEffect <= FILTER_SUPER_2XSAI && nGameImageHeight == nTextureHeight)
-    {
-        nTextureHeight <<= 1;
-    }
+    nPreScaleTextureWidth = GetTextureSize(nGameImageWidth);
+    nPreScaleTextureHeight = GetTextureSize(nGameImageHeight);
 
     if (d3dDeviceDesc.dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_SQUAREONLY)
     {
@@ -1345,17 +1261,6 @@ static int vidAllocSurfaces()
     }
 
     nVidImageDepth = VidSGetSurfaceDepth(pEmuImage[0]);		// Get colourdepth of game (texture) surface
-
-    for (int i = 0; i < 2; i++)
-    {
-        int nDepth[] = { 15, 16, 32 };
-        if (VidSoftFXCheckDepth(nPreScaleEffect, nDepth[i]) == nVidImageDepth)
-        {
-            nVidImageDepth = nDepth[i];
-            break;
-        }
-    }
-
     nVidImageBPP = (nVidImageDepth + 7) >> 3;
 
     VidSAllocVidImage();									// Set up memory buffer for Burn library
@@ -1551,7 +1456,7 @@ static int vidInit()
 
     bUseTriplebuffer = false;
 
-    hVidWnd = hScrnWnd;//nVidFullscreen ? hScrnWnd : hVideoWindow;								// Use Screen window for video
+    hVidWnd = hMainWnd;//nVidFullscreen ? hMainWnd : hVideoWindow;								// Use Screen window for video
 
     nWantDriver = 0;
 #if 1 && defined(PRINT_DEBUG_INFO)
@@ -1613,39 +1518,11 @@ static int vidInit()
         }
     }
 
-    nPreScale = 0;
-    nPreScaleZoom = 2;
-    nPreScaleEffect = 0;
-    if (nVidBlitterOpt[nVidSelect] & 0x01000000)
-    {
-        nPreScale = 3;
-
-        if (nVidBlitterOpt[nVidSelect] & 0x02000000)
-        {
-            nPreScaleEffect = (unsigned long long)(nVidBlitterOpt[nVidSelect] >> 32);
-            nPreScaleZoom = VidSoftFXGetZoom(nPreScaleEffect);
-        }
-        else
-        {
-            if (bVidScanlines)
-            {
-                nPreScale &= 2;
-            }
-        }
-    }
-
     // Set up the display mode
     if (nVidFullscreen)
     {
         int nZoomlevel;
-        if (nVidBlitterOpt[nVidSelect] & 0x04000000)
-        {
-            nZoomlevel = nPreScaleZoom;
-        }
-        else
-        {
-            nZoomlevel = nScreenSize;
-        }
+        nZoomlevel = nScreenSize;
         if (VidSEnterFullscreenMode(nZoomlevel, 0))
         {
             vidExit();
@@ -1852,12 +1729,6 @@ static int vidInit()
             }
         }
     }
-
-    if (bRotateEffects)
-    {
-        nPreScale = ((nPreScale >> 1) | (nPreScale << 1)) & 3;
-    }
-
     pD3DDevice = NULL;
 
 #ifdef USE_D3D_REFERENCE_DEVICE
@@ -1932,18 +1803,6 @@ static int vidInit()
         return 1;
     }
 
-    if (nPreScaleEffect)
-    {
-        if (VidSoftFXInit(nPreScaleEffect, 0))
-        {
-#ifdef PRINT_DEBUG_INFO
-            dprintf(_T("  * Error: Couldn't initialise software SoftFX.\n"));
-#endif
-            vidExit();
-            return 1;
-        }
-    }
-
     // Add a viewport
     Viewport.dwX = 0;
     Viewport.dwY = 0;
@@ -1975,20 +1834,6 @@ static int vidInit()
         int nHeight = nGameImageHeight;
         int nTexWidth = nTextureWidth;
         int nTexHeight = nTextureHeight;
-
-        if (nPreScaleEffect)
-        {
-            if (nPreScale & 1)
-            {
-                nWidth *= nPreScaleZoom;
-                nTexWidth = nPreScaleTextureWidth;
-            }
-            if (nPreScale & 2)
-            {
-                nHeight *= nPreScaleZoom;
-                nTexHeight = nPreScaleTextureHeight;
-            }
-        }
 
         if (nRotateGame & 1)
         {
@@ -2033,16 +1878,6 @@ static int vidInit()
     {
         int nWidth = nGameImageWidth;
         int nHeight = nGameImageHeight;
-
-        if (nPreScale & 1)
-        {
-            nWidth *= nPreScaleZoom;
-        }
-        if (nPreScale & 2)
-        {
-            nHeight *= nPreScaleZoom;
-        }
-
         vFeedbackImage[nRotateGame & 2 ? 3 : 0] = D3DTLVERTEX(D3DVECTOR(-0.5, -0.5, 2.0f), 1, 0, 0, 0, 0);
         vFeedbackImage[nRotateGame & 2 ? 2 : 1] = D3DTLVERTEX(D3DVECTOR(-0.5 + nWidth, -0.5, 2.0f), 1, 0, 0, float(nGameImageWidth) / nTextureWidth, 0);
         vFeedbackImage[nRotateGame & 2 ? 1 : 2] = D3DTLVERTEX(D3DVECTOR(-0.5, -0.5 + nHeight, 2.0f), 1, 0, 0, 0, float(nGameImageHeight) / nTextureHeight);
@@ -2125,11 +1960,6 @@ static int vidInit()
 // Scale the image to fit the screen/window
 static int vidScale(RECT *pRect, int nWidth, int nHeight)
 {
-    if ((nVidBlitterOpt[nVidSelect] & 0x07000000) == 0x07000000)
-    {
-        return VidSoftFXScale(pRect, nWidth, nHeight);
-    }
-
     return VidSScaleImage(pRect, nWidth, nHeight, bVidScanRotate);
 }
 
@@ -2244,7 +2074,7 @@ static int vidRenderImageB()
         return 1;
     }
 
-    if ((bDrvOkay && bVidScanDelay) || (nPreScale && nPreScaleEffect == 0))
+    if ((bDrvOkay && bVidScanDelay))
     {
 
         if (FAILED(pD3DDevice->BeginScene()))
@@ -2265,16 +2095,6 @@ static int vidRenderImageB()
         Viewport.dwY = 0;
         Viewport.dwWidth = nGameImageWidth;
         Viewport.dwHeight = nGameImageHeight;
-
-        if (nPreScale & 1)
-        {
-            Viewport.dwWidth *= nPreScaleZoom;
-        }
-
-        if (nPreScale & 2)
-        {
-            Viewport.dwHeight *= nPreScaleZoom;
-        }
 
         pD3DDevice->SetViewport(&Viewport);
 
@@ -2329,16 +2149,6 @@ static int vidRenderImageB()
         if (!bRenderToTexture)
         {
             RECT rect = {0, 0, nGameImageWidth, nGameImageHeight};
-
-            if (nPreScale & 1)
-            {
-                rect.right = nPreScaleTextureWidth;
-            }
-            if (nPreScale & 2)
-            {
-                rect.bottom = nPreScaleTextureHeight;
-            }
-
             pEmuImage[1]->BltFast(0, 0, pEmuImage[3], &rect, DDBLTFAST_WAIT);
         }
 
@@ -2638,15 +2448,6 @@ static int vidBurnToSurf()
 
     if (nVidTransferMethod <= 0)
     {
-        if (nPreScaleEffect)
-        {
-
-            rect.right *= nPreScaleZoom;
-            rect.bottom *= nPreScaleZoom;
-
-            VidSoftFXApplyEffectDirectX(pEmuImage[2], NULL);
-        }
-        else
         {
             // Copy the image to a surface (located in video memory), then use bltfast() to blit it to the texture
             if (FAILED(pEmuImage[2]->Lock(NULL, &ddsd, DDLOCK_SURFACEMEMORYPTR | DDLOCK_WAIT, NULL)))
@@ -2669,15 +2470,6 @@ static int vidBurnToSurf()
     }
     else
     {
-        if (nPreScaleEffect)
-        {
-
-            rect.right *= nPreScaleZoom;
-            rect.bottom *= nPreScaleZoom;
-
-            VidSoftFXApplyEffectDirectX(pEmuImage[0], &rect);
-        }
-        else
         {
             // Use the surface supplied by DirectX texture management and let it perform the blit
             if (FAILED(pEmuImage[0]->Lock(&rect, &ddsd, DDLOCK_SURFACEMEMORYPTR | DDLOCK_WRITEONLY | DDLOCK_DISCARDCONTENTS | DDLOCK_WAIT, NULL)))
@@ -2965,21 +2757,6 @@ static int vidGetSettings(InterfaceInfo *pInfo)
         IntInfoAddStringModule(pInfo, _T("Using Blt() to transfer the image"));
     }
 
-    if (nPreScale)
-    {
-        TCHAR szString[MAX_PATH] = _T("");
-
-        if (nPreScaleEffect)
-        {
-            _sntprintf(szString, MAX_PATH, _T("Prescaling using %s (%ix zoom)"), VidSoftFXGetEffect(nPreScaleEffect), nPreScaleZoom);
-        }
-        else
-        {
-            _sntprintf(szString, MAX_PATH, _T("Prescaling using 3D hardware (%ix zoom)"), nPreScaleZoom);
-        }
-        IntInfoAddStringModule(pInfo, szString);
-    }
-
     if (bUse3DProjection || bUseRGBEffects || bVidScanDelay || bVidScanlines)
     {
         TCHAR *pszEffect[8] = { _T(""), _T(""), _T(""), _T(""), _T(""), _T(""), _T(""), _T("") };
@@ -3024,7 +2801,7 @@ static int vidGetSettings(InterfaceInfo *pInfo)
     {
         TCHAR szString[MAX_PATH] = _T("");
 
-        _sntprintf(szString, MAX_PATH, _T("Using Direct3D texture management"), VidSoftFXGetEffect(nPreScaleEffect), nPreScaleZoom);
+        _sntprintf(szString, MAX_PATH, _T("Using Direct3D texture management"));
         IntInfoAddStringModule(pInfo, szString);
     }
 

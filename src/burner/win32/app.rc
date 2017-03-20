@@ -479,7 +479,7 @@ BEGIN
         	MENUITEM "弹出\tF7",				MENU_MEMCARD_EJECT
         END
         MENUITEM SEPARATOR
-        POPUP "游戏进度"
+        POPUP "游戏存档"
         BEGIN
 	        MENUITEM "读取存档...\tCtrl+F9",				MENU_STATE_LOAD_DIALOG, GRAYED
         	MENUITEM "保存存档...\tCtrl+F10",				MENU_STATE_SAVE_DIALOG, GRAYED
@@ -498,15 +498,13 @@ BEGIN
     END
     POPUP "视频"
     BEGIN
-        POPUP "渲染器"
+        POPUP "选择插件"
         BEGIN
-            MENUITEM "Basic\t(DirectDraw 7)",				MENU_BLITTER_1
-            MENUITEM "SoftFX\t(DirectDraw 7)",				MENU_BLITTER_3
-            MENUITEM "Enhanced\t(Direct3D 7)",				MENU_BLITTER_2
-            MENUITEM "Experimental\t(DirectX 9)",	MENU_BLITTER_4
-			MENUITEM "DirectX9 Alt\t(DirectX 9)",	MENU_BLITTER_5
+            MENUITEM "DirectDraw 7",				MENU_BLITTER_1
+            MENUITEM "Direct3D 7",				MENU_BLITTER_2
+            MENUITEM "DirectX 9",			MENU_BLITTER_3
         END
-        MENUITEM "渲染选项",					MENU_BLITTEROPTIONS, GRAYED
+        MENUITEM "插件选项",					MENU_BLITTEROPTIONS, GRAYED
         POPUP "缩放方式"
         BEGIN
             MENUITEM "原始大小",				MENU_NOSTRETCH
@@ -649,7 +647,7 @@ BEGIN
            MENUITEM "总是响应键盘输入",			MENU_PROCESSINPUT, GRAYED
            MENUITEM "显示提示信息",				MENU_DISPLAYINDICATOR
 		END
-		POPUP "程序优先级"
+		POPUP "优先级"
            BEGIN
               MENUITEM "实时",					MENU_PRIORITY_REALTIME
               MENUITEM "高",					MENU_PRIORITY_HIGH
@@ -730,49 +728,6 @@ BEGIN
                 MENUITEM "Enable &bi-linear filtering",                 MENU_BILINEAR
                 MENUITEM "&Rotate scanlines and RGB effects",           MENU_ENHANCED_ROTSCAN
                 MENUITEM SEPARATOR
-                MENUITEM "Enable &Pre-scale",                           MENU_PRESCALE
-                MENUITEM "Pre-scale using Soft&FX",                     MENU_SOFTFX
-                POPUP "SoftFX algorithm"
-                BEGIN
-                        MENUITEM "Double pixels (3D hardware)",         MENU_ENHANCED_SOFT_STRETCH
-						MENUITEM "AdvanceMAME Scale2x",			MENU_ENHANCED_SOFT_SCALE2X
-						MENUITEM "AdvanceMAME Scale3x",			MENU_ENHANCED_SOFT_SCALE3X
-						MENUITEM "2xPM LQ",				MENU_ENHANCED_SOFT_2XPM_LQ
-						MENUITEM "2xPM HQ",				MENU_ENHANCED_SOFT_2XPM_HQ
-						MENUITEM "Eagle Graphics",			MENU_ENHANCED_SOFT_EAGLE
-						MENUITEM "Super Eagle",				MENU_ENHANCED_SOFT_SUPEREAGLE
-						MENUITEM "2xSaI",				MENU_ENHANCED_SOFT_2XSAI
-						MENUITEM "Super 2xSaI",				MENU_ENHANCED_SOFT_SUPER2XSAI
-						MENUITEM "Super Eagle (VBA)",			MENU_ENHANCED_SOFT_SUPEREAGLE_VBA
-						MENUITEM "2xSaI (VBA)",				MENU_ENHANCED_SOFT_2XSAI_VBA
-						MENUITEM "Super 2xSaI (VBA)",			MENU_ENHANCED_SOFT_SUPER2XSAI_VBA
-						MENUITEM "SuperScale",				MENU_ENHANCED_SOFT_SUPERSCALE
-						MENUITEM "SuperScale (75% Scanlines)",		MENU_ENHANCED_SOFT_SUPERSCALE75
-						MENUITEM "hq2x Filter",				MENU_ENHANCED_SOFT_HQ2X
-						MENUITEM "hq3x Filter",				MENU_ENHANCED_SOFT_HQ3X
-						MENUITEM "hq4x Filter",				MENU_ENHANCED_SOFT_HQ4X
-						MENUITEM "hq2xS (VBA) Filter",			MENU_ENHANCED_SOFT_HQ2XS_VBA
-						MENUITEM "hq3xS (VBA) Filter",			MENU_ENHANCED_SOFT_HQ3XS_VBA, GRAYED
-						MENUITEM "hq2xS (SNES9X) Filter",		MENU_ENHANCED_SOFT_HQ2XS_SNES9X
-						MENUITEM "hq3xS (SNEX9X) Filter",		MENU_ENHANCED_SOFT_HQ3XS_SNES9X
-						MENUITEM "hq2xBold Filter",			MENU_ENHANCED_SOFT_HQ2XBOLD
-						MENUITEM "hq3xBold Filter",			MENU_ENHANCED_SOFT_HQ3XBOLD
-						MENUITEM "EPXB Filter",				MENU_ENHANCED_SOFT_EPXB
-						MENUITEM "EPXC Filter",				MENU_ENHANCED_SOFT_EPXC
-						MENUITEM "2xBR Squared",						MENU_ENHANCED_SOFT_2XBR_A
-						MENUITEM "2xBR Semi-Rounded",					MENU_ENHANCED_SOFT_2XBR_B
-						MENUITEM "2xBR Rounded",						MENU_ENHANCED_SOFT_2XBR_C
-						MENUITEM "3xBR Squared",						MENU_ENHANCED_SOFT_3XBR_A
-						MENUITEM "3xBR Semi-Rounded",					MENU_ENHANCED_SOFT_3XBR_B
-						MENUITEM "3xBR Rounded",						MENU_ENHANCED_SOFT_3XBR_C
-						MENUITEM "4xBR Squared",						MENU_ENHANCED_SOFT_4XBR_A
-						MENUITEM "4xBR Semi-Rounded",					MENU_ENHANCED_SOFT_4XBR_B
-						MENUITEM "4xBR Rounded",						MENU_ENHANCED_SOFT_4XBR_C
-						MENUITEM "DDT3x",	        					MENU_ENHANCED_SOFT_DDT3X
-                        MENUITEM SEPARATOR
-                        MENUITEM "Force image to SoftFX size",          MENU_ENHANCED_SOFT_AUTOSIZE
-                END
-                MENUITEM SEPARATOR
                 MENUITEM "Enable &Scanlines",                           MENU_ENHANCED_SCAN
                 MENUITEM "Set scanline &intensity...",                  MENU_ENHANCED_SCANINTENSITY
                 MENUITEM SEPARATOR
@@ -809,57 +764,6 @@ BEGIN
 END
 
 IDR_MENU_BLITTER_3 MENU
-BEGIN
-        POPUP "SoftFX\t(DirectDraw 7)"
-        BEGIN
-                MENUITEM "&Double pixels (Software)",                   MENU_SOFTFX_SOFT_STRETCH
-                MENUITEM "AdvanceMAME Scale2x\t(16/32-bit only)",       MENU_SOFTFX_SOFT_SCALE2X
-                MENUITEM "AdvanceMAME Scale3x\t(16/32-bit only)",       MENU_SOFTFX_SOFT_SCALE3X
-				MENUITEM "2xPM LQ\t(15/16-bit only)",					MENU_SOFTFX_SOFT_2XPM_LQ
-				MENUITEM "2xPM HQ\t(15/16-bit only)",					MENU_SOFTFX_SOFT_2XPM_HQ
-                MENUITEM "Eagle Graphics\t(16-bit only)",               MENU_SOFTFX_SOFT_EAGLE
-                MENUITEM "Super Eagle\t(15/16-bit only)",               MENU_SOFTFX_SOFT_SUPEREAGLE
-                MENUITEM "2xSaI\t(15/16-bit only)",                     MENU_SOFTFX_SOFT_2XSAI
-                MENUITEM "Super 2xSaI\t(15/16-bit only)",	       		MENU_SOFTFX_SOFT_SUPER2XSAI
-                MENUITEM "Super Eagle (VBA)\t(15/16/32-bit only)",      MENU_SOFTFX_SOFT_SUPEREAGLE_VBA
-                MENUITEM "2xSaI (VBA)\t(15/16/32-bit only)",            MENU_SOFTFX_SOFT_2XSAI_VBA
-                MENUITEM "Super 2xSaI (VBA)\t(15/16/32-bit only)",      MENU_SOFTFX_SOFT_SUPER2XSAI_VBA
-                MENUITEM "SuperScale\t(15/16-bit only)",				MENU_SOFTFX_SOFT_SUPERSCALE
-                MENUITEM "SuperScale (75% Scanlines)\t(15/16-bit only)",MENU_SOFTFX_SOFT_SUPERSCALE75
-                MENUITEM "hq2x filter\t(32-bit only)",                  MENU_SOFTFX_SOFT_HQ2X
-                MENUITEM "hq3x filter\t(32-bit only)",                  MENU_SOFTFX_SOFT_HQ3X
-                MENUITEM "hq4x filter\t(32-bit only)",                  MENU_SOFTFX_SOFT_HQ4X
-                MENUITEM "hq2xS (VBA) filter\t(16/32-bit only)",        MENU_SOFTFX_SOFT_HQ2XS_VBA
-                MENUITEM "hq3xS (VBA) filter\t(16/32-bit only)",        MENU_SOFTFX_SOFT_HQ3XS_VBA, GRAYED
-                MENUITEM "hq2xS (SNES9X) Filter\t(16-bit only)",		MENU_SOFTFX_SOFT_HQ2XS_SNES9X
-				MENUITEM "hq3xS (SNEX9X) Filter\t(16-bit only)",		MENU_SOFTFX_SOFT_HQ3XS_SNES9X
-				MENUITEM "hq2xBold Filter\t(16-bit only)",				MENU_SOFTFX_SOFT_HQ2XBOLD
-				MENUITEM "hq3xBold Filter\t(16-bit only)",				MENU_SOFTFX_SOFT_HQ3XBOLD
-				MENUITEM "EPXB Filter\t(16-bit only)",					MENU_SOFTFX_SOFT_EPXB
-				MENUITEM "EPXC Filter\t(16-bit only)",					MENU_SOFTFX_SOFT_EPXC
-				MENUITEM "2xBR Squared\t(16-bit only)",					MENU_SOFTFX_SOFT_2XBR_A
-				MENUITEM "2xBR Semi-Rounded\t(16-bit only)",			MENU_SOFTFX_SOFT_2XBR_B
-				MENUITEM "2xBR Rounded\t(16-bit only)",					MENU_SOFTFX_SOFT_2XBR_C
-				MENUITEM "3xBR Squared\t(16-bit only)",					MENU_SOFTFX_SOFT_3XBR_A
-				MENUITEM "3xBR Semi-Rounded\t(16-bit only)",			MENU_SOFTFX_SOFT_3XBR_B
-				MENUITEM "3xBR Rounded\t(16-bit only)",					MENU_SOFTFX_SOFT_3XBR_C
-				MENUITEM "4xBR Squared\t(16-bit only)",					MENU_SOFTFX_SOFT_4XBR_A
-				MENUITEM "4xBR Semi-Rounded\t(16-bit only)",			MENU_SOFTFX_SOFT_4XBR_B
-				MENUITEM "4xBR Rounded\t(16-bit only)",					MENU_SOFTFX_SOFT_4XBR_C
-				MENUITEM "DDT3x\t(16-bit only)",            	        MENU_SOFTFX_SOFT_DDT3X
-                MENUITEM SEPARATOR
-                MENUITEM "&Force image to SoftFX size",                 MENU_SOFTFX_SOFT_AUTOSIZE
-                POPUP "Buffering &method"
-                BEGIN
-                        MENUITEM "&Autodetect",                         MENU_SOFTFX_MEMAUTO
-                        MENUITEM "&Video memory",                       MENU_SOFTFX_VIDEOMEM
-                        MENUITEM "&System memory",                      MENU_SOFTFX_SYSMEM
-                        MENUITEM SEPARATOR
-                        MENUITEM "Directly access video memory",        MENU_SOFT_DIRECTACCESS
-                END
-        END
-END
-IDR_MENU_BLITTER_4 MENU
 BEGIN
         POPUP "Experimental\t(DirectX Graphics 9)"
         BEGIN
@@ -902,61 +806,6 @@ BEGIN
         END
 END
 
-IDR_MENU_BLITTER_5 MENU
-BEGIN
-	POPUP "DirectX9 Alt\t(DirectX 9)"
-	BEGIN
-		MENUITEM "Point filtering",                             MENU_DX9_ALT_POINT
-		MENUITEM "Linear filtering",                            MENU_DX9_ALT_LINEAR
-		MENUITEM SEPARATOR
-		POPUP "SoftFX algorithm"
-		BEGIN
-			MENUITEM "Double pixels (3D hardware)",				MENU_DX9_ALT_SOFT_STRETCH
-			MENUITEM "AdvanceMAME Scale2x",						MENU_DX9_ALT_SOFT_SCALE2X
-			MENUITEM "AdvanceMAME Scale3x",						MENU_DX9_ALT_SOFT_SCALE3X
-			MENUITEM "2xPM LQ",									MENU_DX9_ALT_SOFT_2XPM_LQ
-			MENUITEM "2xPM HQ",									MENU_DX9_ALT_SOFT_2XPM_HQ
-			MENUITEM "Eagle Graphics",							MENU_DX9_ALT_SOFT_EAGLE
-			MENUITEM "Super Eagle",								MENU_DX9_ALT_SOFT_SUPEREAGLE
-			MENUITEM "2xSaI",									MENU_DX9_ALT_SOFT_2XSAI
-			MENUITEM "Super 2xSaI",								MENU_DX9_ALT_SOFT_SUPER2XSAI
-			MENUITEM "Super Eagle (VBA)",						MENU_DX9_ALT_SOFT_SUPEREAGLE_VBA
-			MENUITEM "2xSaI (VBA)",								MENU_DX9_ALT_SOFT_2XSAI_VBA
-			MENUITEM "Super 2xSaI (VBA)",						MENU_DX9_ALT_SOFT_SUPER2XSAI_VBA
-			MENUITEM "SuperScale",								MENU_DX9_ALT_SOFT_SUPERSCALE
-			MENUITEM "SuperScale (75% Scanlines)",				MENU_DX9_ALT_SOFT_SUPERSCALE75
-			MENUITEM "hq2x Filter",								MENU_DX9_ALT_SOFT_HQ2X
-			MENUITEM "hq3x Filter",								MENU_DX9_ALT_SOFT_HQ3X
-			MENUITEM "hq4x Filter",								MENU_DX9_ALT_SOFT_HQ4X
-			MENUITEM "hq2xS (VBA) Filter",						MENU_DX9_ALT_SOFT_HQ2XS_VBA
-			MENUITEM "hq3xS (VBA) Filter",						MENU_DX9_ALT_SOFT_HQ3XS_VBA, GRAYED
-			MENUITEM "hq2xS (SNES9X) Filter",					MENU_DX9_ALT_SOFT_HQ2XS_SNES9X
-			MENUITEM "hq3xS (SNEX9X) Filter",					MENU_DX9_ALT_SOFT_HQ3XS_SNES9X
-			MENUITEM "hq2xBold Filter",							MENU_DX9_ALT_SOFT_HQ2XBOLD
-			MENUITEM "hq3xBold Filter",							MENU_DX9_ALT_SOFT_HQ3XBOLD
-			MENUITEM "EPXB Filter",								MENU_DX9_ALT_SOFT_EPXB
-			MENUITEM "EPXC Filter",								MENU_DX9_ALT_SOFT_EPXC
-			MENUITEM "2xBR Squared",							MENU_DX9_ALT_SOFT_2XBR_A
-			MENUITEM "2xBR Semi-Rounded",						MENU_DX9_ALT_SOFT_2XBR_B
-			MENUITEM "2xBR Rounded",							MENU_DX9_ALT_SOFT_2XBR_C
-			MENUITEM "3xBR Squared",							MENU_DX9_ALT_SOFT_3XBR_A
-			MENUITEM "3xBR Semi-Rounded",						MENU_DX9_ALT_SOFT_3XBR_B
-			MENUITEM "3xBR Rounded",							MENU_DX9_ALT_SOFT_3XBR_C
-			MENUITEM "4xBR Squared",							MENU_DX9_ALT_SOFT_4XBR_A
-			MENUITEM "4xBR Semi-Rounded",						MENU_DX9_ALT_SOFT_4XBR_B
-			MENUITEM "4xBR Rounded",							MENU_DX9_ALT_SOFT_4XBR_C
-			MENUITEM "DDT3x",	        					    MENU_DX9_ALT_SOFT_DDT3X
-			MENUITEM SEPARATOR
-			MENUITEM "Force image to SoftFX size",          	MENU_DX9_ALT_SOFT_AUTOSIZE
-        END
-		MENUITEM SEPARATOR
-		POPUP "Advanced settings"
-		BEGIN
-			MENUITEM "Hardware vertex processing",              MENU_DX9_ALT_HARDWAREVERTEX
-			MENUITEM "Motion blur",                             MENU_DX9_ALT_MOTIONBLUR
-		END
-	END
-END
 
 IDR_MENU_AUD_PLUGIN_1 MENU
 BEGIN
@@ -1009,8 +858,6 @@ BEGIN
     VK_F5,	MENU_DIPSW,		CONTROL, VIRTKEY, NOINVERT
     VK_F5,	MENU_PALETTEVIEWER,	CONTROL, SHIFT, VIRTKEY, NOINVERT
     VK_F6,	MENU_LOAD,		VIRTKEY, NOINVERT
-    VK_F6,	MENU_START_NEOGEO_MVS,		CONTROL, VIRTKEY, NOINVERT
-	VK_F6,	MENU_START_NEOGEO_CD,		CONTROL, SHIFT, VIRTKEY, NOINVERT
     VK_F7,	MENU_MEMCARD_TOGGLE,	VIRTKEY, NOINVERT
     VK_F7,	MENU_MEMCARD_CREATE,	CONTROL, SHIFT, VIRTKEY, NOINVERT
     VK_F7,	MENU_MEMCARD_SELECT,	CONTROL, VIRTKEY, NOINVERT
@@ -1022,9 +869,6 @@ BEGIN
     VK_F10,	MENU_STATE_SAVE_SLOT,	VIRTKEY, NOINVERT
     VK_F10,	MENU_STATE_SAVE_DIALOG,	CONTROL, VIRTKEY, NOINVERT
     VK_F11,	MENU_STATE_NEXTSLOT,	VIRTKEY, NOINVERT
-    VK_F12,	MENU_SAVESNAP,		VIRTKEY, NOINVERT
-    VK_F12,	MENU_SNAPFACT,		CONTROL, VIRTKEY, NOINVERT
-	VK_F12,	MENU_CDIMAGE,		CONTROL, SHIFT, VIRTKEY, NOINVERT
     VK_PAUSE,	MENU_PAUSE,		VIRTKEY, NOINVERT
     VK_RETURN,	MENU_FULL,		ALT, VIRTKEY, NOINVERT
     VK_HOME,    MENU_CHEATSEARCH_START, CONTROL, VIRTKEY, NOINVERT

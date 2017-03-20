@@ -1103,7 +1103,7 @@ static INT_PTR CALLBACK SysInfoProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM l
         SendDlgItemMessage(hDlg, IDC_SYSINFO_EDIT, EM_SETMARGINS, (WPARAM)EC_LEFTMARGIN, (LPARAM)3);
         SendDlgItemMessage(hDlg, IDC_SYSINFO_EDIT, WM_SETTEXT, (WPARAM)0, (LPARAM)pszTextBuffer);
 
-        WndInMid(hDlg, hScrnWnd);
+        WndInMid(hDlg, hMainWnd);
 
         return TRUE;
     }
@@ -1170,7 +1170,7 @@ static INT_PTR CALLBACK SysInfoProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM l
                 GetWindowRect(hDlg, &rect);
                 MoveWindow(hDlg, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top + nSize, TRUE);
 
-                WndInMid(hDlg, hScrnWnd);
+                WndInMid(hDlg, hMainWnd);
             }
             if (LOWORD(wParam) == IDC_SYSINFO_LOG_SAVE)
             {
@@ -1256,7 +1256,7 @@ LONG CALLBACK ExceptionFilter(_EXCEPTION_POINTERS *pExceptionInfo)
     {
         if (nRecursion <= 2)
         {
-            MessageBox(hScrnWnd, _T(APP_TITLE) _T(" will now be terminated."), _T(APP_TITLE) _T(" Fatal exception"), MB_OK | MB_SETFOREGROUND);
+            MessageBox(hMainWnd, _T(APP_TITLE) _T(" will now be terminated."), _T(APP_TITLE) _T(" Fatal exception"), MB_OK | MB_SETFOREGROUND);
             AppCleanup();
         }
 #ifdef _DEBUG
@@ -1270,7 +1270,7 @@ LONG CALLBACK ExceptionFilter(_EXCEPTION_POINTERS *pExceptionInfo)
 
     pExceptionPointers = pExceptionInfo;
 
-    nRet = FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_EXCEPTION), hScrnWnd, (DLGPROC)SysInfoProc);
+    nRet = FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_EXCEPTION), hMainWnd, (DLGPROC)SysInfoProc);
 
     switch (nRet)
     {
@@ -1286,7 +1286,7 @@ int SystemInfoCreate()
 {
     pExceptionPointers = NULL;
 
-    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_SYSINFO), hScrnWnd, (DLGPROC)SysInfoProc);
+    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_SYSINFO), hMainWnd, (DLGPROC)SysInfoProc);
 
     return 0;
 }
