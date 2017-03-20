@@ -2293,7 +2293,7 @@ static void OnSize(HWND, UINT state, int cx, int cy)
 
         if (bSizeChanged)
         {
-            RefreshWindow(false);//true);
+            RefreshWindow(true);
         }
         else
         {
