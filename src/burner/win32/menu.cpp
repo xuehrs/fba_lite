@@ -19,7 +19,7 @@ static int nCurrentItem;
 static int nCurrentItemFlags;
 
 int nMenuHeight = 0;
-int nWindowSize = 1;
+int nWindowSize = 0;
 int nScreenSize = 0;
 int nScreenSizeHor = 0;
 int nScreenSizeVer = 0;
@@ -126,7 +126,7 @@ int OnUnInitMenuPopup(HWND, HMENU, UINT, BOOL)
 
 int MenuCreate()
 {
-    if (hMenu == NULL)
+	if (hMenu == NULL)
     {
     	hMenu = GetMenu(hMainWnd);
         hBlitterMenu[0] = FBALoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_BLITTER_1));	// DirectDraw Standard blitter
@@ -136,6 +136,14 @@ int MenuCreate()
         hAudioPluginMenu[0] = FBALoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_AUD_PLUGIN_1));
         hAudioPluginMenu[1] = FBALoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_AUD_PLUGIN_2));
     }
+	
+	if (nVidFullscreen)
+	{
+		SetMenu(hMainWnd,NULL);
+		return 0;
+	}
+	
+    SetMenu(hMainWnd,hMenu);
     MenuEnableItems();
     MenuUpdate();
 
@@ -379,12 +387,6 @@ void MenuUpdate()
         CheckMenuItem(hMenu, MENU_RES_ARCADE, bVidArcaderes ? MF_CHECKED : MF_UNCHECKED);
         break;
     case 2:
-        var = (nVidBlitterOpt[nVidSelect] & 0xFF) + MENU_SOFTFX_SOFT_STRETCH;
-        CheckMenuRadioItem(hMenu, MENU_SOFTFX_SOFT_STRETCH, MENU_SOFTFX_SOFT_STRETCH + 34, var, MF_BYCOMMAND);
-        CheckMenuItem(hMenu, MENU_SOFTFX_SOFT_AUTOSIZE, (nVidBlitterOpt[nVidSelect] & 0x0100) ? MF_CHECKED : MF_UNCHECKED);
-        CheckMenuItem(hMenu, MENU_SOFT_DIRECTACCESS, !(nVidBlitterOpt[nVidSelect] & 0x0200) ? MF_CHECKED : MF_UNCHECKED);
-        break;
-    case 3:
         var = ((nVidBlitterOpt[nVidSelect] >> 24) & 0x03) + MENU_DX9_POINT;
         CheckMenuRadioItem(hMenu, MENU_DX9_POINT, MENU_DX9_POINT + 2, var, MF_BYCOMMAND);
         CheckMenuItem(hMenu, MENU_EXP_SCAN, bVidScanlines ? MF_CHECKED : MF_UNCHECKED);
@@ -599,9 +601,9 @@ void MenuUpdate()
     }
     CheckMenuRadioItem(hMenu, MENU_SOFTFX_MEMAUTO, MENU_SOFTFX_SYSMEM, var, MF_BYCOMMAND);
 
-    if (nWindowSize <= 4)
+    if (nWindowSize < 4)
     {
-        var = MENU_AUTOSIZE + nWindowSize;
+        var = MENU_SINGLESIZEWINDOW + nWindowSize;
     }
     else
     {

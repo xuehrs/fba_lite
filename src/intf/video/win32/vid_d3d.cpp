@@ -2284,7 +2284,6 @@ static int vidRenderImageB()
 
     if (bMultiTexturing)
     {
-
         if (bScanlines)
         {
             if (bVidScanBilinear)

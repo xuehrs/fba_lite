@@ -589,14 +589,6 @@ int RunMessageLoop()
 
                                 break;
                             }
-                            if (GetAsyncKeyState(VK_CONTROL) & 0x80000000)
-                            {
-                                bMenuEnabled = !bMenuEnabled;
-                                POST_INITIALISE_MESSAGE;
-
-                                break;
-                            }
-
                             break;
                         }
                         case VK_F1:

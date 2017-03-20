@@ -17,7 +17,6 @@ void DisplayPopupMenu(int nMenu);
 RECT SystemWorkArea = { 0, 0, 640, 480 };				// Work area on the desktop
 
 int  bAutoPause = 1;
-bool bMenuEnabled = true;
 bool bHasFocus = false;
 int  nSavestateSlot = 1;
 
@@ -290,14 +289,6 @@ int CreateDatfileWindows(int bType)
 
     TCHAR szConsoleString[64];
     _sntprintf(szConsoleString, 64, _T(""));
-    if (bType == DAT_MEGADRIVE_ONLY) _sntprintf(szConsoleString, 64, _T(", Megadrive only"));
-    if (bType == DAT_PCENGINE_ONLY) _sntprintf(szConsoleString, 64, _T(", PC-Engine only"));
-    if (bType == DAT_TG16_ONLY) _sntprintf(szConsoleString, 64, _T(", TurboGrafx16 only"));
-    if (bType == DAT_SGX_ONLY) _sntprintf(szConsoleString, 64, _T(", SuprGrafx only"));
-    if (bType == DAT_SG1000_ONLY) _sntprintf(szConsoleString, 64, _T(", Sega SG-1000 only"));
-    if (bType == DAT_COLECO_ONLY) _sntprintf(szConsoleString, 64, _T(", ColecoVision only"));
-    if (bType == DAT_MASTERSYSTEM_ONLY) _sntprintf(szConsoleString, 64, _T(", Master System only"));
-    if (bType == DAT_GAMEGEAR_ONLY) _sntprintf(szConsoleString, 64, _T(", Game Gear only"));
 
     TCHAR szProgramString[25];
     _sntprintf(szProgramString, 25, _T("ClrMame Pro XML"));
@@ -334,7 +325,7 @@ static bool VidInitNeeded()
     {
         return true;
     }
-    if (nVidSelect == 3)
+    if (nVidSelect == 2)
     {
         return true;
     }
@@ -361,48 +352,6 @@ static void RefreshWindow(bool bInitialise)
     }
 }
 
-static LRESULT CALLBACK ScrnProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
-{
-    switch (Msg)
-    {
-        HANDLE_MSG(hWnd, WM_CREATE,			OnCreate);
-        HANDLE_MSG(hWnd, WM_ACTIVATEAPP,	OnActivateApp);
-        HANDLE_MSGB(hWnd, WM_PAINT,			OnPaint);
-        HANDLE_MSG(hWnd, WM_CLOSE,			OnClose);
-        HANDLE_MSG(hWnd, WM_DESTROY,		OnDestroy);
-        HANDLE_MSG(hWnd, WM_COMMAND,		OnCommand);
-
-    // We can't use the macro from windowsx.h macro for this one
-    case WM_SYSCOMMAND:
-    {
-        if (OnSysCommand(hWnd, (UINT)wParam, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam)))
-        {
-            return 0;
-        }
-        break;
-    }
-    // - dink - handle return from Hibernation
-    case WM_POWERBROADCAST:
-    {
-        if (wParam == PBT_APMRESUMESUSPEND || wParam == PBT_APMSUSPEND)
-        {
-            bBackFromHibernation = 1;
-        }
-        break;
-    }
-        // - dink - end
-    HANDLE_MSG(hWnd, WM_SIZE,			OnSize);
-    HANDLE_MSG(hWnd, WM_ENTERSIZEMOVE,	OnEnterSizeMove);
-    HANDLE_MSG(hWnd, WM_EXITSIZEMOVE,	OnExitSizeMove);
-    HANDLE_MSG(hWnd, WM_ENTERIDLE,		OnEnterIdle);
-    HANDLE_MSG(hWnd, WM_LBUTTONDBLCLK,	OnLButtonDblClk);
-    HANDLE_MSG(hWnd, WM_NOTIFY,			OnNotify);
-    HANDLE_MSG(hWnd, WM_DISPLAYCHANGE,	OnDisplayChange);
-    }
-
-    return DefWindowProc(hWnd, Msg, wParam, lParam);
-}
-
 static int OnDisplayChange(HWND, UINT, UINT, UINT)
 {
     if (!nVidFullscreen)
@@ -415,7 +364,7 @@ static int OnDisplayChange(HWND, UINT, UINT, UINT)
 
 static int OnLButtonDblClk(HWND hwnd, BOOL, int, int, UINT)
 {
-    if(nVidFullscreen)
+    //if(nVidFullscreen)
     {
         if (hwnd == hMainWnd && bDrvOkay)
         {
@@ -1430,47 +1379,16 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         POST_INITIALISE_MESSAGE;
         break;
 
-    case MENU_AUTOSIZE:
-        if (nWindowSize != 0)
-        {
-            nWindowSize = 0;
-            POST_INITIALISE_MESSAGE;
-        }
-        break;
     case MENU_SINGLESIZEWINDOW:
-        if (nWindowSize != 1)
-        {
-            nWindowSize = 1;
-            POST_INITIALISE_MESSAGE;
-        }
-        break;
     case MENU_DOUBLESIZEWINDOW:
-        if (nWindowSize != 2)
-        {
-            nWindowSize = 2;
-            POST_INITIALISE_MESSAGE;
-        }
-        break;
     case MENU_TRIPLESIZEWINDOW:
-        if (nWindowSize != 3)
-        {
-            nWindowSize = 3;
-            POST_INITIALISE_MESSAGE;
-        }
-        break;
     case MENU_QUADSIZEWINDOW:
-        if (nWindowSize != 4)
-        {
-            nWindowSize = 4;
-            POST_INITIALISE_MESSAGE;
-        }
+		nWindowSize = id - MENU_SINGLESIZEWINDOW;
+        POST_INITIALISE_MESSAGE;
         break;
     case MENU_MAXIMUMSIZEWINDOW:
-        if (nWindowSize <= 4)
-        {
-            nWindowSize = 9999;
-            POST_INITIALISE_MESSAGE;
-        }
+        nWindowSize = 9999;
+        POST_INITIALISE_MESSAGE;
         break;
 
     case MENU_MONITORAUTOCHECK:
@@ -1779,10 +1697,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         break;
     }
 
-    case MENU_ASSEMBLYCORE:
-        bBurnUseASMCPUEmulation = !bBurnUseASMCPUEmulation;
-        break;
-
     case MENU_CHEATSEARCH_START:
     {
         CheatSearchStart();
@@ -2085,58 +1999,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
             nVidBlitterOpt[nVidSelect] ^= 0x01000000;
             POST_INITIALISE_MESSAGE;
             break;
-        case MENU_SOFTFX:
-            nVidBlitterOpt[nVidSelect] ^= 0x02000000;
-            nVidBlitterOpt[nVidSelect] |= 0x01000000;
-            POST_INITIALISE_MESSAGE;
-            break;
-
-        case MENU_ENHANCED_SOFT_STRETCH:
-        case MENU_ENHANCED_SOFT_SCALE2X:
-        case MENU_ENHANCED_SOFT_SCALE3X:
-        case MENU_ENHANCED_SOFT_2XPM_LQ:
-        case MENU_ENHANCED_SOFT_2XPM_HQ:
-        case MENU_ENHANCED_SOFT_EAGLE:
-        case MENU_ENHANCED_SOFT_SUPEREAGLE:
-        case MENU_ENHANCED_SOFT_2XSAI:
-        case MENU_ENHANCED_SOFT_SUPER2XSAI:
-        case MENU_ENHANCED_SOFT_SUPEREAGLE_VBA:
-        case MENU_ENHANCED_SOFT_2XSAI_VBA:
-        case MENU_ENHANCED_SOFT_SUPER2XSAI_VBA:
-        case MENU_ENHANCED_SOFT_SUPERSCALE:
-        case MENU_ENHANCED_SOFT_SUPERSCALE75:
-        case MENU_ENHANCED_SOFT_HQ2X:
-        case MENU_ENHANCED_SOFT_HQ3X:
-        case MENU_ENHANCED_SOFT_HQ4X:
-        case MENU_ENHANCED_SOFT_HQ2XS_VBA:
-        case MENU_ENHANCED_SOFT_HQ3XS_VBA:
-        case MENU_ENHANCED_SOFT_HQ2XS_SNES9X:
-        case MENU_ENHANCED_SOFT_HQ3XS_SNES9X:
-        case MENU_ENHANCED_SOFT_HQ2XBOLD:
-        case MENU_ENHANCED_SOFT_HQ3XBOLD:
-        case MENU_ENHANCED_SOFT_EPXB:
-        case MENU_ENHANCED_SOFT_EPXC:
-        case MENU_ENHANCED_SOFT_2XBR_A:
-        case MENU_ENHANCED_SOFT_2XBR_B:
-        case MENU_ENHANCED_SOFT_2XBR_C:
-        case MENU_ENHANCED_SOFT_3XBR_A:
-        case MENU_ENHANCED_SOFT_3XBR_B:
-        case MENU_ENHANCED_SOFT_3XBR_C:
-        case MENU_ENHANCED_SOFT_4XBR_A:
-        case MENU_ENHANCED_SOFT_4XBR_B:
-        case MENU_ENHANCED_SOFT_4XBR_C:
-        case MENU_ENHANCED_SOFT_DDT3X:
-        {
-            nVidBlitterOpt[nVidSelect] &= 0x0FFFFFFF;
-            nVidBlitterOpt[nVidSelect] |= 0x03000000 + ((long long)(id - MENU_ENHANCED_SOFT_STRETCH) << 32);
-            POST_INITIALISE_MESSAGE;
-            break;
-        }
-        case MENU_ENHANCED_SOFT_AUTOSIZE:
-            nVidBlitterOpt[nVidSelect] ^= 0x04000000;
-            POST_INITIALISE_MESSAGE;
-            break;
-
         case MENU_ENHANCED_SCANINTENSITY:
             if (UseDialogs())
             {
@@ -2218,63 +2080,8 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         }
         break;
     }
+    
     case 2:
-    {
-        switch (id)
-        {
-        // Options for the DirectDraw Software Effects blitter
-        case MENU_SOFTFX_SOFT_STRETCH:
-        case MENU_SOFTFX_SOFT_SCALE2X:
-        case MENU_SOFTFX_SOFT_SCALE3X:
-        case MENU_SOFTFX_SOFT_2XPM_LQ:
-        case MENU_SOFTFX_SOFT_2XPM_HQ:
-        case MENU_SOFTFX_SOFT_EAGLE:
-        case MENU_SOFTFX_SOFT_SUPEREAGLE:
-        case MENU_SOFTFX_SOFT_2XSAI:
-        case MENU_SOFTFX_SOFT_SUPER2XSAI:
-        case MENU_SOFTFX_SOFT_SUPEREAGLE_VBA:
-        case MENU_SOFTFX_SOFT_2XSAI_VBA:
-        case MENU_SOFTFX_SOFT_SUPER2XSAI_VBA:
-        case MENU_SOFTFX_SOFT_SUPERSCALE:
-        case MENU_SOFTFX_SOFT_SUPERSCALE75:
-        case MENU_SOFTFX_SOFT_HQ2X:
-        case MENU_SOFTFX_SOFT_HQ3X:
-        case MENU_SOFTFX_SOFT_HQ4X:
-        case MENU_SOFTFX_SOFT_HQ2XS_VBA:
-        case MENU_SOFTFX_SOFT_HQ3XS_VBA:
-        case MENU_SOFTFX_SOFT_HQ2XS_SNES9X:
-        case MENU_SOFTFX_SOFT_HQ3XS_SNES9X:
-        case MENU_SOFTFX_SOFT_HQ2XBOLD:
-        case MENU_SOFTFX_SOFT_HQ3XBOLD:
-        case MENU_SOFTFX_SOFT_EPXB:
-        case MENU_SOFTFX_SOFT_EPXC:
-        case MENU_SOFTFX_SOFT_2XBR_A:
-        case MENU_SOFTFX_SOFT_2XBR_B:
-        case MENU_SOFTFX_SOFT_2XBR_C:
-        case MENU_SOFTFX_SOFT_3XBR_A:
-        case MENU_SOFTFX_SOFT_3XBR_B:
-        case MENU_SOFTFX_SOFT_3XBR_C:
-        case MENU_SOFTFX_SOFT_4XBR_A:
-        case MENU_SOFTFX_SOFT_4XBR_B:
-        case MENU_SOFTFX_SOFT_4XBR_C:
-        case MENU_SOFTFX_SOFT_DDT3X:
-            nVidBlitterOpt[nVidSelect] &= ~0xFF;
-            nVidBlitterOpt[nVidSelect] |= id - MENU_SOFTFX_SOFT_STRETCH;
-            POST_INITIALISE_MESSAGE;
-            break;
-
-        case MENU_SOFTFX_SOFT_AUTOSIZE:
-            nVidBlitterOpt[nVidSelect] ^= 0x0100;
-            POST_INITIALISE_MESSAGE;
-            break;
-        case MENU_SOFT_DIRECTACCESS:
-            nVidBlitterOpt[nVidSelect] ^= 0x0200;
-            POST_INITIALISE_MESSAGE;
-            break;
-        }
-        break;
-    }
-    case 3:
         switch (id)
         {
         // Options for the DirectX Graphics 9 blitter
@@ -2324,24 +2131,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
             dVidCubicC = 1.0;
             VidRedraw();
             break;
-
-        /*
-        					if (UseDialogs()) {
-        						InputSetCooperativeLevel(false, bAlwaysProcessKeyboardInput);
-        						AudBlankSound();
-        						if ((nVidBlitterOpt[nVidSelect] & (3 << 24)) !=  (2 << 24)) {
-        							nVidBlitterOpt[nVidSelect] &= ~(3 << 24);
-        							nVidBlitterOpt[nVidSelect] |=  (2 << 24);
-        							ScrnSize();
-        							VidInit();
-        							VidRedraw();
-        						}
-        						CubicSharpnessDialog();
-        						GameInpCheckMouse();
-        					}
-        					break;
-        */
-
         case MENU_EXP_SCAN:
             bVidScanlines = !bVidScanlines;
             POST_INITIALISE_MESSAGE;
@@ -2415,76 +2204,6 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
 
         }
         break;
-    case 4:
-        switch (id)
-        {
-        // Options for the DirectX Graphics 9 Alternate blitter
-        case MENU_DX9_ALT_POINT:
-            bVidDX9Bilinear = 0;
-            POST_INITIALISE_MESSAGE;
-            break;
-
-        case MENU_DX9_ALT_LINEAR:
-            bVidDX9Bilinear = 1;
-            POST_INITIALISE_MESSAGE;
-            break;
-
-        case MENU_DX9_ALT_SOFT_STRETCH:
-        case MENU_DX9_ALT_SOFT_SCALE2X:
-        case MENU_DX9_ALT_SOFT_SCALE3X:
-        case MENU_DX9_ALT_SOFT_2XPM_LQ:
-        case MENU_DX9_ALT_SOFT_2XPM_HQ:
-        case MENU_DX9_ALT_SOFT_EAGLE:
-        case MENU_DX9_ALT_SOFT_SUPEREAGLE:
-        case MENU_DX9_ALT_SOFT_2XSAI:
-        case MENU_DX9_ALT_SOFT_SUPER2XSAI:
-        case MENU_DX9_ALT_SOFT_SUPEREAGLE_VBA:
-        case MENU_DX9_ALT_SOFT_2XSAI_VBA:
-        case MENU_DX9_ALT_SOFT_SUPER2XSAI_VBA:
-        case MENU_DX9_ALT_SOFT_SUPERSCALE:
-        case MENU_DX9_ALT_SOFT_SUPERSCALE75:
-        case MENU_DX9_ALT_SOFT_HQ2X:
-        case MENU_DX9_ALT_SOFT_HQ3X:
-        case MENU_DX9_ALT_SOFT_HQ4X:
-        case MENU_DX9_ALT_SOFT_HQ2XS_VBA:
-        case MENU_DX9_ALT_SOFT_HQ3XS_VBA:
-        case MENU_DX9_ALT_SOFT_HQ2XS_SNES9X:
-        case MENU_DX9_ALT_SOFT_HQ3XS_SNES9X:
-        case MENU_DX9_ALT_SOFT_HQ2XBOLD:
-        case MENU_DX9_ALT_SOFT_HQ3XBOLD:
-        case MENU_DX9_ALT_SOFT_EPXB:
-        case MENU_DX9_ALT_SOFT_EPXC:
-        case MENU_DX9_ALT_SOFT_2XBR_A:
-        case MENU_DX9_ALT_SOFT_2XBR_B:
-        case MENU_DX9_ALT_SOFT_2XBR_C:
-        case MENU_DX9_ALT_SOFT_3XBR_A:
-        case MENU_DX9_ALT_SOFT_3XBR_B:
-        case MENU_DX9_ALT_SOFT_3XBR_C:
-        case MENU_DX9_ALT_SOFT_4XBR_A:
-        case MENU_DX9_ALT_SOFT_4XBR_B:
-        case MENU_DX9_ALT_SOFT_4XBR_C:
-        case MENU_DX9_ALT_SOFT_DDT3X:
-            nVidBlitterOpt[nVidSelect] &= ~0xFF;
-            nVidBlitterOpt[nVidSelect] |= id - MENU_DX9_ALT_SOFT_STRETCH;
-            POST_INITIALISE_MESSAGE;
-            break;
-
-        case MENU_DX9_ALT_SOFT_AUTOSIZE:
-            nVidBlitterOpt[nVidSelect] ^= 0x0100;
-            POST_INITIALISE_MESSAGE;
-            break;
-
-        case MENU_DX9_ALT_HARDWAREVERTEX:
-            bVidHardwareVertex = !bVidHardwareVertex;
-            POST_INITIALISE_MESSAGE;
-            break;
-
-        case MENU_DX9_ALT_MOTIONBLUR:
-            bVidMotionBlur = !bVidMotionBlur;
-            POST_INITIALISE_MESSAGE;
-            break;
-        }
-        break;
     }
 
     if (hwndChat)
@@ -2520,22 +2239,22 @@ static int OnSysCommand(HWND, UINT sysCommand, int, int)
     {
     case SC_MONITORPOWER:
     case SC_SCREENSAVE:
-    {
-        if (!bRunPause && bDrvOkay)
-        {
-            return 1;
-        }
-        break;
-    }
+	    {
+	        if (!bRunPause && bDrvOkay)
+	        {
+	            return 1;
+	        }
+	        break;
+	    }
     case SC_KEYMENU:
     case SC_MOUSEMENU:
-    {
-        if (kNetGame)
-        {
-            return 1;
-        }
-        break;
-    }
+	    {
+	        if (kNetGame)
+	        {
+	            return 1;
+	        }
+	        break;
+	    }
     }
 
     return 0;
@@ -2574,7 +2293,7 @@ static void OnSize(HWND, UINT state, int cx, int cy)
 
         if (bSizeChanged)
         {
-            RefreshWindow(true);
+            RefreshWindow(false);//true);
         }
         else
         {
@@ -2616,6 +2335,50 @@ static void OnEnterIdle(HWND /*hwnd*/, UINT /*source*/, HWND /*hwndSource*/)
     }
 }
 
+
+static LRESULT CALLBACK ScrnProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+{
+    switch (Msg)
+    {
+        HANDLE_MSG(hWnd, WM_CREATE,			OnCreate);
+        HANDLE_MSG(hWnd, WM_ACTIVATEAPP,	OnActivateApp);
+        HANDLE_MSGB(hWnd, WM_PAINT,			OnPaint);
+        HANDLE_MSG(hWnd, WM_CLOSE,			OnClose);
+        HANDLE_MSG(hWnd, WM_DESTROY,		OnDestroy);
+        HANDLE_MSG(hWnd, WM_COMMAND,		OnCommand);
+
+    // We can't use the macro from windowsx.h macro for this one
+    case WM_SYSCOMMAND:
+    {
+        if (OnSysCommand(hWnd, (UINT)wParam, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam)))
+        {
+            return 0;
+        }
+        break;
+    }
+    // - dink - handle return from Hibernation
+    case WM_POWERBROADCAST:
+    {
+        if (wParam == PBT_APMRESUMESUSPEND || wParam == PBT_APMSUSPEND)
+        {
+            bBackFromHibernation = 1;
+        }
+        break;
+    }
+        // - dink - end
+    HANDLE_MSG(hWnd, WM_SIZE,			OnSize);
+    HANDLE_MSG(hWnd, WM_ENTERSIZEMOVE,	OnEnterSizeMove);
+    HANDLE_MSG(hWnd, WM_EXITSIZEMOVE,	OnExitSizeMove);
+    HANDLE_MSG(hWnd, WM_ENTERIDLE,		OnEnterIdle);
+    HANDLE_MSG(hWnd, WM_LBUTTONDBLCLK,	OnLButtonDblClk);
+    HANDLE_MSG(hWnd, WM_NOTIFY,			OnNotify);
+    HANDLE_MSG(hWnd, WM_DISPLAYCHANGE,	OnDisplayChange);
+    }
+
+    return DefWindowProc(hWnd, Msg, wParam, lParam);
+}
+
+
 static int ScrnRegister()
 {
     WNDCLASSEX WndClassEx;
@@ -2646,7 +2409,7 @@ static int ScrnRegister()
 
 int ScrnSize()
 {
-    int x, y, w, h, ew, eh;
+    int w, h, ew, eh;
     int nScrnWidth, nScrnHeight;
     int nBmapWidth = nVidImageWidth, nBmapHeight = nVidImageHeight;
     int nGameAspectX = 4, nGameAspectY = 3;
@@ -2683,71 +2446,7 @@ int ScrnSize()
 
     nScrnWidth = SystemWorkArea.right - SystemWorkArea.left;
     nScrnHeight = SystemWorkArea.bottom - SystemWorkArea.top;
-
-    if (nVidSelect == 2 && nVidBlitterOpt[2] & 0x0100)  								// The Software effects blitter uses a fixed size
-    {
-        nMaxSize = 9;
-    }
-    else
-    {
-        if (nWindowSize)
-        {
-            nMaxSize = nWindowSize;
-        }
-        else
-        {
-            if (nBmapWidth < nBmapHeight)
-            {
-                if (SystemWorkArea.bottom - SystemWorkArea.top <= 600)
-                {
-                    nMaxSize = 1;
-                }
-                else
-                {
-                    if (SystemWorkArea.bottom - SystemWorkArea.top <= 960)
-                    {
-                        nMaxSize = 2;
-                    }
-                    else
-                    {
-                        if (SystemWorkArea.bottom - SystemWorkArea.top <= 1280)
-                        {
-                            nMaxSize = 3;
-                        }
-                        else
-                        {
-                            nMaxSize = 4;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                if (SystemWorkArea.right - SystemWorkArea.left <= 640)
-                {
-                    nMaxSize = 1;
-                }
-                else
-                {
-                    if (SystemWorkArea.right - SystemWorkArea.left <= 1152)
-                    {
-                        nMaxSize = 2;
-                    }
-                    else
-                    {
-                        if (SystemWorkArea.right - SystemWorkArea.left <= 1600)
-                        {
-                            nMaxSize = 3;
-                        }
-                        else
-                        {
-                            nMaxSize = 4;
-                        }
-                    }
-                }
-            }
-        }
-    }
+    nMaxSize = nWindowSize+1;
 
     // Find the width and height
     w = nScrnWidth;
@@ -2768,25 +2467,17 @@ int ScrnSize()
 #endif
 #endif
 
-    if (bMenuEnabled)
-    {
-        eh += GetSystemMetrics(SM_CYCAPTION);
-        eh += nMenuHeight;
-    }
-    else
-    {
-        eh += 1 << 1;
-        ew += 1 << 1;
-    }
+    eh += GetSystemMetrics(SM_CYCAPTION);
+    eh += nMenuHeight;
 
-    if (bMenuEnabled || !bVidScanlines || nVidSelect == 2)
+    if (!bVidScanlines)
     {
         // Subtract the border space
         w -= ew;
         h -= eh;
     }
 
-    if ((bVidCorrectAspect || bVidFullStretch) && !(nVidSelect == 2 && (nVidBlitterOpt[2] & 0x0100) == 0))
+    if ((bVidCorrectAspect || bVidFullStretch))
     {
         int ww = w;
         int hh = h;
@@ -2845,17 +2536,9 @@ int ScrnSize()
     w = rect.right - rect.left + ew;
     h = rect.bottom - rect.top + eh;
 
-    // Find the midpoint for the window
-    x = SystemWorkArea.left + SystemWorkArea.right;
-    x /= 2;
-    y = SystemWorkArea.bottom + SystemWorkArea.top;
-    y /= 2;
-    x -= w / 2;
-    y -= h / 2;
-
     MenuUpdate();
     bMaximised = false;
-    MoveWindow(hMainWnd, x, y, w, h, true);
+	SetWindowPos(hMainWnd,NULL,0,0,w,h,SWP_NOMOVE|SWP_NOZORDER);
     return 0;
 }
 
@@ -2905,21 +2588,15 @@ int ScrnInit()
     {
         nWindowStyles = WS_POPUP;
         nWindowExStyles = 0;
+		nMenuHeight = 0;
     }
     else
     {
-        if (bMenuEnabled)
-        {
-            nWindowStyles = WS_OVERLAPPEDWINDOW;
-            nWindowExStyles = 0;
-        }
-        else
-        {
-            nWindowStyles = WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU | WS_THICKFRAME;
-            nWindowExStyles = WS_EX_CLIENTEDGE;
-        }
+        nWindowStyles = WS_OVERLAPPEDWINDOW;
+        nWindowExStyles = 0;
+		nMenuHeight = GetSystemMetrics(SM_CYMENU);
     }
-
+	
     hMainWnd = CreateWindowEx(nWindowExStyles, szClass, _T(APP_TITLE), nWindowStyles,
                               0, 0, 0, 0,									   			// size of window
                               NULL, NULL, hAppInst, NULL);
@@ -2929,12 +2606,12 @@ int ScrnInit()
         return 1;
     }
 	MenuCreate();
-    nMenuHeight = 0;
     if (!nVidFullscreen)
     {
         ScrnTitle();
         ScrnSize();
     }
+	WndInMid(hMainWnd, NULL);
     return 0;
 }
 

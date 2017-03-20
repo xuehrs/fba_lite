@@ -213,7 +213,6 @@ void ToggleLayer(unsigned char thisLayer);
 extern HWND hMainWnd;								// Handle to the screen window
 extern HWND hwndChat;
 extern bool bRescanRoms;
-extern bool bMenuEnabled;
 extern RECT SystemWorkArea;							// The full screen area
 extern int  nSavestateSlot;
 
