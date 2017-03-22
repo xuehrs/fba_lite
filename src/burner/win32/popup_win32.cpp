@@ -23,13 +23,13 @@ static int FBAPopupLog()
     switch (nPopupFlags & 7)
     {
     case PUF_TYPE_ERROR:
-        pszTypeEnglish = FBALoadStringEx(hAppInst, IDS_ERR_ERROR, false);
+        pszTypeEnglish = LoadStringEx(hAppInst, IDS_ERR_ERROR, false);
         break;
     case PUF_TYPE_WARNING:
-        pszTypeEnglish = FBALoadStringEx(hAppInst, IDS_ERR_WARNING, false);
+        pszTypeEnglish = LoadStringEx(hAppInst, IDS_ERR_WARNING, false);
         break;
     default:
-        pszTypeEnglish = FBALoadStringEx(hAppInst, IDS_ERR_INFORMATION, false);
+        pszTypeEnglish = LoadStringEx(hAppInst, IDS_ERR_INFORMATION, false);
         break;
     }
 
@@ -97,20 +97,20 @@ static INT_PTR CALLBACK FBAPopupProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
         case PUF_TYPE_ERROR:
             nIcon = OIC_ERROR;
             nBeep = MB_ICONHAND;
-            pszTypeEnglish = FBALoadStringEx(hAppInst, IDS_ERR_ERROR, false);
-            pszTypeLocal = FBALoadStringEx(hAppInst, IDS_ERR_ERROR, true);
+            pszTypeEnglish = LoadStringEx(hAppInst, IDS_ERR_ERROR, false);
+            pszTypeLocal = LoadStringEx(hAppInst, IDS_ERR_ERROR, true);
             break;
         case PUF_TYPE_WARNING:
             nIcon = OIC_WARNING;
             nBeep = MB_ICONEXCLAMATION;
-            pszTypeEnglish = FBALoadStringEx(hAppInst, IDS_ERR_WARNING, false);
-            pszTypeLocal = FBALoadStringEx(hAppInst, IDS_ERR_WARNING, true);
+            pszTypeEnglish = LoadStringEx(hAppInst, IDS_ERR_WARNING, false);
+            pszTypeLocal = LoadStringEx(hAppInst, IDS_ERR_WARNING, true);
             break;
         default:
             nIcon = OIC_INFORMATION;
             nBeep = MB_ICONASTERISK;
-            pszTypeEnglish = FBALoadStringEx(hAppInst, IDS_ERR_INFORMATION, false);
-            pszTypeLocal = FBALoadStringEx(hAppInst, IDS_ERR_INFORMATION, true);
+            pszTypeEnglish = LoadStringEx(hAppInst, IDS_ERR_INFORMATION, false);
+            pszTypeLocal = LoadStringEx(hAppInst, IDS_ERR_INFORMATION, true);
             break;
         }
 
@@ -157,33 +157,6 @@ static INT_PTR CALLBACK FBAPopupProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
                     szText += nLen + 1;
                 }
 
-                if (bLocalisationActive && pszBufferLocal)
-                {
-                    for (TCHAR *szText = pszBufferLocal; ; )
-                    {
-
-                        SIZE line;
-                        int nLen;
-
-                        for (nLen = 0; szText[nLen] && szText[nLen] != _T('\n'); nLen++) { }
-
-                        GetTextExtentPoint32(hDC, szText, nLen ? nLen : 1, &line);
-
-                        if (sizel.cx < line.cx)
-                        {
-                            sizel.cx = line.cx;
-                        }
-                        sizel.cy += line.cy;
-
-                        if (!szText[nLen])
-                        {
-                            break;
-                        }
-
-                        szText += nLen + 1;
-                    }
-                }
-
                 SelectObject(hDC, hFont);
                 ReleaseDC(hWnd, hDC);
             }
@@ -199,39 +172,6 @@ static INT_PTR CALLBACK FBAPopupProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
             ClientToScreen(hDlg, &p);
             GetWindowRect(hDlg, &rect);
 
-            // Size dialog and edit control containing message text
-            if (bLocalisationActive && pszBufferLocal)
-            {
-
-                if (sizel.cx < sizee.cx)
-                {
-                    sizel.cx = sizee.cx;
-                }
-                else
-                {
-                    sizee.cx = sizel.cx;
-                }
-                if (sizel.cy < 32)
-                {
-                    sizel.cy = 32;
-                }
-
-                MoveWindow(hDlg, rect.left, rect.top, rect.right - rect.left + sizee.cx, rect.bottom - rect.top + sizee.cy + sizel.cy + 12, FALSE);
-
-                hWnd = GetDlgItem(hDlg, IDC_MESSAGE_EDIT_LOCAL);
-                GetWindowRect(hWnd, &rect);
-                SetWindowPos(hWnd, NULL, 0, 0, rect.right - rect.left + sizel.cx, rect.bottom - rect.top + sizel.cy, SWP_NOMOVE | SWP_NOZORDER | SWP_NOREDRAW);
-                SendMessage(hWnd, WM_SETTEXT, (WPARAM)0, (LPARAM)pszBufferLocal);
-                SendMessage(hWnd, EM_SETMARGINS, EC_LEFTMARGIN, 3);
-                ShowWindow(hWnd, SW_SHOW);
-
-                hWnd = GetDlgItem(hDlg, IDC_MESSAGE_BACK);
-                SetWindowPos(hWnd, NULL, 0, 0, 9999, rect.bottom - p.y + sizel.cy + 6, SWP_NOZORDER | SWP_NOREDRAW);
-                ShowWindow(hWnd, SW_SHOW);
-
-                p.y -= rect.bottom - rect.top + sizel.cy + 12;
-            }
-            else
             {
                 if (sizee.cy < 32)
                 {
@@ -292,7 +232,7 @@ int FBAPopupAddText(int nFlags, TCHAR *pszFormat, ...)
 
     if (IS_INTRESOURCE(pszFormat))
     {
-        pszStringEnglish = FBALoadStringEx(hAppInst, (INT_PTR)pszFormat, false);
+        pszStringEnglish = LoadStringEx(hAppInst, (INT_PTR)pszFormat, false);
     }
     else
     {
@@ -309,29 +249,11 @@ int FBAPopupAddText(int nFlags, TCHAR *pszFormat, ...)
 
         if (IS_INTRESOURCE(pszFormat))
         {
-            pszStringLocal = FBALoadStringEx(hAppInst, (INT_PTR)pszFormat, true);
+            pszStringLocal = LoadStringEx(hAppInst, (INT_PTR)pszFormat, true);
         }
         else
         {
             pszStringLocal = pszFormat;
-        }
-
-        // Add the translated string if present
-        if (bLocalisationActive && (nFlags & PUF_TEXT_TRANSLATE) &&  pszStringLocal && *pszStringLocal)
-        {
-            // Add the translated string
-            int nLen = _vsntprintf(szString, 1024, pszStringLocal, vaLocal);
-            if (nLen > 0)
-            {
-                TCHAR *pszNewBuffer = (TCHAR *)realloc(pszBufferLocal, (nLen + nBufferLocalSize + 1) * sizeof(TCHAR));
-                if (pszNewBuffer)
-                {
-                    pszBufferLocal = pszNewBuffer;
-                    _tcsncpy(pszBufferLocal + nBufferLocalSize, szString, nLen);
-                    nBufferLocalSize += nLen;
-                    pszBufferLocal[nBufferLocalSize] = 0;
-                }
-            }
         }
 
         va_end(vaLocal);

@@ -164,3 +164,54 @@ int WndInMid(HWND hMid, HWND hBase)
     return 0;
 }
 
+
+TCHAR *LoadStringEx(HINSTANCE hInstance, UINT uID, bool bTranslate)
+{
+    {
+        // Convert the string ID into a bundle number
+        wchar_t *pwsz = (wchar_t *)LoadResource(hInstance, FindResource(hInstance, MAKEINTRESOURCE(uID / 16 + 1), RT_STRING));
+
+        if ((pwsz = (wchar_t *)LockResource(pwsz)) != NULL)
+        {
+            // Locate the string in the bundle
+            for (unsigned int i = 0; i < (uID & 15); i++)
+            {
+                pwsz += *pwsz + 1;
+            }
+        }
+
+#if 1 && defined (PRINT_TRANSLATION_INFO)
+        dprintf(_T("string %5i: \"%ls\"\n"), uID, *pwsz ? pwsz + 1 : pwsz);
+#endif
+
+#if defined (UNICODE) && defined (_MSC_VER)
+        return *pwsz ? pwsz + 1 : pwsz;
+#else
+        {
+#if !defined (UNICODE)
+            static char szStringBuffer[5120];
+            //			memset(szStringBuffer, 0, sizeof(szStringBuffer));
+
+            if (WideCharToMultiByte(CP_ACP, 0, *pwsz ? pwsz + 1 : pwsz, *pwsz, szStringBuffer, 5120, NULL, NULL))
+            {
+                szStringBuffer[*pwsz] = '\0';
+                return szStringBuffer;
+            }
+#else
+            static wchar_t szStringBuffer[5120];
+
+            // When using GCC, copy the string since Windres can't zero-terminate strings in resource files
+            if (*pwsz)
+            {
+                wcsncpy(szStringBuffer, pwsz + 1, *pwsz);
+            }
+            szStringBuffer[*pwsz] = '\0';
+            return szStringBuffer;
+
+#endif
+            return NULL;
+        }
+#endif
+    }
+}
+

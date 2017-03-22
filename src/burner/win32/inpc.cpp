@@ -126,7 +126,7 @@ int InpcCreate()
     DestroyWindow(hInpcDlg);
     hInpcDlg = NULL;
 
-    hInpcDlg = FBACreateDialog(hAppInst, MAKEINTRESOURCE(IDD_INPC), hInpdDlg, (DLGPROC)DialogProc);
+    hInpcDlg = CreateDialog(hAppInst, MAKEINTRESOURCE(IDD_INPC), hInpdDlg, (DLGPROC)DialogProc);
     if (hInpcDlg == NULL)
     {
         return 1;

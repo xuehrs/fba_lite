@@ -25,7 +25,6 @@
 #include <windowsx.h>
 #include <commctrl.h>
 #include <commdlg.h>
-
 #include <mmsystem.h>
 #include <shellapi.h>
 #include <shlwapi.h>
@@ -33,7 +32,6 @@
 INT32 DSCore_Init();
 INT32 DICore_Init();
 INT32 DDCore_Init();
-INT32 Dx9Core_Init();
 
 // Additions to the Cygwin/MinGW win32 headers
 #ifdef __GNUC__
@@ -132,20 +130,6 @@ void AppCleanup();
 int AppMessage(MSG *pMsg);
 bool AppProcessKeyboardInput();
 
-// localise.cpp
-extern bool bLocalisationActive;
-extern TCHAR szLocalisationTemplate[MAX_PATH];
-
-void FBALocaliseExit();
-int FBALocaliseInit(TCHAR *pszTemplate);
-int FBALocaliseLoadTemplate();
-int FBALocaliseCreateTemplate();
-HMENU FBALoadMenu(HINSTANCE hInstance, LPTSTR lpMenuName);
-INT_PTR FBADialogBox(HINSTANCE hInstance, LPTSTR lpTemplate, HWND hWndParent, DLGPROC  lpDialogFunc);
-HWND FBACreateDialog(HINSTANCE hInstance, LPCTSTR lpTemplate, HWND hWndParent, DLGPROC lpDialogFunc);
-int FBALoadString(HINSTANCE hInstance, UINT uID, LPTSTR lpBuffer, int nBufferMax);
-TCHAR *FBALoadStringEx(HINSTANCE hInstance, UINT uID, bool bTranslate);
-
 // localise_gamelist.cpp
 extern TCHAR szGamelistLocalisationTemplate[MAX_PATH];
 extern bool nGamelistLocalisationActive;
@@ -190,6 +174,7 @@ void UpdatePath(TCHAR *path);
 int GetClientScreenRect(HWND hWnd, RECT *pRect);
 int WndInMid(HWND hMid, HWND hBase);
 char *DecorateGameName(unsigned int nBurnDrv);
+TCHAR *LoadStringEx(HINSTANCE hInstance, UINT uID, bool bTranslate);
 
 
 // drv.cpp

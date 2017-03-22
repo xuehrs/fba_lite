@@ -109,7 +109,7 @@ int ResCreate(int nResOrientation)
 {
     nOrientation = nResOrientation;
 
-    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_CHOOSERES), hMainWnd, (DLGPROC)ResProc);
+    DialogBox(hAppInst, MAKEINTRESOURCE(IDD_CHOOSERES), hMainWnd, (DLGPROC)ResProc);
     return 0;
 }
 

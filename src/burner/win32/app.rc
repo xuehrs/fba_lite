@@ -500,9 +500,7 @@ BEGIN
     BEGIN
         POPUP "选择插件"
         BEGIN
-            MENUITEM "DirectDraw 7",				MENU_BLITTER_1
-            MENUITEM "Direct3D 7",				MENU_BLITTER_2
-            MENUITEM "DirectX 9",			MENU_BLITTER_3
+            MENUITEM "DirectDraw7",				MENU_BLITTER_1
         END
         MENUITEM "插件选项",					MENU_BLITTEROPTIONS, GRAYED
         MENUITEM SEPARATOR
@@ -522,49 +520,8 @@ BEGIN
         END
         MENUITEM SEPARATOR
         MENUITEM "全屏显示\tAlt+Enter",			MENU_FULL
-        POPUP "全屏选项"
-        BEGIN
-        	MENUITEM "自动全屏",		MENU_AUTOSWITCHFULL
-        	MENUITEM "使用三倍缓冲",			MENU_TRIPLE
-			POPUP "分辨率(水平方向)"
-			BEGIN
-				MENUITEM "MENU_RES_ARCADE",					MENU_RES_ARCADE
-				MENUITEM SEPARATOR
-				MENUITEM "原始大小",					MENU_SINGLESIZESCREEN
-				MENUITEM "两倍大小",					MENU_DOUBLESIZESCREEN
-				MENUITEM "三倍大小",					MENU_TRIPLESIZESCREEN
-				MENUITEM "四倍大小",					MENU_QUADSIZESCREEN
-				MENUITEM SEPARATOR
-				MENUITEM "MENU_RES_1",						MENU_RES_1
-				MENUITEM "MENU_RES_2",						MENU_RES_2
-				MENUITEM "MENU_RES_3",						MENU_RES_3
-				MENUITEM "MENU_RES_4",						MENU_RES_4
-				MENUITEM SEPARATOR
-				MENUITEM "MENU_RES_OTHER",					MENU_RES_OTHER
-			END
-			POPUP "分辨率(垂直方向)"
-			BEGIN
-				MENUITEM "MENU_RES_ARCADE_VERTICAL",		MENU_RES_ARCADE_VERTICAL
-				MENUITEM SEPARATOR
-				MENUITEM "原始大小",					MENU_SINGLESIZESCREEN_VERTICAL
-				MENUITEM "二倍大小",					MENU_DOUBLESIZESCREEN_VERTICAL
-				MENUITEM "三倍大小",					MENU_TRIPLESIZESCREEN_VERTICAL
-				MENUITEM "四倍大小",					MENU_QUADSIZESCREEN_VERTICAL
-				MENUITEM SEPARATOR
-				MENUITEM "MENU_RES_1_VERTICAL",				MENU_RES_1_VERTICAL
-				MENUITEM "MENU_RES_2_VERTICAL",				MENU_RES_2_VERTICAL
-				MENUITEM "MENU_RES_3_VERTICAL",				MENU_RES_3_VERTICAL
-				MENUITEM "MENU_RES_4_VERTICAL",				MENU_RES_4_VERTICAL
-				MENUITEM SEPARATOR
-				MENUITEM "MENU_RES_OTHER_VERTICAL",			MENU_RES_OTHER_VERTICAL
-			END
-	        POPUP "色彩位深"
-	        BEGIN
-	            MENUITEM "&16bit",						MENU_16
-	            MENUITEM "&24bit",						MENU_24
-	            MENUITEM "&32bit",						MENU_32
-	        END
-	    END
+        MENUITEM "自动全屏",		MENU_AUTOSWITCHFULL
+        MENUITEM "使用三倍缓冲",			MENU_TRIPLE
 	    MENUITEM SEPARATOR
 	    MENUITEM "开启伽玛校正",				MENU_GAMMA_DO
         POPUP "伽玛校正设置"
@@ -600,7 +557,6 @@ BEGIN
     	POPUP "选择插件"
     	BEGIN
     	    MENUITEM "DirectSound",					MENU_AUD_PLUGIN_1
-    	    MENUITEM "XAudio2",						MENU_AUD_PLUGIN_2
     	END
     	MENUITEM "插件选项",					MENU_AUDIO_OPTIONS, GRAYED
     	MENUITEM "缓冲大小...",					MENU_FRAMES
@@ -656,10 +612,6 @@ BEGIN
            END
 	    POPUP "语言"
 	    BEGIN
-       		MENUITEM "选择界面语言",				MENU_LANGUAGE_SELECT
-       		MENUITEM "导出界面翻译模板",			MENU_LANGUAGE_EXPORT
-       		MENUITEM "恢复默认界面语言",			MENU_LANGUAGE_RESET
-			MENUITEM SEPARATOR
        		MENUITEM "选择游戏列表语言",				MENU_LANGUAGE_GL_SELECT
        		MENUITEM "导出游戏列表翻译模板",			MENU_LANGUAGE_GL_EXPORT
        		MENUITEM "恢复默认游戏列表语言",			MENU_LANGUAGE_GL_RESET
@@ -679,10 +631,6 @@ BEGIN
            MENUITEM SEPARATOR
            MENUITEM "退出作弊码搜索",				MENU_CHEATSEARCH_EXIT, GRAYED
         END
-    MENUITEM SEPARATOR
-    MENUITEM "68000调试器...\tCtrl+Shift+F1",	MENU_DEBUG
-	MENUITEM SEPARATOR
-	MENUITEM "调色板查看器...\tCtrl+Shift+F5",			MENU_PALETTEVIEWER, GRAYED
 	MENUITEM SEPARATOR
 	MENUITEM "生成DAT文件...",			MENU_CLRMAME_PRO_XML
     END
@@ -717,94 +665,6 @@ BEGIN
         END
 END
 
-IDR_MENU_BLITTER_2 MENU
-BEGIN
-        POPUP "Enhanced\t(Direct3D 7)"
-        BEGIN
-                MENUITEM "Disable all effects",				MENU_DISABLEFX
-                MENUITEM SEPARATOR
-                MENUITEM "Enable &bi-linear filtering",                 MENU_BILINEAR
-                MENUITEM "&Rotate scanlines and RGB effects",           MENU_ENHANCED_ROTSCAN
-                MENUITEM SEPARATOR
-                MENUITEM "Enable &Scanlines",                           MENU_ENHANCED_SCAN
-                MENUITEM "Set scanline &intensity...",                  MENU_ENHANCED_SCANINTENSITY
-                MENUITEM SEPARATOR
-                MENUITEM "Enable phosphor &feedback",                   MENU_PHOSPHOR
-                MENUITEM "Set &phosphor feedback intensity...",         MENU_PHOSPHORINTENSITY
-                MENUITEM SEPARATOR
-                MENUITEM "&No effects",                                 MENU_ENHANCED_NORMAL
-                MENUITEM "RGB &effects",                                MENU_RGBEFFECTS
-                MENUITEM "&3D projection",                              MENU_3DPROJECTION
-                MENUITEM SEPARATOR
-                MENUITEM "&Auto size scanlined RGB preset",             MENU_EFFECT_AUTO
-                POPUP "Manually select RGB preset"
-                BEGIN
-                        MENUITEM "Small faint RGB mask",                MENU_EFFECT_01
-                        MENUITEM "Large faint RGB dot mask",            MENU_EFFECT_02
-                        MENUITEM "Large faint RGB mask",                MENU_EFFECT_03
-                        MENUITEM SEPARATOR
-                        MENUITEM "MAME rgbmicro",						MENU_EFFECT_04
-                        MENUITEM "MAME rgbtiny",						MENU_EFFECT_05
-                        MENUITEM "Aperture grille",                     MENU_EFFECT_06
-                        MENUITEM SEPARATOR
-                        MENUITEM "Large oversaturated RGB dot",         MENU_EFFECT_07
-                        MENUITEM "Huge oversaturated pattern",          MENU_EFFECT_08
-                END
-                MENUITEM SEPARATOR
-                MENUITEM "Set 3&D projection properties...",            MENU_3DSCREENANGLE
-                MENUITEM SEPARATOR
-                POPUP "Advanced settings"
-                BEGIN
-                        MENUITEM "Force &16-bit emulation",             MENU_FORCE_16BIT
-                        MENUITEM "Use DirectX texture &management",     MENU_TEXTUREMANAGE
-                END
-        END
-END
-
-IDR_MENU_BLITTER_3 MENU
-BEGIN
-        POPUP "Experimental\t(DirectX Graphics 9)"
-        BEGIN
-                MENUITEM "Enable point filtering",						MENU_DX9_POINT
-                MENUITEM "Enable linear filtering",						MENU_DX9_LINEAR
-                MENUITEM "Enable cubic filtering",						MENU_DX9_CUBIC
-                POPUP "Cubic filter quality"
-                BEGIN
-		            MENUITEM "Lightly filtered\tTensioned B-spline",			MENU_DX9_CUBIC_LIGHT
-	                MENUITEM SEPARATOR
-		            MENUITEM "Smoothened strongly\tMitchell-Netravali notch",	MENU_DX9_CUBIC_NOTCH
-	                MENUITEM "Smoothened lightly\tCubic B-spline",				MENU_DX9_CUBIC_BSPLINE
-		            MENUITEM "Perceptual compromise\tMitchell-Netravali",		MENU_DX9_CUBIC_OPTIMAL
-					MENUITEM "Sharpened lightly\tCatmull-Rom spline",			MENU_DX9_CUBIC_CATMULL
-					MENUITEM "Sharpened strongly\tCardinal cubic spline",		MENU_DX9_CUBIC_SHARP
-	                MENUITEM SEPARATOR
-				    MENUITEM "Duff's tensioned B-splines...",			MENU_DX9_CUBIC_DUFF, GRAYED
-			        MENUITEM "Mitchell-Netravali 2C + B = 1...",		MENU_DX9_CUBIC_MITCHELL, GRAYED
-		            MENUITEM "Cardinal cubic splines...",				MENU_DX9_CUBIC_CARDINAL, GRAYED
-		            MENUITEM "Mitchell-Netravali free...",				MENU_DX9_CUBIC_CUSTOM, GRAYED
-                END
-                MENUITEM SEPARATOR
-                MENUITEM "Enable &Scanlines",                           MENU_EXP_SCAN
-                MENUITEM "Set scanline &intensity...",                  MENU_EXP_SCANINTENSITY
-                MENUITEM SEPARATOR
-                POPUP "Advanced settings"
-                BEGIN
-//                      MENUITEM "Single-pass reference implementation",			MENU_DX9_CUBIC0
-//                      MENUITEM "Single-pass partial precision implementation",	MENU_DX9_CUBIC1
-//                      MENUITEM "Multi-pass full precision implementation",		MENU_DX9_CUBIC2
-//                      MENUITEM "Multi-pass partial precision implementation",		MENU_DX9_CUBIC3
-//                      MENUITEM "Multi-pass high-performance implementation",		MENU_DX9_CUBIC4
-                        MENUITEM "Single-pass\tRadeon GPUs",						MENU_DX9_CUBIC1
-                        MENUITEM "Multi-pass\tGeforce GPUs",						MENU_DX9_CUBIC3
-                        MENUITEM "High-performance",								MENU_DX9_CUBIC4
-		                MENUITEM SEPARATOR
-						MENUITEM "Use PS1.4",										MENU_DX9_FORCE_PS14, GRAYED
-						MENUITEM "Use floating-point textures",						MENU_DX9_FPTERXTURES, GRAYED
-                END
-        END
-END
-
-
 IDR_MENU_AUD_PLUGIN_1 MENU
 BEGIN
 	POPUP "DirectSound plugin"
@@ -819,20 +679,6 @@ BEGIN
 	END
 END
 
-IDR_MENU_AUD_PLUGIN_2 MENU
-BEGIN
-	POPUP "XAudio2 plugin"
-	BEGIN
-		MENUITEM "Use Low-pass filter",					MENU_XAUDIO_BASS
-		MENUITEM "Use reverb",						MENU_XAUDIO_REVERB
-		MENUITEM SEPARATOR
-		MENUITEM "Sound disabled",					MENU_XAUDIO_NOSOUND
-        	MENUITEM "11025Hz samplerate",					MENU_XAUDIO_11025
-        	MENUITEM "22050Hz samplerate",					MENU_XAUDIO_22050
-        	MENUITEM "44100Hz samplerate",					MENU_XAUDIO_44100
-        	MENUITEM "48000Hz samplerate",					MENU_XAUDIO_48000
-	END
-END
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -850,17 +696,14 @@ BMP_MISC                BITMAP  DISCARDABLE     "resource/misc.bmp"
 IDR_ACCELERATOR ACCELERATORS DISCARDABLE
 BEGIN
     VK_F1,	MENU_ENABLECHEAT,	CONTROL, VIRTKEY, NOINVERT
-    VK_F1,	MENU_DEBUG,		CONTROL, SHIFT, VIRTKEY, NOINVERT
     VK_F4,	MENU_QUIT,		CONTROL, VIRTKEY, NOINVERT
     VK_F5,	MENU_INPUT,		VIRTKEY, NOINVERT
     VK_F5,	MENU_DIPSW,		CONTROL, VIRTKEY, NOINVERT
-    VK_F5,	MENU_PALETTEVIEWER,	CONTROL, SHIFT, VIRTKEY, NOINVERT
     VK_F6,	MENU_LOAD,		VIRTKEY, NOINVERT
     VK_F7,	MENU_MEMCARD_TOGGLE,	VIRTKEY, NOINVERT
     VK_F7,	MENU_MEMCARD_CREATE,	CONTROL, SHIFT, VIRTKEY, NOINVERT
     VK_F7,	MENU_MEMCARD_SELECT,	CONTROL, VIRTKEY, NOINVERT
     VK_F8,	MENU_STATE_PREVSLOT,	VIRTKEY, NOINVERT
-	VK_F8,	MENU_LOAD_NEOCD,		CONTROL, VIRTKEY, NOINVERT
 	VK_F8,	MENU_STATE_UNDO,		SHIFT, VIRTKEY, NOINVERT
     VK_F9,	MENU_STATE_LOAD_SLOT,	VIRTKEY, NOINVERT
     VK_F9,	MENU_STATE_LOAD_DIALOG,	CONTROL, VIRTKEY, NOINVERT

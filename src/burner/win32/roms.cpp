@@ -87,7 +87,7 @@ static INT_PTR CALLBACK DefInpProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
 	        memset(&bInfo, 0, sizeof(bInfo));
 	        bInfo.hwndOwner = hDlg;
 	        bInfo.pszDisplayName = buffer;
-	        bInfo.lpszTitle = FBALoadStringEx(hAppInst, IDS_ROMS_SELECT_DIR, true);
+	        bInfo.lpszTitle = LoadStringEx(hAppInst, IDS_ROMS_SELECT_DIR, true);
 	        bInfo.ulFlags = BIF_USENEWUI;
 
 	        pItemIDList = SHBrowseForFolder(&bInfo);
@@ -133,7 +133,7 @@ int RomsDirCreate(HWND hParentWND)
 {
     hParent = hParentWND;
 
-    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_ROMSDIR), hParent, (DLGPROC)DefInpProc);
+    DialogBox(hAppInst, MAKEINTRESOURCE(IDD_ROMSDIR), hParent, (DLGPROC)DefInpProc);
     return 1;
 }
 
@@ -374,7 +374,7 @@ static INT_PTR CALLBACK WaitProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM)		//
         SendDlgItemMessage(hDlg, IDC_WAIT_PROG, PBM_SETSTEP, (WPARAM)1, 0);
 
         ShowWindow(GetDlgItem(hDlg, IDC_WAIT_LABEL_A), TRUE);
-        SendMessage(GetDlgItem(hDlg, IDC_WAIT_LABEL_A), WM_SETTEXT, (WPARAM)0, (LPARAM)FBALoadStringEx(hAppInst, IDS_SCANNING_ROMS, true));
+        SendMessage(GetDlgItem(hDlg, IDC_WAIT_LABEL_A), WM_SETTEXT, (WPARAM)0, (LPARAM)LoadStringEx(hAppInst, IDS_SCANNING_ROMS, true));
         ShowWindow(GetDlgItem(hDlg, IDCANCEL), TRUE);
 
         avOk = false;
@@ -438,7 +438,7 @@ int CreateROMInfo(HWND hParentWND)
     {
         if (CheckGameAvb() || bRescanRoms)
         {
-            FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_WAIT), hParent, (DLGPROC)WaitProc);
+            DialogBox(hAppInst, MAKEINTRESOURCE(IDD_WAIT), hParent, (DLGPROC)WaitProc);
         }
     }
 

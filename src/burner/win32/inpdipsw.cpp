@@ -59,10 +59,10 @@ static int InpDIPSWListBegin()
     memset(&LvCol, 0, sizeof(LvCol));
     LvCol.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
     LvCol.cx = 158;
-    LvCol.pszText = FBALoadStringEx(hAppInst, IDS_DIP_GROUP, true);
+    LvCol.pszText = LoadStringEx(hAppInst, IDS_DIP_GROUP, true);
     SendMessage(hInpDIPSWList, LVM_INSERTCOLUMN, 0, (LPARAM)&LvCol);
     LvCol.cx = 215;
-    LvCol.pszText = FBALoadStringEx(hAppInst, IDS_DIP_SETTING, true);
+    LvCol.pszText = LoadStringEx(hAppInst, IDS_DIP_SETTING, true);
     SendMessage(hInpDIPSWList, LVM_INSERTCOLUMN, 1, (LPARAM)&LvCol);
 
     return 0;
@@ -416,7 +416,7 @@ int InpDIPSWCreate()
 
     bOK = false;
 
-    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_INPDIP), hMainWnd, (DLGPROC)DialogProc);
+    DialogBox(hAppInst, MAKEINTRESOURCE(IDD_INPDIP), hMainWnd, (DLGPROC)DialogProc);
 
     return 0;
 }

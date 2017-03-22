@@ -181,12 +181,12 @@ int	MemCardCreate()
     TCHAR szFilter[1024];
     int nRet;
 
-    _stprintf(szFilter, FBALoadStringEx(hAppInst, IDS_DISK_FILE_CARD, true), _T(APP_TITLE));
+    _stprintf(szFilter, LoadStringEx(hAppInst, IDS_DISK_FILE_CARD, true), _T(APP_TITLE));
     memcpy(szFilter + _tcslen(szFilter), _T(" (*.fc)\0*.fc\0\0"), 14 * sizeof(TCHAR));
 
     _stprintf (szMemoryCardFile, _T("memorycard"));
     MakeOfn();
-    ofn.lpstrTitle = FBALoadStringEx(hAppInst, IDS_MEMCARD_CREATE, true);
+    ofn.lpstrTitle = LoadStringEx(hAppInst, IDS_MEMCARD_CREATE, true);
     ofn.lpstrFilter = szFilter;
     ofn.Flags |= OFN_OVERWRITEPROMPT;
 
@@ -234,17 +234,17 @@ int	MemCardSelect()
     TCHAR *pszTemp = szFilter;
     int nRet;
 
-    pszTemp += _stprintf(pszTemp, FBALoadStringEx(hAppInst, IDS_DISK_ALL_CARD, true));
+    pszTemp += _stprintf(pszTemp, LoadStringEx(hAppInst, IDS_DISK_ALL_CARD, true));
     memcpy(pszTemp, _T(" (*.fc, MEMCARD.\?\?\?)\0*.fc;MEMCARD.\?\?\?\0"), 38 * sizeof(TCHAR));
     pszTemp += 38;
-    pszTemp += _stprintf(pszTemp, FBALoadStringEx(hAppInst, IDS_DISK_FILE_CARD, true), _T(APP_TITLE));
+    pszTemp += _stprintf(pszTemp, LoadStringEx(hAppInst, IDS_DISK_FILE_CARD, true), _T(APP_TITLE));
     memcpy(pszTemp, _T(" (*.fc)\0*.fc\0"), 13 * sizeof(TCHAR));
     pszTemp += 13;
-    pszTemp += _stprintf(pszTemp, FBALoadStringEx(hAppInst, IDS_DISK_FILE_CARD, true), _T("MAME"));
+    pszTemp += _stprintf(pszTemp, LoadStringEx(hAppInst, IDS_DISK_FILE_CARD, true), _T("MAME"));
     memcpy(pszTemp, _T(" (MEMCARD.\?\?\?)\0MEMCARD.\?\?\?\0\0"), 28 * sizeof(TCHAR));
 
     MakeOfn();
-    ofn.lpstrTitle = FBALoadStringEx(hAppInst, IDS_MEMCARD_SELECT, true);
+    ofn.lpstrTitle = LoadStringEx(hAppInst, IDS_MEMCARD_SELECT, true);
     ofn.lpstrFilter = szFilter;
 
     int bOldPause = bRunPause;

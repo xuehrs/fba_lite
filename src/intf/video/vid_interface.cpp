@@ -8,8 +8,8 @@
 
 #if defined (BUILD_WIN32)
 extern struct VidOut VidOutDDraw;
-extern struct VidOut VidOutD3D;
-extern struct VidOut VidOutDX9;
+//extern struct VidOut VidOutD3D;
+//extern struct VidOut VidOutDX9;
 #elif defined (BUILD_SDL)
 extern struct VidOut VidOutSDLOpenGL;
 extern struct VidOut VidOutSDLFX;
@@ -23,8 +23,8 @@ static struct VidOut *pVidOut[] =
 {
 #if defined (BUILD_WIN32)
     &VidOutDDraw,
-    &VidOutD3D,
-    &VidOutDX9,
+    //&VidOutD3D,
+    //&VidOutDX9,
 #elif defined (BUILD_SDL)
     &VidOutSDLOpenGL,
     &VidOutSDLFX,
@@ -384,7 +384,7 @@ const TCHAR *VidGetModuleName()
         return pszName;
     }
 #if defined (BUILD_WIN32)
-    return FBALoadStringEx(hAppInst, IDS_ERR_UNKNOWN, true);
+    return LoadStringEx(hAppInst, IDS_ERR_UNKNOWN, true);
 #else
     return "There was an error with the video";
 #endif

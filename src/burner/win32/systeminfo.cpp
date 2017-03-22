@@ -1190,7 +1190,7 @@ static INT_PTR CALLBACK SysInfoProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM l
                 {
                     TCHAR szFilter[1024];
 
-                    _stprintf(szFilter, FBALoadStringEx(hAppInst, IDS_DISK_TEXT, true));
+                    _stprintf(szFilter, LoadStringEx(hAppInst, IDS_DISK_TEXT, true));
                     memcpy(szFilter + _tcslen(szFilter), _T(" (*.txt)\0*.txt\0\0"), 16 * sizeof(TCHAR));
 
                     _stprintf(szChoice, _T("%s system information.txt"), szAppExeName);
@@ -1204,7 +1204,7 @@ static INT_PTR CALLBACK SysInfoProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM l
                     ofn.lpstrInitialDir = _T(".");
                     ofn.Flags = OFN_NOCHANGEDIR | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
                     ofn.lpstrDefExt = _T("txt");
-                    ofn.lpstrTitle = FBALoadStringEx(hAppInst, IDS_DISK_SAVEREPORT, true);
+                    ofn.lpstrTitle = LoadStringEx(hAppInst, IDS_DISK_SAVEREPORT, true);
 
                     if (GetSaveFileName(&ofn))
                     {
@@ -1270,7 +1270,7 @@ LONG CALLBACK ExceptionFilter(_EXCEPTION_POINTERS *pExceptionInfo)
 
     pExceptionPointers = pExceptionInfo;
 
-    nRet = FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_EXCEPTION), hMainWnd, (DLGPROC)SysInfoProc);
+    nRet = DialogBox(hAppInst, MAKEINTRESOURCE(IDD_EXCEPTION), hMainWnd, (DLGPROC)SysInfoProc);
 
     switch (nRet)
     {
@@ -1286,7 +1286,7 @@ int SystemInfoCreate()
 {
     pExceptionPointers = NULL;
 
-    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_SYSINFO), hMainWnd, (DLGPROC)SysInfoProc);
+    DialogBox(hAppInst, MAKEINTRESOURCE(IDD_SYSINFO), hMainWnd, (DLGPROC)SysInfoProc);
 
     return 0;
 }

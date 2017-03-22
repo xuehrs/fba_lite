@@ -523,7 +523,6 @@ static int AppInit()
     // Load config for the application
     ConfigAppLoad();
 
-    FBALocaliseInit(szLocalisationTemplate);
     BurnerDoGameListLocalisation();
 
     if (bMonitorAutoCheck) MonitorAutoCheck();
@@ -570,8 +569,6 @@ static int AppExit()
     FreeROMInfo();
     MediaExit();
     BurnLibExit();					// Exit the Burn library
-
-    FBALocaliseExit();
     BurnerExitGameListLocalisation();
 
     if (hAccel)
@@ -623,7 +620,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR lpCmdLine, int nShowCmd
     DSCore_Init();
     DICore_Init();
     DDCore_Init();
-    Dx9Core_Init();
+    //Dx9Core_Init();
 
     // Provide a custom exception handler
     SetUnhandledExceptionFilter(ExceptionFilter);

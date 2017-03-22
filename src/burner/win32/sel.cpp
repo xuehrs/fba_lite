@@ -52,11 +52,11 @@ static void SetupListControl(void)
 	ZeroMemory(&list_column,sizeof(list_column));
 	list_column.mask = LVCF_WIDTH|LVCF_TEXT|LVCF_SUBITEM;
 	list_column.cx = 100;
-	list_column.pszText = FBALoadStringEx(hAppInst, IDS_SEL_ZIPNAME, true);
+	list_column.pszText = LoadStringEx(hAppInst, IDS_SEL_ZIPNAME, true);
 	ListView_InsertColumn(hSelList,0,&list_column);
 
 	list_column.cx = 400;
-	list_column.pszText = FBALoadStringEx(hAppInst, IDS_SEL_FULLNAME, true);
+	list_column.pszText = LoadStringEx(hAppInst, IDS_SEL_FULLNAME, true);
 	ListView_InsertColumn(hSelList,1,&list_column);
 
 	ListView_SetExtendedListViewStyleEx(hSelList,LVS_EX_FULLROWSELECT|LVS_EX_DOUBLEBUFFER,LVS_EX_FULLROWSELECT|LVS_EX_DOUBLEBUFFER);
@@ -189,8 +189,8 @@ static void SelectOkay()
     if (!IsBurnDrvWorking(node->nBurnDrvNo))
     {
         TCHAR szWarningText[1024];
-        _stprintf(szWarningText, _T("%s"), FBALoadStringEx(hAppInst, IDS_ERR_WARNING, true));
-        if (MessageBox(hSelDlg, FBALoadStringEx(hAppInst, IDS_ERR_NON_WORKING, true), szWarningText, MB_YESNO | MB_DEFBUTTON2 | MB_ICONWARNING) == IDNO)
+        _stprintf(szWarningText, _T("%s"), LoadStringEx(hAppInst, IDS_ERR_WARNING, true));
+        if (MessageBox(hSelDlg, LoadStringEx(hAppInst, IDS_ERR_NON_WORKING, true), szWarningText, MB_YESNO | MB_DEFBUTTON2 | MB_ICONWARNING) == IDNO)
         {
             return;
         }
@@ -217,7 +217,7 @@ static void RefreshPanel()
 static void UpdateCounter(void)
 {
     TCHAR szRomsAvailableInfo[128];
-    _stprintf(szRomsAvailableInfo, FBALoadStringEx(hAppInst, IDS_SEL_SETSTATUS, true), nTmpDrvCount, nBurnDrvCount);
+    _stprintf(szRomsAvailableInfo, LoadStringEx(hAppInst, IDS_SEL_SETSTATUS, true), nTmpDrvCount, nBurnDrvCount);
     SendDlgItemMessage(hSelDlg, IDC_DRVCOUNT, WM_SETTEXT, 0, (LPARAM)szRomsAvailableInfo);
 }
 
@@ -403,7 +403,7 @@ int PopupSelectDialog(HWND hParentWND)
     }
 	pDrvNode = (NODEINFO *)malloc(nBurnDrvCount * sizeof(NODEINFO));
 	memset(pDrvNode, 0, nBurnDrvCount * sizeof(NODEINFO));
-    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_SELNEW), hParent, (DLGPROC)DialogProc);
+    DialogBox(hAppInst, MAKEINTRESOURCE(IDD_SELNEW), hParent, (DLGPROC)DialogProc);
 	free(pDrvNode);
     hSelDlg = NULL;
     nBurnDrvActive = nOldSelect;

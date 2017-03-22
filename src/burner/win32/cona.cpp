@@ -171,7 +171,6 @@ int ConfigAppLoad()
         VAR(nAudDSPModule[1]);
 
         // Other
-        STR(szLocalisationTemplate);
         STR(szGamelistLocalisationTemplate);
         VAR(nGamelistLocalisationActive);
 
@@ -437,9 +436,6 @@ int ConfigAppSave()
 
     _ftprintf(h, _T("\n\n\n"));
     _ftprintf(h, _T("// --- UI ---------------------------------------------------------------------\n"));
-
-    _ftprintf(h, _T("\n// Filename of the active UI translation template\n"));
-    STR(szLocalisationTemplate);
 
     _ftprintf(h, _T("\n// Filename of the active gamelist translation template\n"));
     STR(szGamelistLocalisationTemplate);

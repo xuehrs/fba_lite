@@ -23,10 +23,10 @@ static int InpCheatListBegin()
     memset(&LvCol, 0, sizeof(LvCol));
     LvCol.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
     LvCol.cx = 0xA4;
-    LvCol.pszText = FBALoadStringEx(hAppInst, IDS_CHEAT_NAME, true);
+    LvCol.pszText = LoadStringEx(hAppInst, IDS_CHEAT_NAME, true);
     SendMessage(hInpCheatList, LVM_INSERTCOLUMN, 0, (LPARAM)&LvCol);
     LvCol.cx = 0xA4;
-    LvCol.pszText = FBALoadStringEx(hAppInst, IDS_CHEAT_STATUS, true);
+    LvCol.pszText = LoadStringEx(hAppInst, IDS_CHEAT_STATUS, true);
     SendMessage(hInpCheatList, LVM_INSERTCOLUMN, 1, (LPARAM)&LvCol);
 
     return 0;
@@ -290,7 +290,7 @@ int InpCheatCreate()
     }
 
     bOK = false;
-    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_INPCHEAT), hMainWnd, (DLGPROC)DialogProc);
+    DialogBox(hAppInst, MAKEINTRESOURCE(IDD_INPCHEAT), hMainWnd, (DLGPROC)DialogProc);
 
     return 0;
 }

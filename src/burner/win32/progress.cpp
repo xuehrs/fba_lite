@@ -118,7 +118,7 @@ static INT_PTR CALLBACK ProgressProc(HWND hDlg, UINT Msg, WPARAM /*wParam*/, LPA
 
         SendDlgItemMessage(hDlg, IDC_WAIT_PROG, PBM_SETRANGE32, nProgressMin, nProgressMax);
 
-        _stprintf(szText, FBALoadStringEx(hAppInst, IDS_PROGRESS_LOADING, true), BurnDrvGetText(DRV_NAME));
+        _stprintf(szText, LoadStringEx(hAppInst, IDS_PROGRESS_LOADING, true), BurnDrvGetText(DRV_NAME));
         SendDlgItemMessage(hDlg, IDC_WAIT_LABEL_B1, WM_SETTEXT, 0, (LPARAM)szText);
 
         ShowWindow(GetDlgItem(hDlg, IDC_WAIT_LABEL_B1), TRUE);
@@ -150,7 +150,7 @@ static unsigned __stdcall DoProgress(void *)
     BurnExtProgressRangeCallback = ProgressSetRangeBurn;
     BurnExtProgressUpdateCallback = ProgressUpdateBurn;
 
-    FBACreateDialog(hAppInst, MAKEINTRESOURCE(IDD_WAIT), NULL, (DLGPROC)ProgressProc);
+    CreateDialog(hAppInst, MAKEINTRESOURCE(IDD_WAIT), NULL, (DLGPROC)ProgressProc);
 
     if (hEvent)
     {

@@ -172,7 +172,7 @@ int PaletteViewerDialogCreate(HWND hParentWND)
     if (pBurnDrvPalette == NULL) return 1;
 
     hParent = hParentWND;
-    FBADialogBox(hAppInst, MAKEINTRESOURCE(IDD_PALETTEVIEWER), hParent, (DLGPROC)DialogProc);
+    DialogBox(hAppInst, MAKEINTRESOURCE(IDD_PALETTEVIEWER), hParent, (DLGPROC)DialogProc);
 
     hParent = NULL;
     hPaletteViewerDlg = NULL;

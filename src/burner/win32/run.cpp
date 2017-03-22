@@ -452,16 +452,16 @@ int RunMessageLoop()
                             if (bMute)
                             {
                                 nAudVolume = 0;// mute sound
-                                _stprintf(buffer, FBALoadStringEx(hAppInst, IDS_SOUND_MUTE, true), nAudVolume / 100);
+                                _stprintf(buffer, LoadStringEx(hAppInst, IDS_SOUND_MUTE, true), nAudVolume / 100);
                             }
                             else
                             {
                                 nAudVolume = nOldAudVolume;// restore volume
-                                _stprintf(buffer, FBALoadStringEx(hAppInst, IDS_SOUND_MUTE_OFF, true), nAudVolume / 100);
+                                _stprintf(buffer, LoadStringEx(hAppInst, IDS_SOUND_MUTE_OFF, true), nAudVolume / 100);
                             }
                             if (AudSoundSetVolume() == 0)
                             {
-                                VidSNewShortMsg(FBALoadStringEx(hAppInst, IDS_SOUND_NOVOLUME, true));
+                                VidSNewShortMsg(LoadStringEx(hAppInst, IDS_SOUND_NOVOLUME, true));
                             }
                             else
                             {
@@ -488,11 +488,11 @@ int RunMessageLoop()
                             }
                             if (AudSoundSetVolume() == 0)
                             {
-                                VidSNewShortMsg(FBALoadStringEx(hAppInst, IDS_SOUND_NOVOLUME, true));
+                                VidSNewShortMsg(LoadStringEx(hAppInst, IDS_SOUND_NOVOLUME, true));
                             }
                             else
                             {
-                                _stprintf(buffer, FBALoadStringEx(hAppInst, IDS_SOUND_VOLUMESET, true), nAudVolume / 100);
+                                _stprintf(buffer, LoadStringEx(hAppInst, IDS_SOUND_VOLUMESET, true), nAudVolume / 100);
                                 VidSNewShortMsg(buffer);
                             }
                             break;
@@ -515,11 +515,11 @@ int RunMessageLoop()
                             }
                             if (AudSoundSetVolume() == 0)
                             {
-                                VidSNewShortMsg(FBALoadStringEx(hAppInst, IDS_SOUND_NOVOLUME, true));
+                                VidSNewShortMsg(LoadStringEx(hAppInst, IDS_SOUND_NOVOLUME, true));
                             }
                             else
                             {
-                                _stprintf(buffer, FBALoadStringEx(hAppInst, IDS_SOUND_VOLUMESET, true), nAudVolume / 100);
+                                _stprintf(buffer, LoadStringEx(hAppInst, IDS_SOUND_VOLUMESET, true), nAudVolume / 100);
                                 VidSNewShortMsg(buffer);
                             }
                             break;

@@ -3,7 +3,7 @@ alldir	+= 	burner burner/win32 dep/kaillera/client dep/libs/zlib intf intf/video
 			intf/perfcount intf/perfcount/win32 dep/generated
 
 depobj	+= 	about.o bzip.o cona.o debugger.o drv.o fba_kaillera.o inpc.o \
-			inpcheat.o inpd.o inpdipsw.o inps.o localise.o localise_gamelist.o main.o\
+			inpcheat.o inpd.o inpdipsw.o inps.o localise_gamelist.o main.o\
 			media.o memcard.o menu.o misc_win32.o numdial.o numpluscommas.o paletteviewer.o popup_win32.o \
 			progress.o res.o roms.o run.o scrn.o sel.o stated.o systeminfo.o wave.o \
 			\
@@ -17,8 +17,8 @@ depobj	+= 	about.o bzip.o cona.o debugger.o drv.o fba_kaillera.o inpc.o \
 			aud_dsp.o aud_interface.o cd_interface.o inp_interface.o interface.o lowpass2.o prf_interface.o vid_interface.o \
 			vid_support.o \
 			\
-			aud_dsound3.o aud_xaudio2.o cd_isowav.o cdsound.o ddraw_core.o dinput_core.o directx9_core.o dsound_core.o \
-			inp_dinput.o prf_performance_counter.o vid_d3d.o vid_ddraw.o vid_directx9.o vid_directx_support.o
+			aud_dsound3.o cd_isowav.o cdsound.o ddraw_core.o dinput_core.o dsound_core.o \
+			inp_dinput.o prf_performance_counter.o vid_ddraw.o vid_directx_support.o
 			
 		
 autobj += $(depobj)

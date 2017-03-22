@@ -2,17 +2,11 @@
 
 #include "burner.h"
 
-#if !defined BUILD_X64_EXE
-#include "vid_directx_support.h"
-#endif
 
 #include <InitGuid.h>
 #define DIRECT3D_VERSION 0x0700							// Use this Direct3D version
 
-#if defined BUILD_X64_EXE
 #include "vid_directx_support.h"
-#endif
-
 #include "ddraw_core.h"
 
 static IDirectDraw7 *DtoDD = NULL;				// DirectDraw interface
