@@ -376,7 +376,7 @@ static int vidInit()
     // Remember the changes to the display
     if (nVidFullscreen)
     {
-        if (VidSEnterFullscreenMode(nScreenSize, 0))
+        if (VidSEnterFullscreenMode(1, 0))
         {
             vidExit();
             return 1;

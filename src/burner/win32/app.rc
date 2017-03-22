@@ -575,11 +575,6 @@ BEGIN
     END
     POPUP "输入"
     BEGIN
-    	POPUP "选择插件"
-    	BEGIN
-    	    MENUITEM "DirectInput",					MENU_INP_PLUGIN_1, GRAYED
-    	END
-		MENUITEM SEPARATOR
     	POPUP "连发速度"
     	BEGIN
     	    MENUITEM "慢",						MENU_INPUT_AUTOFIRE_RATE_1
@@ -595,12 +590,6 @@ BEGIN
     END
     POPUP "杂项"
     BEGIN
-        POPUP "选项"
-        BEGIN
-           MENUITEM "自动暂停",					MENU_AUTOPAUSE
-           MENUITEM "总是响应键盘输入",			MENU_PROCESSINPUT, GRAYED
-           MENUITEM "显示提示信息",				MENU_DISPLAYINDICATOR
-		END
 		POPUP "优先级"
            BEGIN
               MENUITEM "实时",					MENU_PRIORITY_REALTIME
@@ -633,6 +622,9 @@ BEGIN
         END
 	MENUITEM SEPARATOR
 	MENUITEM "生成DAT文件...",			MENU_CLRMAME_PRO_XML
+	MENUITEM "自动暂停",					MENU_AUTOPAUSE
+    MENUITEM "总是响应键盘输入",			MENU_PROCESSINPUT, GRAYED
+    MENUITEM "显示提示信息",				MENU_DISPLAYINDICATOR
     END
     POPUP "帮助"
     BEGIN

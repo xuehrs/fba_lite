@@ -223,9 +223,6 @@ extern HMENU hMenu;									// Handle to the menu
 extern HMENU hMenuPopup;							// Handle to a popup version of the menu
 extern int nMenuHeight;
 extern int bAutoPause;
-extern int nScreenSize;
-extern int nScreenSizeHor;	// For horizontal orientation
-extern int nScreenSizeVer;	// For vertical orientation
 extern int nWindowSize;
 
 #define SHOW_PREV_GAMES		10
@@ -235,7 +232,6 @@ int MenuCreate();
 void MenuDestroy();
 int SetMenuPriority();
 void MenuUpdate();
-void CreateArcaderesItem();
 void MenuEnableItems();
 void MenuRemoveTheme();
 

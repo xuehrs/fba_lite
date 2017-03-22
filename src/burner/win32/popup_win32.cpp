@@ -123,7 +123,6 @@ static INT_PTR CALLBACK FBAPopupProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 
         {
             SIZE sizee = { 0, 0 };
-            SIZE sizel = { 0, 0 };
             POINT p = { 0, 0 };
             RECT rect;
             HWND hWnd;

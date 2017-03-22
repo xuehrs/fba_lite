@@ -91,7 +91,6 @@ int ConfigAppLoad()
         VAR(VidPreset[2].nHeight);
         VAR(VidPreset[3].nWidth);
         VAR(VidPreset[3].nHeight);
-        VAR(nScreenSizeHor);
 
         // vertical oriented
         VAR(nVidVerWidth);
@@ -105,7 +104,6 @@ int ConfigAppLoad()
         VAR(VidPresetVer[2].nHeight);
         VAR(VidPresetVer[3].nWidth);
         VAR(VidPresetVer[3].nHeight);
-        VAR(nScreenSizeVer);
 
         VAR(nWindowSize);
         VAR(bDoGamma);
@@ -298,8 +296,6 @@ int ConfigAppSave()
     VAR(VidPreset[2].nHeight);
     VAR(VidPreset[3].nWidth);
     VAR(VidPreset[3].nHeight);
-    _ftprintf(h, _T("\n// (Horizontal Oriented) Full-screen size (0 = use display mode variables)\n"));
-    VAR(nScreenSizeHor);
 
     // Vertical oriented
     _ftprintf(h, _T("\n// (Vertical Oriented) The display mode to use for fullscreen\n"));
@@ -316,8 +312,6 @@ int ConfigAppSave()
     VAR(VidPresetVer[2].nHeight);
     VAR(VidPresetVer[3].nWidth);
     VAR(VidPresetVer[3].nHeight);
-    _ftprintf(h, _T("\n// (Vertical Oriented) Full-screen size (0 = use display mode variables)\n"));
-    VAR(nScreenSizeVer);
 
     _ftprintf(h, _T("\n// Full-screen bit depth\n"));
     VAR(nVidDepth);

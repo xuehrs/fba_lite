@@ -1,12 +1,6 @@
 // Menu handling
 #include "burner.h"
 
-#ifdef _MSC_VER
-// #include <winable.h>
-#endif
-
-int nOtherRes = 0;
-
 HMENU hMenu = NULL;
 static HMENU hBlitterMenu[8] = {NULL, };	// Handles to the blitter-specific sub-menus
 static HMENU hAudioPluginMenu[8] = {NULL, };
@@ -20,68 +14,7 @@ static int nCurrentItemFlags;
 
 int nMenuHeight = 0;
 int nWindowSize = 0;
-int nScreenSize = 0;
-int nScreenSizeHor = 0;
-int nScreenSizeVer = 0;
-
 TCHAR szPrevGames[SHOW_PREV_GAMES][32];
-
-void DisplayPopupMenu(int nMenu)
-{
-    if (bMenuDisplayed)
-    {
-        EndMenu();
-        if (nLastMenu != nMenu)
-        {
-            PostMessage(hMainWnd, UM_DISPLAYPOPUP, nMenu, 0);
-        }
-    }
-}
-
-int OnNotify(HWND, int, NMHDR *lpnmhdr)		// HWND hwnd, int id, NMHDR* lpnmhdr
-{
-    switch (((TBNOTIFY *)lpnmhdr)->hdr.code)
-    {
-
-    case TBN_DROPDOWN:
-    {
-        if (!bMenuDisplayed || ((TBNOTIFY *)lpnmhdr)->iItem - MENU_MENU_0 != nLastMenu)
-        {
-            DisplayPopupMenu(((TBNOTIFY *)lpnmhdr)->iItem - MENU_MENU_0);
-            nLastMenu = ((TBNOTIFY *)lpnmhdr)->iItem - MENU_MENU_0;
-        }
-        return TBDDRET_DEFAULT;
-    }
-
-    case TBN_HOTITEMCHANGE:
-    {
-        int nItem = ((NMTBHOTITEM *)lpnmhdr)->idNew;
-
-        // If a menu is being displayed, close it and display the new one
-        if (bMenuDisplayed)
-        {
-            if (nItem)
-            {
-                if (nItem - MENU_MENU_0 != nLastMenu)
-                {
-                    DisplayPopupMenu(nItem - MENU_MENU_0);
-                    return 1;
-                }
-            }
-        }
-        else
-        {
-            nLastMenu = nItem - MENU_MENU_0;
-            if (!nItem && !bAltPause)
-            {
-                GameInpCheckMouse();
-            }
-            return 0;
-        }
-    }
-    }
-    return 0;
-}
 
 int OnMenuSelect(HWND, HMENU, int nItem, HMENU, UINT nFlags)
 {
@@ -130,11 +63,8 @@ int MenuCreate()
     {
     	hMenu = GetMenu(hMainWnd);
         hBlitterMenu[0] = LoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_BLITTER_1));	// DirectDraw Standard blitter
-        hBlitterMenu[1] = LoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_BLITTER_2));	// Direct3D
-        hBlitterMenu[2] = LoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_BLITTER_3));	// DirectX 9
 
         hAudioPluginMenu[0] = LoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_AUD_PLUGIN_1));
-        hAudioPluginMenu[1] = LoadMenu(hAppInst, MAKEINTRESOURCE(IDR_MENU_AUD_PLUGIN_2));
     }
 	
 	if (nVidFullscreen)
@@ -159,91 +89,6 @@ void MenuDestroy()
     {
         hMenu = NULL;
     }
-}
-
-// Update the arade resolution menuitem
-void CreateArcaderesItem()
-{
-    int nGameWidth, nGameHeight;
-
-    TCHAR szItemText[256];
-    MENUITEMINFO menuItem = {sizeof(MENUITEMINFO), MIIM_TYPE, MFT_STRING, 0, 0, NULL, NULL, NULL, 0, szItemText, 0, 0, };
-
-    // horizontal oriented
-    LoadString(hAppInst, IDS_MENU_0, szItemText, 256);
-    if ((bDrvOkay) && !(BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL))
-    {
-        BurnDrvGetVisibleSize(&nGameWidth, &nGameHeight);
-        _stprintf(szItemText + _tcslen(szItemText), _T("\t(%i x %i)"), nGameWidth, nGameHeight);
-    }
-    menuItem.cch = _tcslen(szItemText);
-    SetMenuItemInfo(hMenu, MENU_RES_ARCADE, 0, &menuItem);
-
-    // vertical oriented
-    TCHAR szItemText2[256];
-    MENUITEMINFO menuItem2 = {sizeof(MENUITEMINFO), MIIM_TYPE, MFT_STRING, 0, 0, NULL, NULL, NULL, 0, szItemText2, 0, 0, };
-
-    LoadString(hAppInst, IDS_MENU_0, szItemText2, 256);
-    if (bDrvOkay && BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL)
-    {
-        BurnDrvGetVisibleSize(&nGameWidth, &nGameHeight);
-        _stprintf(szItemText + _tcslen(szItemText2), _T("\t(%i x %i)"), nGameWidth, nGameHeight);
-    }
-    menuItem2.cch = _tcslen(szItemText2);
-    SetMenuItemInfo(hMenu, MENU_RES_ARCADE_VERTICAL, 0, &menuItem2);
-}
-
-// (Horizontal oriented) Update the custom resolution menuitem
-static void CreateOtherresItem(bool bOther)
-{
-    TCHAR szItemText[256];
-    MENUITEMINFO menuItem = {sizeof(MENUITEMINFO), MIIM_TYPE, MFT_STRING, 0, 0, NULL, NULL, NULL, 0, szItemText, 0, 0 };
-
-    LoadString(hAppInst, IDS_MENU_1, szItemText, 256);
-    if (bOther)
-    {
-        _stprintf(szItemText + _tcslen(szItemText), _T("\t(%i x %i)"), nVidHorWidth, nVidHorHeight);
-    }
-    menuItem.cch = _tcslen(szItemText);
-    SetMenuItemInfo(hMenu, MENU_RES_OTHER, 0, &menuItem);
-}
-
-// (Vertical oriented) Update the custom resolution menuitem
-static void CreateOtherresItemVer(bool bOther)
-{
-    TCHAR szItemText[256];
-    MENUITEMINFO menuItem = {sizeof(MENUITEMINFO), MIIM_TYPE, MFT_STRING, 0, 0, NULL, NULL, NULL, 0, szItemText, 0, 0 };
-
-    LoadString(hAppInst, IDS_MENU_1, szItemText, 256);
-    if (bOther)
-    {
-        _stprintf(szItemText + _tcslen(szItemText), _T("\t(%i x %i)"), nVidVerWidth, nVidVerHeight);
-    }
-    menuItem.cch = _tcslen(szItemText);
-    SetMenuItemInfo(hMenu, MENU_RES_OTHER_VERTICAL, 0, &menuItem);
-}
-
-static void CreatepresetResItems()
-{
-    TCHAR szItemText[256];
-    MENUITEMINFO menuItem = {sizeof(MENUITEMINFO), MIIM_TYPE, MFT_STRING, 0, 0, NULL, NULL, NULL, 0, szItemText, 0, 0 };
-
-    // horizontal oriented
-    for (int i = 0; i < 4; i++)
-    {
-        _stprintf(szItemText, _T("%i x %i"), VidPreset[i].nWidth, VidPreset[i].nHeight);
-        menuItem.cch = _tcslen(szItemText);
-        SetMenuItemInfo(hMenu, MENU_RES_1 + i, 0, &menuItem);
-    }
-
-    // vertical oriented
-    for (int i = 0; i < 4; i++)
-    {
-        _stprintf(szItemText, _T("%i x %i"), VidPresetVer[i].nWidth, VidPresetVer[i].nHeight);
-        menuItem.cch = _tcslen(szItemText);
-        SetMenuItemInfo(hMenu, MENU_RES_1_VERTICAL + i, 0, &menuItem);
-    }
-    return;
 }
 
 // Update the other gamma menuitem
@@ -299,7 +144,6 @@ void MenuUpdate()
 
     CheckMenuItem(hMenu, MENU_PAUSE, bAltPause ? MF_CHECKED : MF_UNCHECKED);
     CheckMenuItem(hMenu, MENU_ALLRAM, bDrvSaveAll ? MF_CHECKED : MF_UNCHECKED);
-
     CheckMenuItem(hMenu, MENU_SETCPUCLOCK, nBurnCPUSpeedAdjust != 0x0100 ? MF_CHECKED : MF_UNCHECKED);
     CreateCPUSpeedItem(nBurnCPUSpeedAdjust != 0x0100);
 
@@ -348,179 +192,7 @@ void MenuUpdate()
         CheckMenuItem(hMenu, MENU_FORCE_FLIP, bVidForceFlip ? MF_CHECKED : MF_UNCHECKED);
         CheckMenuItem(hMenu, MENU_RES_ARCADE, bVidArcaderes ? MF_CHECKED : MF_UNCHECKED);
         break;
-    case 1:
-        CheckMenuItem(hMenu, MENU_BILINEAR, bVidBilinear ? MF_CHECKED : MF_UNCHECKED);
-        CheckMenuItem(hMenu, MENU_ENHANCED_SCAN, bVidScanlines ? MF_CHECKED : MF_UNCHECKED);
-        CheckMenuItem(hMenu, MENU_PHOSPHOR, bVidScanDelay ? MF_CHECKED : MF_UNCHECKED);
-
-        CheckMenuItem(hMenu, MENU_PRESCALE, nVidBlitterOpt[nVidSelect] & 0x01000000 ? MF_CHECKED : MF_UNCHECKED);
-        CheckMenuItem(hMenu, MENU_SOFTFX, nVidBlitterOpt[nVidSelect] & 0x02000000 ? MF_CHECKED : MF_UNCHECKED);
-
-        var = ((unsigned long long)nVidBlitterOpt[nVidSelect] >> 32) + MENU_ENHANCED_SOFT_STRETCH;
-        CheckMenuRadioItem(hMenu, MENU_ENHANCED_SOFT_STRETCH, MENU_ENHANCED_SOFT_STRETCH + 34, var, MF_BYCOMMAND);
-        CheckMenuItem(hMenu, MENU_ENHANCED_SOFT_AUTOSIZE, (nVidBlitterOpt[nVidSelect] & 0x04000000) ? MF_CHECKED : MF_UNCHECKED);
-        if (nVidBlitterOpt[nVidSelect] & 0x00100000)
-        {
-            var = MENU_3DPROJECTION;
-        }
-        else
-        {
-            if (nVidBlitterOpt[nVidSelect] & 0x00010000)
-            {
-                var = MENU_RGBEFFECTS;
-            }
-            else
-            {
-                var = MENU_ENHANCED_NORMAL;
-            }
-        }
-        CheckMenuRadioItem(hMenu, MENU_ENHANCED_NORMAL, MENU_ENHANCED_NORMAL, var, MF_BYCOMMAND);
-        CheckMenuRadioItem(hMenu, MENU_RGBEFFECTS, MENU_3DPROJECTION, var, MF_BYCOMMAND);
-
-        CheckMenuItem(hMenu, MENU_EFFECT_AUTO, (nVidBlitterOpt[nVidSelect] & 0x00020000) ? MF_CHECKED : MF_UNCHECKED);
-        var = MENU_EFFECT_01 + (nVidBlitterOpt[nVidSelect] & 0x000000FF) - 8;
-        CheckMenuRadioItem(hMenu, MENU_EFFECT_01, MENU_EFFECT_08, var, MF_BYCOMMAND);
-        CheckMenuItem(hMenu, MENU_3DUSELIGHTING, nVidBlitterOpt[nVidSelect] & 0x00200000 ? MF_CHECKED : MF_UNCHECKED);
-        CheckMenuItem(hMenu, MENU_ENHANCED_ROTSCAN, bVidScanRotate ? MF_CHECKED : MF_UNCHECKED);
-        CheckMenuItem(hMenu, MENU_FORCE_16BIT, bVidForce16bit ? MF_CHECKED : MF_UNCHECKED);
-        CheckMenuItem(hMenu, MENU_TEXTUREMANAGE, (nVidTransferMethod & 1) ? MF_CHECKED : MF_UNCHECKED);
-        CheckMenuItem(hMenu, MENU_RES_ARCADE, bVidArcaderes ? MF_CHECKED : MF_UNCHECKED);
-        break;
-    case 2:
-        var = ((nVidBlitterOpt[nVidSelect] >> 24) & 0x03) + MENU_DX9_POINT;
-        CheckMenuRadioItem(hMenu, MENU_DX9_POINT, MENU_DX9_POINT + 2, var, MF_BYCOMMAND);
-        CheckMenuItem(hMenu, MENU_EXP_SCAN, bVidScanlines ? MF_CHECKED : MF_UNCHECKED);
-
-        var = MENU_DX9_CUBIC_CUSTOM;
-        if (dVidCubicB > -0.001 && dVidCubicB <  0.001 && dVidCubicC > -0.001 && dVidCubicC <  0.001)
-        {
-            var = MENU_DX9_CUBIC_LIGHT;
-        }
-        if (dVidCubicB >  1.499 && dVidCubicB <  1.501 && dVidCubicC > -0.251 && dVidCubicC < -0.249)
-        {
-            var = MENU_DX9_CUBIC_NOTCH;
-        }
-        if (dVidCubicB >  0.999 && dVidCubicB <  1.001 && dVidCubicC > -0.001 && dVidCubicC <  0.001)
-        {
-            var = MENU_DX9_CUBIC_BSPLINE;
-        }
-        if (dVidCubicB >  0.333 && dVidCubicB <  0.334 && dVidCubicC >  0.333 && dVidCubicC <  0.334)
-        {
-            var = MENU_DX9_CUBIC_OPTIMAL;
-        }
-        if (dVidCubicB > -0.001 && dVidCubicB <  0.001 && dVidCubicC >  0.499 && dVidCubicC <  0.501)
-        {
-            var = MENU_DX9_CUBIC_CATMULL;
-        }
-        if (dVidCubicB > -0.001 && dVidCubicB <  0.001 && dVidCubicC >  0.999 && dVidCubicC <  1.001)
-        {
-            var = MENU_DX9_CUBIC_SHARP;
-        }
-        CheckMenuRadioItem(hMenu, MENU_DX9_CUBIC_LIGHT, MENU_DX9_CUBIC_BSPLINE + 8, var, MF_BYCOMMAND);
-
-        CheckMenuItem(hMenu, MENU_DX9_FORCE_PS14, !(nVidBlitterOpt[nVidSelect] & (1 <<  9)) ? MF_CHECKED : MF_UNCHECKED);
-        CheckMenuItem(hMenu, MENU_DX9_FPTERXTURES, (nVidBlitterOpt[nVidSelect] & (1 <<  8)) ? MF_CHECKED : MF_UNCHECKED);
-        if (!(nVidBlitterOpt[nVidSelect] & (1 <<  9)))
-        {
-            var = MENU_DX9_CUBIC4;
-        }
-        else
-        {
-            var = ((nVidBlitterOpt[nVidSelect] >> 28) & 0x07) + MENU_DX9_CUBIC0;
-        }
-        CheckMenuRadioItem(hMenu, MENU_DX9_CUBIC0, MENU_DX9_CUBIC0 + 8, var, MF_BYCOMMAND);
-        break;
-    case 4:
-        var = (nVidBlitterOpt[nVidSelect] & 0xFF) + MENU_DX9_ALT_SOFT_STRETCH;
-        CheckMenuRadioItem(hMenu, MENU_DX9_ALT_SOFT_STRETCH, MENU_DX9_ALT_SOFT_STRETCH + 34, var, MF_BYCOMMAND);
-        CheckMenuItem(hMenu, MENU_DX9_ALT_SOFT_AUTOSIZE, (nVidBlitterOpt[nVidSelect] & 0x0100) ? MF_CHECKED : MF_UNCHECKED);
-        CheckMenuRadioItem(hMenu, MENU_DX9_ALT_POINT, MENU_DX9_ALT_POINT + 1, MENU_DX9_ALT_POINT + bVidDX9Bilinear, MF_BYCOMMAND);
-        CheckMenuItem(hMenu, MENU_DX9_ALT_HARDWAREVERTEX, (bVidHardwareVertex) ? MF_CHECKED : MF_UNCHECKED);
-        CheckMenuItem(hMenu, MENU_DX9_ALT_MOTIONBLUR, (bVidMotionBlur) ? MF_CHECKED : MF_UNCHECKED);
-        break;
     }
-
-    var = 0;
-    if (nScreenSizeHor)
-    {
-        var = MENU_SINGLESIZESCREEN + nScreenSizeHor - 1;
-        CreateOtherresItem(0);
-    }
-    else
-    {
-        for (int n = 0; n < 4; n++)
-        {
-            if (nVidHorWidth == VidPreset[n].nWidth && nVidHorHeight == VidPreset[n].nHeight)
-            {
-                var = MENU_RES_1 + n;
-                break;
-            }
-        }
-        if (var)
-        {
-            CreateOtherresItem(0);
-        }
-        else
-        {
-            var = MENU_RES_OTHER;
-            CreateOtherresItem(1);
-        }
-        if (bVidArcaderesHor)
-        {
-            var = MENU_RES_ARCADE;
-        }
-    }
-    CheckMenuRadioItem(hMenu, MENU_RES_1, MENU_QUADSIZESCREEN, var, MF_BYCOMMAND);
-
-    var = 0;
-    if (nScreenSizeVer)
-    {
-        var = MENU_SINGLESIZESCREEN_VERTICAL + nScreenSizeVer - 1;
-        CreateOtherresItemVer(0);
-    }
-    else
-    {
-        for (int n = 0; n < 4; n++)
-        {
-            if (nVidVerWidth == VidPresetVer[n].nWidth && nVidVerHeight == VidPresetVer[n].nHeight)
-            {
-                var = MENU_RES_1_VERTICAL + n;
-                break;
-            }
-        }
-        if (var)
-        {
-            CreateOtherresItemVer(0);
-        }
-        else
-        {
-            var = MENU_RES_OTHER_VERTICAL;
-            CreateOtherresItemVer(1);
-        }
-        if (bVidArcaderesVer)
-        {
-            var = MENU_RES_ARCADE_VERTICAL;
-        }
-    }
-    CheckMenuRadioItem(hMenu, MENU_RES_1_VERTICAL, MENU_QUADSIZESCREEN_VERTICAL, var, MF_BYCOMMAND);
-
-    if (nVidDepth == 16)
-    {
-        var = MENU_16;
-    }
-    else
-    {
-        if (nVidDepth == 24)
-        {
-            var = MENU_24;
-        }
-        else
-        {
-            var = MENU_32;
-        }
-    }
-    CheckMenuRadioItem(hMenu, MENU_16, MENU_32, var, MF_BYCOMMAND);
-
     if (nGamma > 1.249 && nGamma < 1.251)
     {
         var = MENU_GAMMA_DARKER;
@@ -564,7 +236,6 @@ void MenuUpdate()
         }
     }
     CheckMenuRadioItem(hMenu, MENU_GAMMA_USE_HARDWARE, MENU_GAMMA_SOFTWARE_ONLY, var, MF_BYCOMMAND);
-
     CheckMenuItem(hMenu, MENU_AUTOSWITCHFULL, bVidAutoSwitchFull ? MF_CHECKED : MF_UNCHECKED);
 
     if (nVidTransferMethod == 0)
@@ -610,7 +281,6 @@ void MenuUpdate()
         var = MENU_MAXIMUMSIZEWINDOW;
     }
     CheckMenuRadioItem(hMenu, MENU_AUTOSIZE, MENU_MAXIMUMSIZEWINDOW, var, MF_BYCOMMAND);
-
     CheckMenuItem(hMenu, MENU_MONITORAUTOCHECK, bMonitorAutoCheck ? MF_CHECKED : MF_UNCHECKED);
 
     var = -1;
@@ -682,40 +352,6 @@ void MenuUpdate()
         }
         CheckMenuRadioItem(hMenu, MENU_DSOUND_NOSOUND, MENU_DSOUND_48000, var, MF_BYCOMMAND);
         CheckMenuItem(hMenu, MENU_DSOUND_BASS, nAudDSPModule[0] ? MF_CHECKED : MF_UNCHECKED);
-        break;
-    }
-
-    case 1:
-    {
-        var = MENU_XAUDIO_NOSOUND;
-        if (nAudSampleRate[1] > 0)
-        {
-            if (nAudSampleRate[1] <= 11025)
-            {
-                var = MENU_XAUDIO_11025;
-            }
-            else
-            {
-                if (nAudSampleRate[1] <= 22050)
-                {
-                    var = MENU_XAUDIO_22050;
-                }
-                else
-                {
-                    if (nAudSampleRate[1] <= 44100)
-                    {
-                        var = MENU_XAUDIO_44100;
-                    }
-                    else
-                    {
-                        var = MENU_XAUDIO_48000;
-                    }
-                }
-            }
-        }
-        CheckMenuRadioItem(hMenu, MENU_XAUDIO_NOSOUND, MENU_XAUDIO_48000, var, MF_BYCOMMAND);
-        CheckMenuItem(hMenu, MENU_XAUDIO_BASS, (nAudDSPModule[1] & 1) ? MF_CHECKED : MF_UNCHECKED);
-        CheckMenuItem(hMenu, MENU_XAUDIO_REVERB, (nAudDSPModule[1] & 2) ? MF_CHECKED : MF_UNCHECKED);
         break;
     }
     }
@@ -841,9 +477,6 @@ void MenuUpdate()
 
 void MenuEnableItems()
 {
-    CreateArcaderesItem();
-    CreatepresetResItems();
-
     if (hBlitterMenu[nVidSelect])
     {
         MENUITEMINFO myMenuItemInfo;
@@ -896,28 +529,6 @@ void MenuEnableItems()
         EnableMenuItem(GetSubMenu(hMenu, 1), 10,	MF_ENABLED | MF_BYPOSITION);
     }
     EnableMenuItem(GetSubMenu(hMenu, 1), 11,		MF_ENABLED | MF_BYPOSITION);
-
-    if (nVidSelect == 3 && (!(nVidBlitterOpt[3] & (1 <<  9)) || (nVidBlitterOpt[nVidSelect] & (7 << 28)) == (4 << 28)))
-    {
-        EnableMenuItem(hMenu, MENU_DX9_CUBIC_BSPLINE,	MF_GRAYED  | MF_BYCOMMAND);
-        EnableMenuItem(hMenu, MENU_DX9_CUBIC_NOTCH,		MF_GRAYED  | MF_BYCOMMAND);
-        EnableMenuItem(hMenu, MENU_DX9_CUBIC_OPTIMAL,	MF_GRAYED  | MF_BYCOMMAND);
-    }
-    else
-    {
-        EnableMenuItem(hMenu, MENU_DX9_CUBIC_BSPLINE,	MF_ENABLED | MF_BYCOMMAND);
-        EnableMenuItem(hMenu, MENU_DX9_CUBIC_NOTCH,		MF_ENABLED | MF_BYCOMMAND);
-        EnableMenuItem(hMenu, MENU_DX9_CUBIC_OPTIMAL,	MF_ENABLED | MF_BYCOMMAND);
-    }
-    if (nVidSelect == 3)
-    {
-        EnableMenuItem(hMenu, MENU_24,	                MF_GRAYED  | MF_BYCOMMAND);
-    }
-#if defined _MSC_VER && defined BUILD_X86_ASM
-    EnableMenuItem(hBlitterMenu[1], MENU_ENHANCED_SOFT_HQ3XS_VBA, MF_ENABLED | MF_BYCOMMAND);
-    EnableMenuItem(hBlitterMenu[2], MENU_SOFTFX_SOFT_HQ3XS_VBA, MF_ENABLED | MF_BYCOMMAND);
-    EnableMenuItem(hBlitterMenu[4], MENU_DX9_ALT_SOFT_HQ3XS_VBA, MF_ENABLED | MF_BYCOMMAND);
-#endif
 
     if (bDrvOkay)
     {

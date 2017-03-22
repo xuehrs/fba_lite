@@ -177,14 +177,12 @@ int DrvInit(int nDrvNum, bool bRestore)
 
     if (BurnDrvGetFlags() & BDF_ORIENTATION_VERTICAL)
     {
-        nScreenSize = nScreenSizeVer;
         bVidArcaderes = bVidArcaderesVer;
         nVidWidth	= nVidVerWidth;
         nVidHeight	= nVidVerHeight;
     }
     else
     {
-        nScreenSize = nScreenSizeHor;
         bVidArcaderes = bVidArcaderesHor;
         nVidWidth	= nVidHorWidth;
         nVidHeight	= nVidHorHeight;
