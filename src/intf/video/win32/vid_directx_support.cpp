@@ -453,7 +453,7 @@ int VidSEnterFullscreenMode(int nZoom, int nDepth)
     {
         return 1;
     }
-
+/*
     if (FAILED(pDD->SetDisplayMode(nWidth, nHeight, nDepth, nVidRefresh, 0)))
     {
         VidSRestoreScreenMode();
@@ -470,7 +470,7 @@ int VidSEnterFullscreenMode(int nZoom, int nDepth)
 
         return 1;
     }
-
+*/
     nVidScrnWidth = nWidth;
     nVidScrnHeight = nHeight;
 

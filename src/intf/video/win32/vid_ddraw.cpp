@@ -2,7 +2,6 @@
 
 #include "burner.h"
 
-
 #include <InitGuid.h>
 #define DIRECT3D_VERSION 0x0700							// Use this Direct3D version
 
@@ -15,7 +14,6 @@ static IDirectDrawSurface7 *DtoBack = NULL;		// Back buffer surface
 
 static int nRotateGame;
 static bool bRotateScanlines;
-static DDBLTFX *DtoBltFx = NULL;				// We use mirrored blits for flipped games
 
 static IDirectDrawSurface7 *pddsDtos = NULL;	// The screen surface
 static int nGameWidth = 0, nGameHeight = 0;		// screen size
@@ -26,7 +24,6 @@ static RECT Src = { 0, 0, 0, 0 };
 static RECT Dest = { 0, 0, 0, 0 };
 
 static int nHalfMask = 0;
-
 static int nUseSys;								// Use System or Video memory
 
 static int DtoPrimClear()
@@ -274,13 +271,6 @@ static int vidExit()
     DtoBack = NULL;
 
     VidSExit();
-
-    if (DtoBltFx)
-    {
-        free(DtoBltFx);
-        DtoBltFx = NULL;
-    }
-
     RELEASE(DtoDD)
 
     return 0;
@@ -339,8 +329,6 @@ static int vidInit()
     nRotateGame = 0;
     if (bDrvOkay)
     {
-        DtoBltFx = NULL;
-
         // Get the game screen size
         BurnDrvGetVisibleSize(&nGameWidth, &nGameHeight);
 
@@ -376,19 +364,6 @@ static int vidInit()
             DtoDD->GetCaps(&ddcaps, NULL);
             if (((ddcaps.dwFXCaps & DDFXCAPS_BLTMIRRORLEFTRIGHT) && (ddcaps.dwFXCaps & DDFXCAPS_BLTMIRRORUPDOWN)) || bVidForceFlip)
             {
-
-                DtoBltFx = (DDBLTFX *)malloc(sizeof(DDBLTFX));
-                if (DtoBltFx == NULL)
-                {
-                    vidExit();
-                    return 1;
-                }
-
-                memset(DtoBltFx, 0, sizeof(DDBLTFX));
-
-                DtoBltFx->dwSize = sizeof(DDBLTFX);
-                DtoBltFx->dwDDFX = DDBLTFX_MIRRORLEFTRIGHT | DDBLTFX_MIRRORUPDOWN;
-
                 // Enable flipping now
                 nRotateGame |= 2;
             }
@@ -1222,12 +1197,6 @@ static int vidPaint(int bValidate)
         vidBurnToSurf();
     }
 
-    DWORD dwBltFlags = 0;																		// See if we need to use blit effects
-    if (DtoBltFx)
-    {
-        dwBltFlags |= DDBLT_DDFX;
-    }
-
     if (bVidVSync && !nVidFullscreen)
     {
         DtoDD->WaitForVerticalBlank(DDWAITVB_BLOCKEND, NULL);
@@ -1235,9 +1204,9 @@ static int vidPaint(int bValidate)
 
     if (DtoBack != NULL)  																		// Triple bufferring
     {
-        if (FAILED(DtoBack->Blt(&Dest, pddsDtos, &Src, DDBLT_ASYNC | dwBltFlags, DtoBltFx)))
+        if (FAILED(DtoBack->Blt(&Dest, pddsDtos, &Src, DDBLT_ASYNC, NULL)))
         {
-            if (FAILED(DtoBack->Blt(&Dest, pddsDtos, &Src, DDBLT_WAIT | dwBltFlags, DtoBltFx)))
+            if (FAILED(DtoBack->Blt(&Dest, pddsDtos, &Src, DDBLT_WAIT, NULL)))
             {
                 return 1;
             }
@@ -1266,9 +1235,9 @@ static int vidPaint(int bValidate)
         // Display OSD text message
         VidSDisplayOSD(pddsDtos, &rect, nFlags);
 
-        if (FAILED(DtoPrim->Blt(&Dest, pddsDtos, &Src, DDBLT_ASYNC | dwBltFlags, DtoBltFx)))
+        if (FAILED(DtoPrim->Blt(&Dest, pddsDtos, &Src, DDBLT_ASYNC, NULL)))
         {
-            if (FAILED(DtoPrim->Blt(&Dest, pddsDtos, &Src, DDBLT_WAIT | dwBltFlags, DtoBltFx)))
+            if (FAILED(DtoPrim->Blt(&Dest, pddsDtos, &Src, DDBLT_WAIT, NULL)))
             {
                 return 1;
             }
