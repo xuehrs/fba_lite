@@ -73,7 +73,8 @@ LSB_FIRST = 1
 #
 #	execute an appropriate system-specific makefile
 #
-
+default: mingw510
+	
 mingw345: FORCE
 	@$(MAKE) -s -f makefile.mingw GCC345=1
 

@@ -524,7 +524,6 @@
 #define MENU_EFFECT_0D						11134
 #define MENU_EFFECT_0E						11135
 #define MENU_EFFECT_0F						11136
-#define MENU_EFFECT_10						11147
 #define MENU_FORCE_16BIT					11141
 #define MENU_TEXTUREMANAGE					11142
 #define MENU_FORCE_FLIP						11143

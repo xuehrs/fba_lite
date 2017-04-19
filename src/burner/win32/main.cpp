@@ -554,12 +554,6 @@ static int AppInit()
 
     // Build the ROM information
     CreateROMInfo(NULL);
-
-    // Write a clrmame dat file if we are verifying roms
-#if defined (ROM_VERIFY)
-    create_datfile(_T("fba.dat"), 0);
-#endif
-
     return 0;
 }
 

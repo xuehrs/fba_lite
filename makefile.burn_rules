@@ -1,8 +1,9 @@
-alldir	= 	burn burn/devices burn/snd\
-                burn/drv burn/drv/capcom burn/drv/cps3 burn/drv/dataeast burn/drv/neogeo burn/drv/pgm\
-		cpu cpu/arm cpu/arm7 cpu/m68k cpu/sh2 cpu/z80\
+alldir	= 	burn \
+            burn/devices \
+			burn/snd \
+            burn/drv burn/drv/capcom burn/drv/cps3 burn/drv/neogeo burn/drv/pgm\
+		    burn/cpu burn/cpu/arm7 burn/cpu/m68k burn/cpu/sh2 burn/cpu/z80\
 		
-
 drvobj	= 	d_cps1.o d_cps2.o d_cps3.o d_neogeo.o d_pgm.o
 			
 
@@ -16,9 +17,9 @@ depobj	:= 	$(drvobj) \
 			ay8910.o  burn_ym2151.o burn_ym2203.o  burn_ym2610.o \
 			fm.o fmopl.o ics2115.o msm5205.o msm6295.o ym2151.o ymdeltat.o \
 			\
-			arm7_intf.o arm_intf.o m68000_intf.o z80_intf.o \
+			arm7_intf.o m68000_intf.o z80_intf.o \
 			\
-			arm.o arm7.o sh2.o z80.o z80daisy.o \
+			arm7.o sh2.o z80.o z80daisy.o \
 			\
 			cps2_crpt.o cps.o cps_config.o cps_draw.o cps_mem.o cps_obj.o cps_pal.o cps_run.o cps_rw.o cps_scr.o cpsr.o cpsrd.o \
 			cpst.o ctv.o fcrash_snd.o kabuki.o ps.o ps_m.o ps_z.o qs.o qs_c.o qs_z.o sf2mdt_snd.o \
@@ -38,4 +39,3 @@ endif
 ifdef	BUILD_X86_ASM
 	autobj += burn_sound_a.o
 endif
-

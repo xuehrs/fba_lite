@@ -282,41 +282,6 @@ static void DoNetGame()
     POST_INITIALISE_MESSAGE;
 }
 
-int CreateDatfileWindows(int bType)
-{
-    TCHAR szTitle[1024];
-    TCHAR szFilter[1024];
-
-    TCHAR szConsoleString[64];
-    _sntprintf(szConsoleString, 64, _T(""));
-
-    TCHAR szProgramString[25];
-    _sntprintf(szProgramString, 25, _T("ClrMame Pro XML"));
-
-    _sntprintf(szChoice, MAX_PATH, _T(APP_TITLE) _T(" v%.20s (%s%s).dat"), szAppBurnVer, szProgramString, szConsoleString);
-    _sntprintf(szTitle, 256, LoadStringEx(hAppInst, IDS_DAT_GENERATE, true), szProgramString);
-
-    _stprintf(szFilter, LoadStringEx(hAppInst, IDS_DISK_ALL_DAT, true), _T(APP_TITLE));
-    memcpy(szFilter + _tcslen(szFilter), _T(" (*.dat)\0*.dat\0\0"), 16 * sizeof(TCHAR));
-
-    memset(&ofn, 0, sizeof(ofn));
-    ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner = hMainWnd;
-    ofn.lpstrFilter = szFilter;
-    ofn.lpstrFile = szChoice;
-    ofn.nMaxFile = sizeof(szChoice) / sizeof(TCHAR);
-    ofn.lpstrInitialDir = _T(".");
-    ofn.Flags = OFN_NOCHANGEDIR | OFN_HIDEREADONLY;
-    ofn.lpstrDefExt = _T("dat");
-    ofn.lpstrTitle = szTitle;
-    ofn.Flags |= OFN_OVERWRITEPROMPT;
-
-    if (GetSaveFileName(&ofn) == 0)
-        return -1;
-
-    return create_datfile(szChoice, bType);
-}
-
 // Returns true if a VidInit is needed when the window is resized
 static bool VidInitNeeded()
 {
@@ -1398,14 +1363,7 @@ static void OnCommand(HWND /*hDlg*/, int id, HWND /*hwndCtl*/, UINT codeNotify)
         nAppThreadPriority = THREAD_PRIORITY_LOWEST;
         SetThreadPriority(GetCurrentThread(), nAppThreadPriority);
         break;
-
-    case MENU_CLRMAME_PRO_XML:
-        if (UseDialogs())
-        {
-            CreateDatfileWindows(DAT_ARCADE_ONLY);
-        }
-        break;
-
+		
     case MENU_ENABLECHEAT:
         AudBlankSound();
         InputSetCooperativeLevel(false, bAlwaysProcessKeyboardInput);
@@ -1747,6 +1705,17 @@ static void OnEnterIdle(HWND /*hwnd*/, UINT /*source*/, HWND /*hwndSource*/)
     }
 }
 
+static void OnEnterMenuLoop(HWND, BOOL)
+{
+    InputSetCooperativeLevel(false, bAlwaysProcessKeyboardInput);
+    AudBlankSound();
+}
+
+static void OnExitMenuLoop(HWND, BOOL)
+{
+    GameInpCheckMouse();
+}
+
 static LRESULT CALLBACK ScrnProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
     switch (Msg)
@@ -1757,7 +1726,6 @@ static LRESULT CALLBACK ScrnProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPar
         HANDLE_MSG(hWnd, WM_CLOSE,			OnClose);
         HANDLE_MSG(hWnd, WM_DESTROY,		OnDestroy);
         HANDLE_MSG(hWnd, WM_COMMAND,		OnCommand);
-
     // We can't use the macro from windowsx.h macro for this one
     case WM_SYSCOMMAND:
     {
@@ -1777,18 +1745,14 @@ static LRESULT CALLBACK ScrnProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPar
         break;
     }
 	// - dink - end
-	case WM_ENTERMENULOOP:
-		bRunPause++;
-		break;
-	case WM_EXITMENULOOP:
-		bRunPause--;
-		break;
     HANDLE_MSG(hWnd, WM_SIZE,			OnSize);
     HANDLE_MSG(hWnd, WM_ENTERSIZEMOVE,	OnEnterSizeMove);
     HANDLE_MSG(hWnd, WM_EXITSIZEMOVE,	OnExitSizeMove);
     HANDLE_MSG(hWnd, WM_ENTERIDLE,		OnEnterIdle);
     HANDLE_MSG(hWnd, WM_LBUTTONDBLCLK,	OnLButtonDblClk);
     HANDLE_MSG(hWnd, WM_DISPLAYCHANGE,	OnDisplayChange);
+	HANDLE_MSG(hWnd, WM_ENTERMENULOOP,	OnEnterMenuLoop);
+    HANDLE_MSGB(hWnd, WM_EXITMENULOOP,	OnExitMenuLoop);
     }
 
     return DefWindowProc(hWnd, Msg, wParam, lParam);

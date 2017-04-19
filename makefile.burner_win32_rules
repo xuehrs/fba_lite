@@ -7,7 +7,7 @@ depobj	+= 	about.o bzip.o cona.o debugger.o drv.o fba_kaillera.o inpc.o \
 			media.o memcard.o menu.o misc_win32.o numdial.o numpluscommas.o popup_win32.o \
 			progress.o res.o roms.o run.o scrn.o sel.o stated.o systeminfo.o wave.o \
 			\
-			conc.o cong.o dat.o gamc.o gami.o ioapi.o misc.o state.o statec.o unzip.o zipfn.o \
+			conc.o cong.o gamc.o gami.o ioapi.o misc.o state.o statec.o unzip.o zipfn.o \
 			\
 			adler32.o compress.o crc32.o deflate.o gzclose.o gzlib.o gzread.o gzwrite.o infback.o inffast.o inflate.o inftrees.o \
 			trees.o uncompr.o zutil.o \

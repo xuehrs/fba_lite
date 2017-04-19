@@ -122,7 +122,7 @@ depobj	+=	resource.o \
 autdep	= $(depobj:.o=.d)
 
 ifdef	BUILD_A68K
-a68k.o	= $(objdir)cpu/a68k/a68k.o
+a68k.o	= $(objdir)burn/cpu/a68k/a68k.o
 endif
 
 app_gnuc.rc = $(srcdir)dep/generated/app_gnuc.rc
@@ -137,7 +137,7 @@ psikyo_tile_func.h = $(srcdir)dep/generated/psikyo_tile_func.h
 pgm_sprite.h = $(srcdir)dep/generated/pgm_sprite.h
 build_details.h = $(srcdir)dep/generated/build_details.h
 
-allobj	= $(objdir)cpu/m68k/m68kcpu.o $(objdir)cpu/m68k/m68kops.o \
+allobj	= $(objdir)burn/cpu/m68k/m68kcpu.o $(objdir)burn/cpu/m68k/m68kops.o \
 	  $(foreach file,$(autobj:.o=.c), \
 		$(foreach dir,$(alldir),$(subst $(srcdir),$(objdir), \
 		$(firstword $(subst .c,.o,$(wildcard $(srcdir)$(dir)/$(file))))))) \
@@ -445,6 +445,9 @@ all:	$(NAME).exe
 
 endif
 
+
+burnobj = $(find $(objdir)burn/ -name '*.o')
+
 #
 #
 #	Rule for linking the executable
@@ -455,9 +458,10 @@ ifeq ($(MAKELEVEL),2)
 
 $(NAME).exe:	$(allobj)
 	@echo
+	@echo $(burnobj)
 	@echo Linking executable... $(NAME).exe
 	@$(LD) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(lib)
-
+	
 ifdef	DEBUG
 
 #	Don't compress when making a debug build
@@ -567,32 +571,32 @@ endif
 
 # Musashi
 
-$(objdir)cpu/m68k/m68kcpu.o: $(srcdir)cpu/m68k/m68kcpu.c $(objdir)dep/generated/m68kops.h $(srcdir)cpu/m68k/m68k.h $(srcdir)cpu/m68k/m68kconf.h
+$(objdir)burn/cpu/m68k/m68kcpu.o: $(srcdir)burn/cpu/m68k/m68kcpu.c $(objdir)dep/generated/m68kops.h $(srcdir)burn/cpu/m68k/m68k.h $(srcdir)burn/cpu/m68k/m68kconf.h
 	@echo Compiling Musashi MC680x0 core \(m68kcpu.c\)...
-	@$(CC) $(CFLAGS) -c $(srcdir)cpu/m68k/m68kcpu.c -o $(objdir)cpu/m68k/m68kcpu.o
+	@$(CC) $(CFLAGS) -c $(srcdir)burn/cpu/m68k/m68kcpu.c -o $(objdir)burn/cpu/m68k/m68kcpu.o
 
-$(objdir)cpu/m68k/m68kops.o: $(objdir)cpu/m68k/m68kmake.exe $(objdir)dep/generated/m68kops.h $(objdir)dep/generated/m68kops.c $(srcdir)cpu/m68k/m68k.h $(srcdir)cpu/m68k/m68kconf.h
+$(objdir)burn/cpu/m68k/m68kops.o: $(objdir)burn/cpu/m68k/m68kmake.exe $(objdir)dep/generated/m68kops.h $(objdir)dep/generated/m68kops.c $(srcdir)burn/cpu/m68k/m68k.h $(srcdir)burn/cpu/m68k/m68kconf.h
 	@echo Compiling Musashi MC680x0 core \(m68kops.c\)...
-	@$(CC) $(CFLAGS) -c $(objdir)dep/generated/m68kops.c -o $(objdir)cpu/m68k/m68kops.o
+	@$(CC) $(CFLAGS) -c $(objdir)dep/generated/m68kops.c -o $(objdir)burn/cpu/m68k/m68kops.o
 
-$(objdir)cpu/m68k/m68kopac.o: $(objdir)cpu/m68k/m68kmake.exe $(objdir)dep/generated/m68kops.h $(objdir)dep/generated/m68kopac.c $(srcdir)cpu/m68k/m68k.h $(srcdir)cpu/m68k/m68kconf.h
+$(objdir)burn/cpu/m68k/m68kopac.o: $(objdir)burn/cpu/m68k/m68kmake.exe $(objdir)dep/generated/m68kops.h $(objdir)dep/generated/m68kopac.c $(srcdir)burn/cpu/m68k/m68k.h $(srcdir)burn/cpu/m68k/m68kconf.h
 	@echo Compiling Musashi MC680x0 core \(m68kopac.c\)...
-	@$(CC) $(CFLAGS) -c $(objdir)dep/generated/m68kopac.c -o $(objdir)cpu/m68k/m68kopac.o
+	@$(CC) $(CFLAGS) -c $(objdir)dep/generated/m68kopac.c -o $(objdir)burn/cpu/m68k/m68kopac.o
 
-$(objdir)cpu/m68k/m68kopdm.o: $(objdir)cpu/m68k/m68kmake.exe $(objdir)dep/generated/m68kops.h $(objdir)dep/generated/m68kopdm.c $(srcdir)cpu/m68k/m68k.h $(srcdir)cpu/m68k/m68kconf.h
+$(objdir)burn/cpu/m68k/m68kopdm.o: $(objdir)burn/cpu/m68k/m68kmake.exe $(objdir)dep/generated/m68kops.h $(objdir)dep/generated/m68kopdm.c $(srcdir)burn/cpu/m68k/m68k.h $(srcdir)burn/cpu/m68k/m68kconf.h
 	@echo Compiling Musashi MC680x0 core \(m68kopdm.c\)...
-	@$(CC) $(CFLAGS) -c $(objdir)dep/generated/m68kopdm.c -o $(objdir)cpu/m68k/m68kopdm.o
+	@$(CC) $(CFLAGS) -c $(objdir)dep/generated/m68kopdm.c -o $(objdir)burn/cpu/m68k/m68kopdm.o
 
-$(objdir)cpu/m68k/m68kopnz.o: $(objdir)cpu/m68k/m68kmake.exe $(objdir)dep/generated/m68kops.h $(objdir)dep/generated/m68kopnz.c $(srcdir)cpu/m68k/m68k.h $(srcdir)cpu/m68k/m68kconf.h
+$(objdir)burn/cpu/m68k/m68kopnz.o: $(objdir)burn/cpu/m68k/m68kmake.exe $(objdir)dep/generated/m68kops.h $(objdir)dep/generated/m68kopnz.c $(srcdir)burn/cpu/m68k/m68k.h $(srcdir)burn/cpu/m68k/m68kconf.h
 	@echo Compiling Musashi MC680x0 core \(m68kopnz.c\)...
-	@$(CC) $(CFLAGS) -c $(objdir)dep/generated/m68kopnz.c -o $(objdir)cpu/m68k/m68kopnz.o
+	@$(CC) $(CFLAGS) -c $(objdir)dep/generated/m68kopnz.c -o $(objdir)burn/cpu/m68k/m68kopnz.o
 
-$(objdir)dep/generated/m68kops.h: $(objdir)cpu/m68k/m68kmake.exe $(srcdir)cpu/m68k/m68k_in.c
-	$(objdir)/cpu/m68k/m68kmake $(objdir)dep/generated/ $(srcdir)cpu/m68k/m68k_in.c
+$(objdir)dep/generated/m68kops.h: $(objdir)burn/cpu/m68k/m68kmake.exe $(srcdir)burn/cpu/m68k/m68k_in.c
+	$(objdir)burn/cpu/m68k/m68kmake $(objdir)dep/generated/ $(srcdir)burn/cpu/m68k/m68k_in.c
 
-$(objdir)cpu/m68k/m68kmake.exe: $(srcdir)cpu/m68k/m68kmake.c
+$(objdir)burn/cpu/m68k/m68kmake.exe: $(srcdir)burn/cpu/m68k/m68kmake.c
 	@echo Compiling Musashi MC680x0 core \(m68kmake.c\)...
-	@$(CC) $(CFLAGS) $(srcdir)cpu/m68k/m68kmake.c -o $(objdir)cpu/m68k/m68kmake.exe
+	@$(CC) $(CFLAGS) $(srcdir)burn/cpu/m68k/m68kmake.c -o $(objdir)burn/cpu/m68k/m68kmake.exe
 
 
 #
